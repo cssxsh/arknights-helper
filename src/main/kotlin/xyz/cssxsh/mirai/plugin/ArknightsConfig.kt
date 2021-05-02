@@ -8,7 +8,8 @@ val RESOURCES: ResourceMap = mapOf(
     GameDataType.EXCEL to setOf(
         CHARACTER,
         GACHA,
-        HANDBOOK
+        HANDBOOK,
+        CONST
     )
 )
 
@@ -18,6 +19,6 @@ internal val gacha by lazy { data.readGachaTable() }
 
 internal val handbook by lazy { data.readHandbookTable() }
 
-internal val handbook by lazy { data.handbook() }
+internal val const by lazy { data.readConstInfo() }
 
 val POOL_USE_COIN = 600
