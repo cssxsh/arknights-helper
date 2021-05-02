@@ -1,13 +1,12 @@
 package xyz.cssxsh.mirai.plugin
 
+import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.command.CommandSenderOnMessage
-import net.mamoe.mirai.contact.Contact
-import net.mamoe.mirai.message.data.Message
+import net.mamoe.mirai.contact.*
+import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
-import net.mamoe.mirai.message.data.buildMessageChain
+import net.mamoe.mirai.utils.*
 import xyz.cssxsh.arknights.excel.*
-import xyz.cssxsh.mirai.plugin.data.ArknightsUserData
-import xyz.cssxsh.mirai.plugin.data.delegate
 
 internal val logger get() = ArknightsHelperPlugin.logger
 
@@ -19,23 +18,10 @@ suspend fun CommandSenderOnMessage<*>.sendMessage(block: suspend (Contact) -> Me
     }.onSuccess {
         sendMessage(fromEvent.message.quote() + it)
     }.onFailure {
+        logger.warning({ "对${fromEvent.subject}构建消息失败" }, it)
         sendMessage(fromEvent.message.quote() + it.toString())
     }.isSuccess
 }
-
-suspend fun CommandSenderOnMessage<*>.sendString(block: suspend (Contact) -> String): Boolean {
-    return runCatching {
-        block(fromEvent.subject)
-    }.onSuccess {
-        sendMessage(fromEvent.message.quote() + it)
-    }.onFailure {
-        sendMessage(fromEvent.message.quote() + it.toString())
-    }.isSuccess
-}
-
-var CommandSenderOnMessage<*>.coin: Int by ArknightsUserData.delegate()
-
-var CommandSenderOnMessage<*>.reason: Int by ArknightsUserData.delegate()
 
 internal fun Array<out String>.check(tags: Set<String> = gacha.tags()) = map { word ->
     val temp = tags.map { it.substring(0..1) }
@@ -75,14 +61,14 @@ fun RecruitMap.getContent() = buildMessageChain {
     }
 }
 
-val obtain = character.values.rarities(2..5).obtain("招募寻访")
-
-val normal: PoolData = listOf(
-    obtain.rarities(5) to 0.02,
-    obtain.rarities(4) to 0.08,
-    obtain.rarities(3) to 0.48,
-    obtain.rarities(2) to 0.42
-)
-
-val bug: PoolData = listOf(character.values.toSet() to 1.00)
-
+@Suppress("FunctionName")
+fun UserOrNull(id: Long): User? {
+    Bot.instances.forEach { bot ->
+        bot.getFriend(id)?.let { return@UserOrNull it }
+        bot.getStranger(id)?.let { return@UserOrNull it }
+        bot.groups.forEach { group ->
+            group.getMember(id)?.let { return@UserOrNull it }
+        }
+    }
+    return null
+}

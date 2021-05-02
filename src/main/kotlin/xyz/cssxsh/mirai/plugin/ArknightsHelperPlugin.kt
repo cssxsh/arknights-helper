@@ -1,5 +1,6 @@
 package xyz.cssxsh.mirai.plugin
 
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
@@ -9,7 +10,7 @@ import net.mamoe.mirai.utils.info
 import net.mamoe.mirai.utils.warning
 import xyz.cssxsh.arknights.download
 import xyz.cssxsh.mirai.plugin.command.*
-import xyz.cssxsh.mirai.plugin.data.ArknightsUserData
+import xyz.cssxsh.mirai.plugin.data.*
 import kotlin.time.*
 
 object ArknightsHelperPlugin : KotlinPlugin(
@@ -23,6 +24,8 @@ object ArknightsHelperPlugin : KotlinPlugin(
     override val autoSaveIntervalMillis: LongRange
         get() = (3).minutes.toLongMilliseconds()..(10).minutes.toLongMilliseconds()
 
+    private lateinit var clock: Job
+
     @ConsoleExperimentalApi
     override fun onEnable() {
         launch {
@@ -35,13 +38,20 @@ object ArknightsHelperPlugin : KotlinPlugin(
             }
         }
         ArknightsUserData.reload()
+        ArknightsPoolData.reload()
         ArknightsRecruitCommand.register()
         ArknightsGachaCommand.register()
+        ArknightsPlayerCommand.register()
+
+        clock = clock()
     }
 
     @ConsoleExperimentalApi
     override fun onDisable() {
         ArknightsRecruitCommand.unregister()
         ArknightsGachaCommand.unregister()
+        ArknightsPlayerCommand.unregister()
+
+        clock.cancel()
     }
 }

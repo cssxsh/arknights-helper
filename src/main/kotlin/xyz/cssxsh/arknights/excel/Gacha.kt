@@ -68,16 +68,67 @@ typealias PoolData = List<Pair<Set<Character>, Double>>
 
 private const val CAPACITY = 1000
 
+private fun check(prob: Collection<Double>) {
+    check(prob.sumOf { (it * CAPACITY).toInt() } in (CAPACITY - 3 .. CAPACITY + 3)) { "${prob}概率和不满足100%" }
+}
+
 /**
  * 抽卡
  */
-fun gacha(pool: List<Pair<Set<Character>, Double>>): Character {
+fun gacha(pool: PoolData): Character {
+    check(pool.map { it.second })
     val temp = (1..CAPACITY).toMutableList()
     val balls = pool.map { (set, prob) ->
         set to (1..(prob * CAPACITY).toInt()).map { temp.random().also { temp.remove(it) } }
     }
-    val random = (1..CAPACITY).random()
-    return balls.first {  (_, ball) -> random in ball }.first.random()
+    val random = ((1..CAPACITY) - temp).random()
+    return balls.first { (_, ball) -> random in ball }.first.random()
+}
+
+val BUILD_POOL_LINE = """\s*([^|]+(\s*[|]\s*[^|]+)*)\s*:\s*(0\.\d+)\s*""".toRegex()
+
+/**
+ *  使用 几个 * 值表示几星干员，
+ *  多干员使用 | 隔开，
+ *  干员和概率用: 隔开，
+ *  规则用 换行符 或 ; 隔开
+ *  注释#开头
+ *  @see BUILD_POOL_LINE
+ */
+fun Collection<Character>.pool(rule: String): PoolData = pool(rule.split("\r\n", "\n", "\r", ";"))
+
+/**
+ *  使用 几个 * 值表示几星干员，
+ *  多干员使用 | 隔开，
+ *  干员和概率用: 隔开
+ *  注释#开头
+ *  @see BUILD_POOL_LINE
+ */
+fun Collection<Character>.pool(rule: Collection<String>): PoolData {
+    check(rule.all { it.matches(BUILD_POOL_LINE) || it.startsWith("#") }) { "rule: $rule" }
+    val map = rule.filter { it.matches(BUILD_POOL_LINE) }.associate { line ->
+        line.split(':').let { (a, b) ->
+            a.trim() to b.trim().toDouble()
+        }
+    }
+    check(map.values)
+    val other = map.entries.find { it.key == "other" }?.value
+    val set = mutableSetOf<Character>()
+    return map.entries.filter { it.key != "other" }.sortedByDescending { it.key }.map { (key, prob) ->
+        if (key.contains('*')) {
+            rarities(key.count { it == '*' } - 1) - set
+        } else {
+            names(key.split('|').map { it.trim() }).also {
+                set.addAll(it)
+            }
+        } to prob
+    }.let { list ->
+        if (other == null) {
+            list
+        } else {
+            list + ((this - list.flatMap { it.first }).toSet() to other)
+        }
+    }
 }
 
 @Serializable
@@ -163,19 +214,21 @@ data class GachaPool(
     private val LMTGSID: String?
 )
 
-enum class GachaPoolRule {
+enum class GachaPoolRule(vararg lines: String) {
     /**
      * 正常
      */
-    NORMAL,
+    NORMAL("******:0.02", "*****:0.08", "****:0.48", "***:0.42"),
 
     /**
      * 限定
      */
-    LIMITED,
+    LIMITED(""),
 
     /**
      * 联动
      */
-    LINKAGE
+    LINKAGE("");
+
+    val rule = "#${name};" + lines.joinToString(";")
 }
