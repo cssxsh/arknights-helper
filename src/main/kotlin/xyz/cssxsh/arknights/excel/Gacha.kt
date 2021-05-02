@@ -9,7 +9,7 @@ import java.time.OffsetDateTime
 
 const val GACHA = "gacha_table.json"
 
-fun File.gacha(): GachaTable = read(name = GACHA, type = GameDataType.EXCEL)
+fun File.readGachaTable(): GachaTable = read(name = GACHA, type = GameDataType.EXCEL)
 
 /**
  * 获取公招干员

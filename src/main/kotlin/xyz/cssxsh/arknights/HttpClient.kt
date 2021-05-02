@@ -81,5 +81,4 @@ object TimestampSerializer : KSerializer<OffsetDateTime> {
     override fun serialize(encoder: Encoder, value: OffsetDateTime) {
         encoder.encodeLong(value.toEpochSecond())
     }
-
 }
