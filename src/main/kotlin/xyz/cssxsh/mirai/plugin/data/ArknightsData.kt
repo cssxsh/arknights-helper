@@ -9,20 +9,44 @@ import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
+/**
+ * 合成玉数量
+ */
 var CommandSenderOnMessage<*>.coin: Int by ArknightsUserData.sender()
 
+/**
+ * 玩家等级
+ */
 var CommandSenderOnMessage<*>.level: Int by ArknightsUserData.sender()
 
+/**
+ * 玩家理智恢复时间
+ */
 var CommandSenderOnMessage<*>.reason: Long by ArknightsUserData.sender()
 
+/**
+ * 玩家公招到达时间
+ */
 var CommandSenderOnMessage<*>.recruit: Map<Int, Long> by ArknightsUserData.sender()
 
+/**
+ * 玩家理智最大值
+ */
 val CommandSenderOnMessage<*>.max: Int by ReadOnlyProperty { that, _ -> const.playerApMap[that.level - 1] }
 
+/**
+ * 当前卡池
+ */
 var CommandSenderOnMessage<*>.pool: String by ArknightsPoolData.subject()
 
+/**
+ * 当前卡池规则
+ */
 val CommandSenderOnMessage<*>.rule: String by ReadOnlyProperty { that, _ -> ArknightsPoolData.rules[that.pool] }
 
+/**
+ * 卡池规则MAP
+ */
 internal val rules get() = ArknightsPoolData.rules
 
 object ArknightsUserData : AutoSavePluginData("user") {

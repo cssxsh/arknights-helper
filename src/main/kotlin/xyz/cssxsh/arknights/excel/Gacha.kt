@@ -42,7 +42,7 @@ fun Collection<RecruitResult>.sum(): RecruitResult = buildMap {
 }
 
 /**
- * XXX
+ * 列出公招结果
  */
 fun CharacterTable.recruit(words: Set<String>, recruit: Set<String> = name()): RecruitMap {
     check(words.size in 1..5) { "词条数量不对" }
