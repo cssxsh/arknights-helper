@@ -12,9 +12,11 @@ val RESOURCES: ResourceMap = mapOf(
     )
 )
 
-internal val character by lazy { data.character() }
+internal val character by lazy { data.readCharacterTable() }
 
-internal val gacha by lazy { data.gacha() }
+internal val gacha by lazy { data.readGachaTable() }
+
+internal val handbook by lazy { data.readHandbookTable() }
 
 internal val handbook by lazy { data.handbook() }
 

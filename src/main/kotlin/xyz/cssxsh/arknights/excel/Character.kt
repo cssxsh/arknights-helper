@@ -8,7 +8,7 @@ import java.io.File
 
 const val CHARACTER = "character_table.json"
 
-fun File.character(): CharacterTable = read(name = CHARACTER, type = GameDataType.EXCEL)
+fun File.readCharacterTable(): CharacterTable = read(name = CHARACTER, type = GameDataType.EXCEL)
 
 typealias CharacterTable = Map<String, Character>
 

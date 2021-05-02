@@ -8,7 +8,7 @@ import java.io.File
 
 const val HANDBOOK = "handbook_info_table.json"
 
-fun File.handbook(): HandbookTable = read(name = HANDBOOK, type = GameDataType.EXCEL)
+fun File.readHandbookTable(): HandbookTable = read(name = HANDBOOK, type = GameDataType.EXCEL)
 
 fun HandbookTable.sex() = character.values.groupBy { "【性别】男" in it.storyTextAudio.toString() }
 

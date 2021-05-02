@@ -5,11 +5,11 @@ import xyz.cssxsh.arknights.excel.*
 
 internal class ExcelKtTest : JsonTest {
 
-    private val character by lazy { dir.character() }
+    private val character by lazy { dir.readCharacterTable() }
 
-    private val gacha by lazy { dir.gacha() }
+    private val gacha by lazy { dir.readGachaTable() }
 
-    private val handbook by lazy { dir.handbook() }
+    private val handbook by lazy { dir.readHandbookTable() }
 
     @Test
     fun character() {
