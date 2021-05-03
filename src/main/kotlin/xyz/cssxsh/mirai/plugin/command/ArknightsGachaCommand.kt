@@ -42,7 +42,6 @@ object ArknightsGachaCommand : CompositeCommand(
     @SubCommand("detail", "详情")
     @Description("查看卡池详情")
     suspend fun CommandSenderOnMessage<*>.detail() = sendMessage {
-        check(name in rules) { "卡池不存在" }
         rules.entries.joinToString("\n") { (name, rule) ->
             "===> [${name}]" + rule.split(';').joinToString("\n")
         }.toPlainText()
