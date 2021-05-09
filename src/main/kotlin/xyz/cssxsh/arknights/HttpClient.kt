@@ -53,7 +53,7 @@ private fun client() = HttpClient(OkHttp) {
     }
 }
 
-private val DEFAULT_IGNORE: (exception: Throwable) -> Boolean = { it is IOException }
+private val DEFAULT_IGNORE: (exception: Throwable) -> Boolean = { it is IOException || it is HttpRequestTimeoutException }
 
 internal suspend fun <T> useHttpClient(
     ignore: (exception: Throwable) -> Boolean = DEFAULT_IGNORE,
@@ -70,12 +70,14 @@ internal suspend fun <T> useHttpClient(
     result
 }
 
+internal fun timestamp(value: Long) = OffsetDateTime.ofInstant(Instant.ofEpochSecond(value), SERVER_ZONE)
+
 object TimestampSerializer : KSerializer<OffsetDateTime> {
     override val descriptor: SerialDescriptor
         get() = buildSerialDescriptor(OffsetDateTime::class.qualifiedName!!, PrimitiveKind.LONG)
 
     override fun deserialize(decoder: Decoder): OffsetDateTime {
-        return OffsetDateTime.ofInstant(Instant.ofEpochSecond(decoder.decodeLong()), SERVER_ZONE)
+        return timestamp(decoder.decodeLong())
     }
 
     override fun serialize(encoder: Encoder, value: OffsetDateTime) {

@@ -6,20 +6,38 @@ import kotlinx.serialization.json.JsonObject
 import xyz.cssxsh.arknights.*
 import java.io.File
 
-const val HANDBOOK = "handbook_info_table.json"
+fun File.readHandbookTable(): HandbookTable = read(type = ExcelDataType.HANDBOOK)
 
-fun File.readHandbookTable(): HandbookTable = read(name = HANDBOOK, type = GameDataType.EXCEL)
+fun HandbookMap(book: HandbookTable, characters: CharacterTable): HandbookMap {
+    return book.handbooks.mapNotNull { (id, info) ->
+        characters[id]?.let { it.name to info }
+    }.toMap()
+}
 
-fun HandbookTable.sex() = character.values.groupBy { "【性别】男" in it.storyTextAudio.toString() }
+typealias HandbookMap = Map<String, Handbook>
+
+private val TagRegex = """(?<=【|\[)(.+)(?:]|】)(.+)""".toRegex()
+
+fun Handbook.infos(): Map<String, String> {
+    return stories.values.flatten().flatMap { text ->
+        TagRegex.findAll(text).map { result ->
+            result.destructured.let { (key, value) -> key to value.trim()  }
+        }
+    }.toMap()
+}
+
+val Handbook.stories get() = storyTextAudio.associate { info -> info.title to info.stories.map { it.text } }
+
+fun HandbookMap.tags() = entries.fold(emptySet<String>()) { acc, (_, handbook) -> acc + handbook.infos().keys }
 
 @Serializable
 data class HandbookTable(
     @SerialName("handbookDict")
-    val character: Map<String, CharacterInfo>,
+    val handbooks: HandbookMap,
     @SerialName("npcDict")
     val npc: Map<String, NpcInfo>,
     @SerialName("teamMissionList")
-    val team: Map<String, TeamInfo>,
+    val teams: Map<String, TeamInfo>,
     @SerialName("handbookDisplayConditionList")
     private val handbookDisplayConditionList: JsonObject,
     @SerialName("handbookStageData")
@@ -27,89 +45,79 @@ data class HandbookTable(
 )
 
 @Serializable
-data class CharacterInfo(
+data class Handbook(
     @SerialName("charID")
-    val character: String,
+    override val character: String,
     @SerialName("drawName")
-    val illust: String,
+    override val illust: String,
     @SerialName("handbookAvgList")
     private val handbookAvgList: List<JsonObject>,
     @SerialName("infoName")
-    val cv: String,
+    override val voice: String,
     @SerialName("storyTextAudio")
     val storyTextAudio: List<StoryTextAudio>
-) {
-    @Serializable
-    data class StoryTextAudio(
-        @SerialName("stories")
-        val stories: List<Story>,
-        @SerialName("storyTitle")
-        val storyTitle: String,
-        @SerialName("unLockorNot")
-        val unLockOrNot: Boolean
-    ) {
-        @Serializable
-        data class Story(
-            @SerialName("storyText")
-            val storyText: String,
-            @SerialName("unLockParam")
-            val unLockParam: String,
-            @SerialName("unLockString")
-            val unLockString: String,
-            @SerialName("unLockType")
-            val unLockType: Int
-        )
-    }
-}
+) : Illust, Voice, CharacterId
+
+@Serializable
+data class StoryTextAudio(
+    @SerialName("stories")
+    val stories: List<HandbookStory>,
+    @SerialName("storyTitle")
+    val title: String,
+    @SerialName("unLockorNot")
+    val unLockOrNot: Boolean
+)
+
+@Serializable
+data class HandbookStory(
+    @SerialName("storyText")
+    val text: String,
+    @SerialName("unLockParam")
+    val unLockParam: String,
+    @SerialName("unLockString")
+    val unLockString: String,
+    @SerialName("unLockType")
+    val unLockType: Int
+)
 
 @Serializable
 data class NpcInfo(
     @SerialName("appellation")
-    val appellation: String,
+    override val appellation: String,
     @SerialName("cv")
-    val cv: String,
+    override val voice: String,
     @SerialName("displayNumber")
-    val displayNumber: String,
+    override val displayNumber: String,
     @SerialName("groupId")
-    val group: String?,
+    override val group: String?,
     @SerialName("illust")
-    val illust: String,
+    override val illust: String,
     @SerialName("name")
-    val name: String,
+    override val name: String,
     @SerialName("nationId")
-    val nation: String?,
+    override val nation: String?,
     @SerialName("npcId")
-    val npc: String,
+    override val id: String,
     @SerialName("profession")
-    val profession: String,
+    val profession: String,// XXX
     @SerialName("teamId")
-    val team: String?,
+    override val team: String?,
     @SerialName("unlockDict")
     val unlockDict: Map<String, JsonObject>
-)
+) : Illust, Voice, Role, Id
 
 @Serializable
 data class TeamInfo(
     @SerialName("favorPoint")
     val favorPoint: Int,
     @SerialName("id")
-    val id: String,
+    override val id: String,
     @SerialName("item")
-    val item: Item,
+    val item: LegacyItem,
     @SerialName("powerId")
-    val powerId: String,
+    val powerId: String, // XXX
     @SerialName("powerName")
     val powerName: String,
     @SerialName("sort")
     val sort: Int
-) {
-    @Serializable
-    data class Item(
-        @SerialName("count")
-        val count: Int,
-        @SerialName("id")
-        val id: String,
-        @SerialName("type")
-        val type: String
-    )
-}
+) : Id

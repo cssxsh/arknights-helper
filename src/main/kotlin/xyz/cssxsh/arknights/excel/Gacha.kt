@@ -7,15 +7,13 @@ import xyz.cssxsh.arknights.*
 import java.io.File
 import java.time.OffsetDateTime
 
-const val GACHA = "gacha_table.json"
-
-fun File.readGachaTable(): GachaTable = read(name = GACHA, type = GameDataType.EXCEL)
+fun File.readGachaTable(): GachaTable = read(type = ExcelDataType.GACHA)
 
 /**
  * 获取公招干员
  */
 fun GachaTable.recruit(): Set<String> {
-    return recruitDetail.removeSign().lines().flatMap { line ->
+    return recruitDetail.remove(SIGN).lines().flatMap { line ->
         if (line.startsWith("★")) {
             line.substringAfterLast("""\n""").split("/").map { it.trim() }
         } else {
@@ -33,18 +31,12 @@ typealias RecruitResult = Map<Int, List<Character>>
 
 typealias RecruitMap = Map<Set<String>, RecruitResult>
 
-fun Collection<RecruitResult>.sum(): RecruitResult = buildMap {
-    this@sum.forEach {
-        it.forEach { (t, u) ->
-            this[t] = this[t].orEmpty() + u
-        }
-    }
-}
+fun Collection<Character>.toRecruitResult() = groupBy { it.rarity }.toSortedMap()
 
 /**
  * 列出公招结果
  */
-fun CharacterTable.recruit(words: Set<String>, recruit: Set<String> = name()): RecruitMap {
+fun CharacterMap.recruit(words: Set<String>, recruit: Set<String> = name()): RecruitMap {
     check(words.size in 1..5) { "词条数量不对" }
     val site = minOf(3, words.size)
     val obtain = values.names(recruit)
@@ -68,7 +60,10 @@ typealias PoolData = List<Pair<Set<Character>, Double>>
 
 private const val CAPACITY = 1000
 
-private fun check(prob: Collection<Double>) {
+/**
+ * 检查概率和
+ */
+private fun one(prob: Collection<Double>) {
     check(prob.sumOf { (it * CAPACITY).toInt() } in (CAPACITY - 3 .. CAPACITY + 3)) { "${prob}概率和不满足100%" }
 }
 
@@ -76,7 +71,7 @@ private fun check(prob: Collection<Double>) {
  * 抽卡
  */
 fun gacha(pool: PoolData): Character {
-    check(pool.map { it.second })
+    one(pool.map { it.second })
     val temp = (1..CAPACITY).toMutableList()
     val balls = pool.map { (set, prob) ->
         set to (1..(prob * CAPACITY).toInt()).map { temp.random().also { temp.remove(it) } }
@@ -111,10 +106,10 @@ fun Collection<Character>.pool(rule: Collection<String>): PoolData {
             a.trim() to b.trim().toDouble()
         }
     }
-    check(map.values)
+    one(map.values)
     val other = map.entries.find { it.key == "other" }?.value
     val set = mutableSetOf<Character>()
-    return map.entries.filter { it.key != "other" }.sortedByDescending { it.key }.map { (key, prob) ->
+    return (map - "other").entries.sortedByDescending { it.key }.map { (key, prob) ->
         if (key.contains('*')) {
             rarities(key.count { it == '*' } - 1) - set
         } else {
@@ -184,16 +179,16 @@ data class GachaPool(
     val detail: String?,
     @SerialName("endTime")
     @Serializable(TimestampSerializer::class)
-    val end: OffsetDateTime,
+    override val end: OffsetDateTime,
     @SerialName("gachaPoolId")
-    val id: String,
+    override val id: String,
     @SerialName("gachaIndex")
     val index: Int,
     @SerialName("gachaPoolName")
-    val name: String,
+    override val name: String,
     @SerialName("openTime")
     @Serializable(TimestampSerializer::class)
-    val open: OffsetDateTime,
+    override val start: OffsetDateTime,
     @SerialName("gachaRuleType")
     val rule: GachaPoolRule,
     @SerialName("gachaPoolSummary")
@@ -212,7 +207,7 @@ data class GachaPool(
     private val CDSecColor: String?,
     @SerialName("LMTGSID")
     private val LMTGSID: String?
-)
+): Id, Name, Period
 
 enum class GachaPoolRule(vararg lines: String) {
     /**

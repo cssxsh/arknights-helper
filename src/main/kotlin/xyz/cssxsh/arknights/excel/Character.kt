@@ -6,11 +6,13 @@ import kotlinx.serialization.json.JsonObject
 import xyz.cssxsh.arknights.*
 import java.io.File
 
-const val CHARACTER = "character_table.json"
-
-fun File.readCharacterTable(): CharacterTable = read(name = CHARACTER, type = GameDataType.EXCEL)
+fun File.readCharacterTable(): CharacterTable = read(type = ExcelDataType.CHARACTER)
 
 typealias CharacterTable = Map<String, Character>
+
+typealias CharacterMap = Map<String, Character>
+
+fun CharacterMap(table: CharacterTable): CharacterMap = table.values.associateBy { it.name }
 
 /**
  * @see Character.group
@@ -82,7 +84,6 @@ fun Collection<Character>.rarities(vararg levels: Int) = filter { it.rarity in l
  */
 fun Collection<Character>.rarities(levels: Collection<Int>) = filter { it.rarity in levels }.toSet()
 
-
 /**
  * @see Character.tags
  */
@@ -104,7 +105,7 @@ fun Collection<Character>.names(vararg names: String) = filter { it.name in name
 fun Collection<Character>.names(names: Collection<String>) = filter { it.name in names }.toSet()
 
 /**
- * XXX
+ * 按照招募TAG过滤干员
  */
 fun Collection<Character>.filter(word: String): Set<Character> {
     return when (word) {
@@ -126,9 +127,21 @@ fun Collection<Character>.filter(word: String): Set<Character> {
 }
 
 /**
- * XXX
+ * 所有干员名字
  */
 fun CharacterTable.name() = values.map { it.name }.toSet()
+
+/**
+ * 干员全部天赋
+ */
+fun Character.talents() = talents.orEmpty().flatMap { talent ->
+    talent.candidates.orEmpty().mapNotNull { it.name?.trim() }.toSet()
+}
+
+/**
+ * 星级
+ */
+val Character.star get() = (0..rarity).map { '*' }.toString()
 
 @Serializable
 data class Character(
@@ -136,7 +149,7 @@ data class Character(
      * 程序中名称
      */
     @SerialName("appellation")
-    val appellation: String,
+    override val appellation: String,
     /**
      * 能否使用通用信物
      */
@@ -151,12 +164,12 @@ data class Character(
      * 代号
      */
     @SerialName("displayNumber")
-    val displayNumber: String?,
+    override val displayNumber: String?,
     /**
      * 势力 [blacksteel, karlan, sweep, rhine, penguin, lgd, glasgow, abyssal, siesta, babel, elite, sui]
      */
     @SerialName("groupId")
-    val group: String?,
+    override val group: String?,
     /**
      * 是否为不可获得
      */
@@ -191,12 +204,12 @@ data class Character(
      * 名称
      */
     @SerialName("name")
-    val name: String,
+    override val name: String,
     /**
      * 国家代号 [rhodes, columbia, laterano, victoria, sami, kazimierz, siracusa, higashi, kjerag, sargon, lungmen, yan, ursus, egir, leithanien, rim, iberia]
      */
     @SerialName("nationId")
-    val nation: String?,
+    override val nation: String?,
     /**
      * 阶段 XXX
      */
@@ -221,17 +234,17 @@ data class Character(
      * 技能 XXX
      */
     @SerialName("skills")
-    val skills: List<JsonObject>,
+    val skills: List<SkillInfo>,
     /**
      * 标签
      */
     @SerialName("tagList")
-    val tags: List<String>?,
+    override val tags: List<String>?,
     /**
      * 团队 [action4, reserve1, reserve4, reserve6, student, chiave, rainbow, followers, lee]
      */
     @SerialName("teamId")
-    val team: String?,
+    override val team: String?,
     /**
      * XXX
      */
@@ -253,12 +266,12 @@ data class Character(
     @SerialName("potentialRanks")
     private val potentialRanks: List<JsonObject>,
     /**
-     * XXX
+     * 天赋
      */
     @SerialName("talents")
-    private val talents: List<JsonObject>?,
+    val talents: List<Talent>?,
     /**
-     * XXX
+     * 替身 Key
      */
     @SerialName("tokenKey")
     private val tokenKey: String?,
@@ -267,58 +280,58 @@ data class Character(
      */
     @SerialName("trait")
     private val trait: JsonObject?
-)
+) : Role, TagInfo
 
-enum class ProfessionType {
+enum class ProfessionType(val text: String) {
     /**
      * 先锋
      */
-    PIONEER,
+    PIONEER("先锋"),
 
     /**
      * 狙击
      */
-    SNIPER,
+    SNIPER("狙击"),
 
     /**
      * 近卫
      */
-    WARRIOR,
+    WARRIOR("近卫"),
 
     /**
      * 术师
      */
-    CASTER,
+    CASTER("术师"),
 
     /**
      * 重装
      */
-    TANK,
+    TANK("重装"),
 
     /**
      * 医疗
      */
-    MEDIC,
+    MEDIC("医疗"),
 
     /**
      * 特种
      */
-    SPECIAL,
+    SPECIAL("特种"),
 
     /**
      * 辅助
      */
-    SUPPORT,
+    SUPPORT("辅助"),
 
     /**
      * 替身
      */
-    TOKEN,
+    TOKEN("替身"),
 
     /**
      * 装置
      */
-    TRAP;
+    TRAP("装置");
 
     companion object {
 
@@ -328,25 +341,72 @@ enum class ProfessionType {
     }
 }
 
-enum class PositionType {
+enum class PositionType(val text: String) {
     /**
      * 远程位
      */
-    RANGED,
+    RANGED("远程"),
 
     /**
      * 近战位
      */
-    MELEE,
+    MELEE("近战"),
 
     /**
      * 全场位
      */
-    ALL,
+    ALL("全场"),
 
     /**
      * 无
      */
-    NONE
+    NONE("无");
 }
 
+@Serializable
+data class Talent(
+    @SerialName("candidates")
+    val candidates: List<Candidate>? = null
+)
+
+@Serializable
+data class Candidate(
+    @SerialName("blackboard")
+    val blackboard: List<Blackboard>?,
+    @SerialName("description")
+    val description: String?,
+    @SerialName("name")
+    val name: String?,
+    @SerialName("prefabKey")
+    val prefabKey: String?,
+    @SerialName("rangeId")
+    val rangeId: String?,
+    @SerialName("requiredPotentialRank")
+    val requiredPotentialRank: Int,
+    @SerialName("unlockCondition")
+    val unlockCondition: UnlockCondition?
+)
+
+@Serializable
+data class SkillInfo(
+    @SerialName("levelUpCostCond")
+    val levelUpCostCond: List<LevelUpCostCond>,
+    @SerialName("overridePrefabKey")
+    val overridePrefabKey: String?,
+    @SerialName("overrideTokenKey")
+    val overrideTokenKey: String?,
+    @SerialName("skillId")
+    override val skill: String?,
+    @SerialName("unlockCond")
+    val unlockCond: UnlockCondition
+) : SkillId
+
+@Serializable
+data class LevelUpCostCond(
+    @SerialName("levelUpCost")
+    val levelUpCost: List<LegacyItem>?,
+    @SerialName("lvlUpTime")
+    val levelUpTime: Int,
+    @SerialName("unlockCond")
+    val unlockCond: UnlockCondition
+)

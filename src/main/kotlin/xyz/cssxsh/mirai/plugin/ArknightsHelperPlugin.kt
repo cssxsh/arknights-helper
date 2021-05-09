@@ -1,16 +1,11 @@
 package xyz.cssxsh.mirai.plugin
 
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
 import net.mamoe.mirai.console.plugin.jvm.*
 import net.mamoe.mirai.console.util.ConsoleExperimentalApi
-import net.mamoe.mirai.utils.info
-import net.mamoe.mirai.utils.warning
-import xyz.cssxsh.arknights.download
 import xyz.cssxsh.mirai.plugin.command.*
-import xyz.cssxsh.mirai.plugin.data.*
 import kotlin.time.*
 
 object ArknightsHelperPlugin : KotlinPlugin(
@@ -26,24 +21,31 @@ object ArknightsHelperPlugin : KotlinPlugin(
 
     private lateinit var clock: Job
 
+    private lateinit var subscribe: Job
+
+    private lateinit var guard: Job
+
     @ConsoleExperimentalApi
     override fun onEnable() {
-        launch {
-            runCatching {
-                download(dataFolder, RESOURCES)
-            }.onSuccess {
-                logger.info { "${RESOURCES}数据加载完毕" }
-            }.onFailure {
-                logger.warning({ "${RESOURCES}数据加载失败" }, it)
-            }
-        }
+        download()
         ArknightsUserData.reload()
         ArknightsPoolData.reload()
+        ArknightsMineData.reload()
+        ArknightsTaskData.reload()
         ArknightsRecruitCommand.register()
         ArknightsGachaCommand.register()
         ArknightsPlayerCommand.register()
+        ArknightsDataCommand.register()
+        ArknightsItemCommand.register()
+        ArknightsStageCommand.register()
+        ArknightsZoneCommand.register()
+        ArknightsMineCommand.register()
+        ArknightsQuestionCommand.register()
+        ArknightsGuardCommand.register()
 
         clock = clock()
+        subscribe = subscribe()
+        guard = guard()
     }
 
     @ConsoleExperimentalApi
@@ -51,7 +53,16 @@ object ArknightsHelperPlugin : KotlinPlugin(
         ArknightsRecruitCommand.unregister()
         ArknightsGachaCommand.unregister()
         ArknightsPlayerCommand.unregister()
+        ArknightsDataCommand.unregister()
+        ArknightsItemCommand.unregister()
+        ArknightsStageCommand.unregister()
+        ArknightsZoneCommand.unregister()
+        ArknightsMineCommand.unregister()
+        ArknightsQuestionCommand.unregister()
+        ArknightsGuardCommand.unregister()
 
         clock.cancel()
+        subscribe.cancel()
+        guard.cancel()
     }
 }

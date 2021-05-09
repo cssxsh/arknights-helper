@@ -6,7 +6,6 @@ import net.mamoe.mirai.message.data.content
 import net.mamoe.mirai.message.data.toPlainText
 import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.mirai.plugin.*
-import xyz.cssxsh.mirai.plugin.data.*
 
 object ArknightsGachaCommand : CompositeCommand(
     owner = ArknightsHelperPlugin,
@@ -15,16 +14,19 @@ object ArknightsGachaCommand : CompositeCommand(
 ) {
 
     @SubCommand("one", "单抽")
-    @Description("单抽")
+    @Description("单抽times次")
     suspend fun CommandSenderOnMessage<*>.one(times: Int = 1) = sendMessage {
-        check(coin >= times * POOL_USE_COIN) { "合成玉不足" }
-        // coin -= times * POOL_USE_COIN
-        val result: RecruitResult = (1..times).map { gacha(pool = obtain.pool(rule)) }.groupBy { it.rarity }
-        "当前卡池[${pool}] \n".toPlainText() + result.getContent()
+        if (coin >= times * PoolUseCoin) {
+            coin -= times * PoolUseCoin
+            val result: RecruitResult = (1..times).map { gacha(Obtain.pool(rule)) }.toRecruitResult()
+            "当前卡池[${pool}] 合成玉剩余${coin}\n".toPlainText() + result.getContent()
+        } else {
+            "合成玉不足,当前拥有${coin},请尝试答题获得".toPlainText()
+        }
     }
 
     @SubCommand("ten", "十连")
-    @Description("十连")
+    @Description("十连times次")
     suspend fun CommandSenderOnMessage<*>.ten(times: Int = 1) = one(times * 10)
 
     @SubCommand("pool", "卡池")
@@ -33,17 +35,19 @@ object ArknightsGachaCommand : CompositeCommand(
         val name = name_.lines().first()
         val lines = fromEvent.message.content.lines().filter {
             it.matches(BUILD_POOL_LINE) || it.startsWith('#')
-        }.joinToString(";")
-        rules[name] = lines.trim()
+        }.also {
+            gacha(pool = Obtain.pool(it))
+        }
+        rules[name] = lines.joinToString(";").trim()
         if (set) pool = name
         "卡池[${name}] -> $lines 已写入".toPlainText()
     }
 
     @SubCommand("detail", "详情")
-    @Description("查看卡池详情")
+    @Description("查看卡池规则")
     suspend fun CommandSenderOnMessage<*>.detail() = sendMessage {
         rules.entries.joinToString("\n") { (name, rule) ->
-            "===> [${name}]" + rule.split(';').joinToString("\n")
+            "===> [${name}]\n" + rule.split(';').joinToString("\n")
         }.toPlainText()
     }
 

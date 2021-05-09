@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "xyz.cssxsh.mirai.plugin"
-version = "0.1.0-dev-1"
+version = "1.0.0-dev-1"
 
 repositories {
     mavenLocal()
@@ -45,72 +45,13 @@ kotlin {
 dependencies {
     implementation(ktor("client-serialization", Versions.ktor))
     implementation(ktor("client-encoding", Versions.ktor))
-    implementation(selenium("java", Versions.selenium))
+
     testImplementation(junit("api", Versions.junit))
     testRuntimeOnly(junit("engine", Versions.junit))
 }
 
 tasks {
-
     test {
         useJUnitPlatform()
-    }
-
-    val testConsoleDir = rootProject.projectDir.resolve( "test").apply { mkdir() }
-
-    create("copyFile") {
-        group = "mirai"
-
-        dependsOn("buildPlugin")
-
-        doFirst {
-            testConsoleDir.resolve( "plugins/").walk().filter {
-                project.name in it.name
-            }.forEach {
-                delete(it)
-                println("Deleted ${it.absolutePath}")
-            }
-            copy {
-                into(testConsoleDir.resolve("plugins/"))
-                from(project.buildDir.resolve("mirai/")) {
-                    include {
-                        "${project.name}-${version}" in it.name
-                    }.eachFile {
-                        println("Copy ${file.absolutePath}")
-                    }
-                }
-            }
-            testConsoleDir.resolve("start.sh").writeText(
-                buildString {
-                    appendln("cd ${testConsoleDir.absolutePath}")
-                    appendln("java -classpath ${sourceSets.test.get().runtimeClasspath.asPath} \\")
-                    appendln("-Dfile.encoding=UTF-8 \\")
-                    appendln("mirai.RunMirai")
-                }
-            )
-        }
-    }
-
-    create("runMiraiConsole", JavaExec::class.java) {
-        group = "mirai"
-
-        dependsOn("copyFile")
-
-        main = "mirai.RunMirai"
-
-        // debug = true
-
-        defaultCharacterEncoding = "UTF-8"
-
-        workingDir = testConsoleDir
-
-        standardInput = System.`in`
-
-        // jvmArgs("-Djavax.net.debug=all")
-
-        doFirst {
-            classpath = sourceSets.test.get().runtimeClasspath
-            println("WorkingDir: ${workingDir.absolutePath}, Args: $args")
-        }
     }
 }

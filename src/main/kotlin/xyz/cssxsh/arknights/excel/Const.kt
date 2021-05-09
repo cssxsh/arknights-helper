@@ -3,13 +3,11 @@ package xyz.cssxsh.arknights.excel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
-import xyz.cssxsh.arknights.GameDataType
-import xyz.cssxsh.arknights.read
+import xyz.cssxsh.arknights.*
 import java.io.File
 
-const val CONST = "gamedata_const.json"
+fun File.readConstInfo(): ConstInfo = read(type = ExcelDataType.CONST)
 
-fun File.readConstInfo(): ConstInfo = read(name = CONST, type = GameDataType.EXCEL)
 
 @Serializable
 data class ConstInfo(
@@ -155,22 +153,15 @@ data class ConstInfo(
     private val voucherSkinRedeem: Int,
     @SerialName("weeklyOverrideDesc")
     private val weeklyOverrideDesc: String
-) {
-    @Serializable
-    data class CharAssistRefreshTime(
-        @SerialName("Hour")
-        val hour: Int,
-        @SerialName("Minute")
-        val minute: Int
-    )
+)
 
-    @Serializable
-    data class LegacyItem(
-        @SerialName("count")
-        val count: Int,
-        @SerialName("id")
-        val id: String,
-        @SerialName("type")
-        val type: String
-    )
-}
+/**
+ * XXX
+ */
+@Serializable
+data class CharAssistRefreshTime(
+    @SerialName("Hour")
+    val hour: Int,
+    @SerialName("Minute")
+    val minute: Int
+)

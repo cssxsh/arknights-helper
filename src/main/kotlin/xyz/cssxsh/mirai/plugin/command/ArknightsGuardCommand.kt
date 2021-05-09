@@ -1,0 +1,41 @@
+package xyz.cssxsh.mirai.plugin.command
+
+import net.mamoe.mirai.console.command.CommandSenderOnMessage
+import net.mamoe.mirai.console.command.CompositeCommand
+import net.mamoe.mirai.message.data.toPlainText
+import xyz.cssxsh.mirai.plugin.*
+import kotlin.time.minutes
+
+object ArknightsGuardCommand : CompositeCommand(
+    owner = ArknightsHelperPlugin,
+    "guard", "蹲饼",
+    description = "明日方舟助手蹲饼指令"
+) {
+    @SubCommand("detail", "详情")
+    @Description("查看蹲饼详情")
+    suspend fun CommandSenderOnMessage<*>.detail() = sendMessage {
+        "当前蹲饼状态${task}, 蹲饼间隔${GuardInterval}".toPlainText()
+    }
+
+    @SubCommand("speed", "速度")
+    @Description("设置微博蹲饼速度")
+    suspend fun CommandSenderOnMessage<*>.speed(duration: Int) = sendMessage {
+        check(duration in 1..10) { "速度 不合法 1~10 分钟" }
+        GuardInterval = duration.minutes
+        "蹲饼速度已设置 ${duration}分钟".toPlainText()
+    }
+
+    @SubCommand("open", "打开")
+    @Description("开启提醒")
+    suspend fun CommandSenderOnMessage<*>.open() = sendMessage {
+        task = true
+        "蹲饼已打开".toPlainText()
+    }
+
+    @SubCommand("close", "关闭")
+    @Description("关闭提醒")
+    suspend fun CommandSenderOnMessage<*>.close() = sendMessage {
+        task = false
+        "蹲饼已关闭".toPlainText()
+    }
+}
