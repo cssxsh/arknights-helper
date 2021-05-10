@@ -69,39 +69,38 @@ internal val tasks get() = ArknightsTaskData.task
 /**
  * 自定义问题MAP
  */
-internal val questions get() = ArknightsMineData.questions
+internal val questions get() = ArknightsMineData.question
 
 object ArknightsUserData : AutoSavePluginData("user") {
     @Suppress("unused")
-    @ValueName("coin")
+    @ValueDescription("Key 是QQ号，Value是合成玉数值")
     val coin by value<MutableMap<Long, Int>>().withDefault { 3_000 }
 
     @Suppress("unused")
-    @ValueName("level")
+    @ValueDescription("Key 是QQ号，Value是玩家等级")
     var level by value<MutableMap<Long, Int>>().withDefault { ExcelData.const.maxPlayerLevel }
 
     @Suppress("unused")
-    @ValueName("reason")
+    @ValueDescription("Key 是QQ号，Value是理智预警时间戳")
     val reason by value<MutableMap<Long, Long>>().withDefault { 0 }
 
     @Suppress("unused")
-    @ValueName("recruit")
+    @ValueDescription("Key 是QQ号，Value是公招预警预警时间戳")
     val recruit by value<MutableMap<Long, Map<Int, Long>>>().withDefault { emptyMap() }
 }
 
 object ArknightsPoolData : AutoSavePluginData("pool") {
     @Suppress("unused")
-    @ValueName("pool")
+    @ValueDescription("Key 是QQ号/QQ群号，Value是规则名")
     val pool by value<MutableMap<Long, String>>().withDefault { GachaPoolRule.NORMAL.name }
 
     private val default = GachaPoolRule.values().associate { it.name to it.rule }
 
-    @ValueName("rules")
+    @ValueDescription("Key 规则名，Value是卡池规则")
     val rules by value<MutableMap<String, String>>().withDefault { default.getValue(it) }
 }
 
 object ArknightsMineData : AutoSavePluginData("mine") {
-
     private val default: MutableMap<String, CustomQuestion>.() -> Unit = {
         put(
             "default", CustomQuestion(
@@ -119,12 +118,12 @@ object ArknightsMineData : AutoSavePluginData("mine") {
         )
     }
 
-    @ValueName("question")
-    val questions by value(default)
+    @ValueDescription("Key 是问题ID，Value是问题")
+    val question by value(default)
 }
 
 object ArknightsTaskData : AutoSavePluginData("task") {
-    @ValueName("task")
+    @ValueDescription("Key 是QQ号/QQ群号，Value是是否开启了提醒")
     val task by value<MutableMap<Long, Boolean>>().withDefault { false }
 }
 
@@ -143,7 +142,6 @@ fun <V> AbstractPluginData.sender() = delegate<CommandSenderOnMessage<*>, Long, 
 fun <V> AbstractPluginData.subject() = delegate<CommandSenderOnMessage<*>, Long, V> { fromEvent.subject.id }
 
 class SubjectDelegate<T>(private val default: (Contact) -> T) : ReadWriteProperty<CommandSenderOnMessage<*>, T> {
-
     private val map: MutableMap<Contact, T> = mutableMapOf()
 
     override fun setValue(thisRef: CommandSenderOnMessage<*>, property: KProperty<*>, value: T) {
