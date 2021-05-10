@@ -5,6 +5,7 @@ import net.mamoe.mirai.console.command.CommandSenderOnMessage
 import net.mamoe.mirai.console.data.*
 import net.mamoe.mirai.console.data.PluginDataExtensions.withDefault
 import net.mamoe.mirai.contact.Contact
+import net.mamoe.mirai.contact.Group
 import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.mine.*
 import kotlin.properties.ReadOnlyProperty
@@ -51,26 +52,6 @@ val CommandSenderOnMessage<*>.rule: String by ReadOnlyProperty { that, _ -> Arkn
  */
 val CommandSenderOnMessage<*>.mutex: Mutex by SubjectDelegate { Mutex() }
 
-/**
- * XXX
- */
-var CommandSenderOnMessage<*>.task: Boolean by ArknightsTaskData.subject()
-
-/**
- * 卡池规则MAP
- */
-internal val rules get() = ArknightsPoolData.rules
-
-/**
- * XXX
- */
-internal val tasks get() = ArknightsTaskData.task
-
-/**
- * 自定义问题MAP
- */
-internal val questions get() = ArknightsMineData.question
-
 object ArknightsUserData : AutoSavePluginData("user") {
     @Suppress("unused")
     @ValueDescription("Key 是QQ号，Value是合成玉数值")
@@ -89,7 +70,7 @@ object ArknightsUserData : AutoSavePluginData("user") {
     val recruit by value<MutableMap<Long, Map<Int, Long>>>().withDefault { emptyMap() }
 }
 
-object ArknightsPoolData : AutoSavePluginData("pool") {
+object ArknightsPoolData : AutoSavePluginConfig("pool") {
     @Suppress("unused")
     @ValueDescription("Key 是QQ号/QQ群号，Value是规则名")
     val pool by value<MutableMap<Long, String>>().withDefault { GachaPoolRule.NORMAL.name }
@@ -122,10 +103,18 @@ object ArknightsMineData : AutoSavePluginData("mine") {
     val question by value(default)
 }
 
-object ArknightsTaskData : AutoSavePluginData("task") {
+object ArknightsTaskData : AutoSavePluginConfig("task") {
     @ValueDescription("Key 是QQ号/QQ群号，Value是是否开启了提醒")
-    val task by value<MutableMap<Long, Boolean>>().withDefault { false }
+    val contacts by value<MutableSet<Long>>()
+
+    @ValueDescription("蹲饼轮询间隔")
+    var interval by value<Int>()
 }
+
+/**
+ * 通过正负号区分群和用户
+ */
+internal val Contact.delegate get() = if (this is Group) id * -1 else id
 
 fun <T, K, V> AbstractPluginData.delegate(key: T.() -> K) = object : ReadWriteProperty<T, V> {
     override fun getValue(thisRef: T, property: KProperty<*>): V {
@@ -139,7 +128,7 @@ fun <T, K, V> AbstractPluginData.delegate(key: T.() -> K) = object : ReadWritePr
 
 fun <V> AbstractPluginData.sender() = delegate<CommandSenderOnMessage<*>, Long, V> { fromEvent.sender.id }
 
-fun <V> AbstractPluginData.subject() = delegate<CommandSenderOnMessage<*>, Long, V> { fromEvent.subject.id }
+fun <V> AbstractPluginData.subject() = delegate<CommandSenderOnMessage<*>, Long, V> { fromEvent.subject.delegate }
 
 class SubjectDelegate<T>(private val default: (Contact) -> T) : ReadWriteProperty<CommandSenderOnMessage<*>, T> {
     private val map: MutableMap<Contact, T> = mutableMapOf()

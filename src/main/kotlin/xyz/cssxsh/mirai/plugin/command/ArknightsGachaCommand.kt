@@ -38,7 +38,7 @@ object ArknightsGachaCommand : CompositeCommand(
         }.also {
             gacha(pool = Obtain.pool(it))
         }
-        rules[name] = lines.joinToString(";").trim()
+        PoolRules[name] = lines.joinToString(";").trim()
         if (set) pool = name
         "卡池[${name}] -> $lines 已写入".toPlainText()
     }
@@ -46,7 +46,7 @@ object ArknightsGachaCommand : CompositeCommand(
     @SubCommand("detail", "详情")
     @Description("查看卡池规则")
     suspend fun CommandSenderOnMessage<*>.detail() = sendMessage {
-        rules.entries.joinToString("\n") { (name, rule) ->
+        PoolRules.entries.joinToString("\n") { (name, rule) ->
             "===> [${name}]\n" + rule.split(';').joinToString("\n")
         }.toPlainText()
     }
@@ -54,7 +54,7 @@ object ArknightsGachaCommand : CompositeCommand(
     @SubCommand("set", "设置")
     @Description("设置卡池")
     suspend fun CommandSenderOnMessage<*>.set(name: String = GachaPoolRule.NORMAL.name) = sendMessage {
-        check(name in rules) { "卡池不存在" }
+        check(name in PoolRules) { "卡池不存在" }
         pool = name
         "卡池[${pool}]设置完毕".toPlainText()
     }

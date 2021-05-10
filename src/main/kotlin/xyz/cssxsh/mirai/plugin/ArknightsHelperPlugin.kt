@@ -25,9 +25,13 @@ object ArknightsHelperPlugin : KotlinPlugin(
 
     private lateinit var guard: Job
 
+    private lateinit var group: Job
+
+    private lateinit var friend: Job
+
     @ConsoleExperimentalApi
     override fun onEnable() {
-        download()
+        downloadExternalData()
         ArknightsUserData.reload()
         ArknightsPoolData.reload()
         ArknightsMineData.reload()
@@ -46,6 +50,8 @@ object ArknightsHelperPlugin : KotlinPlugin(
         clock = clock()
         subscribe = subscribe()
         guard = guard()
+        group = group()
+        friend = friend()
     }
 
     @ConsoleExperimentalApi
@@ -64,5 +70,7 @@ object ArknightsHelperPlugin : KotlinPlugin(
         clock.cancel()
         subscribe.cancel()
         guard.cancel()
+        group.cancel()
+        friend.cancel()
     }
 }

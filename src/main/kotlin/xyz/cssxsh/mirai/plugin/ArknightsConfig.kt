@@ -39,7 +39,7 @@ internal val MicroBlogData by lazy { MicroBlogData(WeiboData) }
 
 internal suspend fun downloadMicroBlogData(flush: Boolean) = MICRO_BLOG_USER.download(WeiboData, flush)
 
-internal val QuestionDataLoader = QuestionDataLoader({ ExcelData }, { VideoData }, { questions.values })
+internal val QuestionDataLoader = QuestionDataLoader({ ExcelData }, { VideoData }, { CustomQuestions.values })
 
 internal val Obtain get() = ExcelData.characters.values
 
@@ -51,4 +51,26 @@ const val PoolUseCoin = 600
 
 val RecruitTime = (1).hours..(9).hours
 
-internal var GuardInterval: Duration = (5).minutes
+/**
+ * 卡池规则MAP
+ */
+internal val PoolRules get() = ArknightsPoolData.rules
+
+/**
+ * 蹲饼联系人
+ */
+internal val GuardContacts get() = ArknightsTaskData.contacts
+
+/**
+ * 自定义问题MAP
+ */
+internal val CustomQuestions get() = ArknightsMineData.question
+
+/**
+ * 轮询速度
+ */
+internal var GuardInterval
+    get() = ArknightsTaskData.interval.minutes
+    set(value) {
+        ArknightsTaskData.interval = value.inMinutes.toInt()
+    }
