@@ -21,7 +21,7 @@ internal val PENGUIN_DATA = PenguinDataType.values().toList()
 
 internal val BILIBILI_VIDEO = VideoDataType.values().toList()
 
-internal val MICRO_BLOG_USER = MicroBlogUser.values().toList()
+internal val MICRO_BLOG_USER = BlogUser.values().toList()
 
 internal val ExcelData by lazy { ExcelData(ArknightsGameData) }
 
@@ -41,7 +41,7 @@ internal suspend fun downloadMicroBlogData(flush: Boolean) = MICRO_BLOG_USER.dow
 
 internal val QuestionDataLoader = QuestionDataLoader({ ExcelData }, { VideoData }, { questions.values })
 
-internal val Obtain by lazy { ExcelData.characters.values }
+internal val Obtain get() = ExcelData.characters.values
 
 internal val PlayerLevelRange get() = 1..ExcelData.const.maxPlayerLevel
 

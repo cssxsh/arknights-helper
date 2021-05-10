@@ -4,10 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 import xyz.cssxsh.arknights.*
-import java.io.File
 import java.time.OffsetDateTime
-
-fun File.readGachaTable(): GachaTable = read(type = ExcelDataType.GACHA)
 
 /**
  * 获取公招干员

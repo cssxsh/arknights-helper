@@ -21,25 +21,25 @@ const val BLOG_API = "https://m.weibo.cn/api/container/getIndex"
 
 const val CONTENT_API = "https://m.weibo.cn/statuses/extend"
 
-val weibo: (MicroBlogUser) -> Url = { type -> Url(BLOG_API).copy(parameters = type.parameters) }
+private val weibo = { type: BlogUser -> Url(BLOG_API).copy(parameters = type.parameters) }
 
-suspend fun Iterable<MicroBlogUser>.download(dir: File, flush: Boolean = false): List<File> = load(dir, flush, weibo)
+suspend fun Iterable<BlogUser>.download(dir: File, flush: Boolean): List<File> = load(dir, flush, weibo)
 
-fun File.readMicroBlogHistory(type: MicroBlogUser): List<MicroBlog> {
+private fun File.readMicroBlogHistory(type: BlogUser): List<MicroBlog> {
     return read<Temp<WeiboData>>(type).data().cards.map { it.blog }
 }
 
-suspend fun getLongTextContent(id: Long): String {
+private suspend fun getLongTextContent(id: Long): String {
     return useHttpClient<Temp<LongTextContent>> { client ->
         client.get(CONTENT_API) { parameter("id", id) }
     }.data().content.replace("<br />", "\n").remove(SIGN)
 }
 
 class MicroBlogData(private val dir: File) {
-    val arknights get() = dir.readMicroBlogHistory(MicroBlogUser.ARKNIGHTS)
+    val arknights get() = dir.readMicroBlogHistory(BlogUser.ARKNIGHTS)
 }
 
-enum class MicroBlogUser(val id: Long) : GameDataType {
+enum class BlogUser(val id: Long) : GameDataType {
     ARKNIGHTS(6279793937);
 
     override val path = "Blog(${id}).json"
@@ -56,13 +56,7 @@ val MicroBlog.content get() = raw ?: text.replace("<br />", "\n").remove(SIGN)
 
 val MicroBlog.url get() = Url("https://weibo.com/detail/$id")
 
-suspend fun MicroBlog.content(): String {
-    return if (isLongText) {
-        getLongTextContent(id = id)
-    } else {
-        content
-    }
-}
+suspend fun MicroBlog.content(): String = if (isLongText) getLongTextContent(id = id) else content
 
 private fun <T> Temp<T>.data() = requireNotNull(data) { message }
 
@@ -79,19 +73,19 @@ private data class Temp<T>(
 @Serializable
 private data class WeiboData(
     @SerialName("cardlistInfo")
-    private val cardListInfo: JsonObject,
+    private val cardListInfo: JsonObject? = null,
     @SerialName("cards")
-    val cards: List<Card>,
+    val cards: List<Card> = emptyList(),
     @SerialName("scheme")
-    val scheme: String,
+    val scheme: String? = null,
     @SerialName("showAppTips")
-    private val showAppTips: Int
+    private val showAppTips: Int? = null
 )
 
 @Serializable
 private data class Card(
     @SerialName("card_type")
-    val cardType: Int,
+    val type: Int,
     @SerialName("itemid")
     val itemId: String,
     @SerialName("mblog")
@@ -208,7 +202,7 @@ data class MicroBlog(
     @SerialName("title")
     private val title: JsonObject? = null,
     @SerialName("user")
-    val user: BlogUser,
+    val user: MicroBlogUser,
     @SerialName("version")
     private val version: Int? = null,
     @SerialName("visible")
@@ -216,7 +210,7 @@ data class MicroBlog(
 )
 
 @Serializable
-data class BlogUser(
+data class MicroBlogUser(
     @SerialName("avatar_hd")
     val avatar: String,
     @SerialName("badge")
@@ -286,13 +280,13 @@ object WeiboDateTimeSerializer : KSerializer<OffsetDateTime> {
 @Serializable
 data class LongTextContent(
     @SerialName("attitudes_count")
-    private val attitudesCount: Int,
+    private val attitudesCount: Int = 0,
     @SerialName("comments_count")
-    private val commentsCount: Int,
+    private val commentsCount: Int = 0,
     @SerialName("longTextContent")
     val content: String,
     @SerialName("ok")
     val ok: Int,
     @SerialName("reposts_count")
-    private val repostsCount: Int
+    private val repostsCount: Int = 0
 )

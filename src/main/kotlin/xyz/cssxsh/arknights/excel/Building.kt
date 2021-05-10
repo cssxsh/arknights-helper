@@ -4,19 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
-import xyz.cssxsh.arknights.*
-import java.io.File
-
-fun File.readBuilding(): Building = read(type = ExcelDataType.BUILDING)
-
-fun BuffMap(building: Building, characters: CharacterTable): BuffMap {
-    return building.characters.map { (id, info) ->
-        val list = info.buffs.flatMap { (data) -> data.map { it.buff } }.map { buff -> building.buffs.getValue(buff) }
-        characters.getValue(id).name to list
-    }.toMap()
-}
-
-typealias BuffMap = Map<String, List<BuildingBuff>>
 
 @Serializable
 data class Building(

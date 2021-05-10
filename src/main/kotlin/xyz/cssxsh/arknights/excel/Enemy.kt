@@ -3,16 +3,8 @@ package xyz.cssxsh.arknights.excel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
-import xyz.cssxsh.arknights.read
-import java.io.File
-
-fun File.readEnemyTable(): EnemyTable = read(type = ExcelDataType.ENEMY)
 
 typealias EnemyTable = Map<String, Enemy>
-
-typealias EnemyMap = Map<EnemyLevel, List<Enemy>>
-
-fun EnemyMap(table: EnemyTable): EnemyMap = table.values.groupBy { it.level }
 
 val Enemy.designation get() = "${name}(${race?.let { "$it#" }.orEmpty()}${level.text})"
 

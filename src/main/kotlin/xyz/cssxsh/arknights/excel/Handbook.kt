@@ -3,18 +3,6 @@ package xyz.cssxsh.arknights.excel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
-import xyz.cssxsh.arknights.*
-import java.io.File
-
-fun File.readHandbookTable(): HandbookTable = read(type = ExcelDataType.HANDBOOK)
-
-fun HandbookMap(book: HandbookTable, characters: CharacterTable): HandbookMap {
-    return book.handbooks.mapNotNull { (id, info) ->
-        characters[id]?.let { it.name to info }
-    }.toMap()
-}
-
-typealias HandbookMap = Map<String, Handbook>
 
 private val TagRegex = """(?<=【|\[)(.+)(?:]|】)(.+)""".toRegex()
 

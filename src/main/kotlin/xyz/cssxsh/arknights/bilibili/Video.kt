@@ -18,11 +18,11 @@ private const val PAGE_NUM = 1
 
 private const val ORDER = "pubdate"
 
-val bilibili: (VideoDataType) -> Url = { type -> Url(BILIBILI_API).copy(parameters = type.parameters) }
+private val bilibili = { type: VideoDataType -> Url(BILIBILI_API).copy(parameters = type.parameters) }
 
 suspend fun Iterable<VideoDataType>.download(dir: File, flush: Boolean = false): List<File> = load(dir, flush, bilibili)
 
-fun File.readVideoHistory(type: VideoDataType): List<Video> {
+private fun File.readVideoHistory(type: VideoDataType): List<Video> {
     return read<Temp>(type).let { requireNotNull(it.data) { it.message } }.list.videos
 }
 
@@ -65,7 +65,7 @@ private data class Temp(
 )
 
 @Serializable
-data class VideoHistory(
+private data class VideoHistory(
     @SerialName("episodic_button")
     private val episodicButton: JsonObject? = null,
     @SerialName("list")
@@ -75,7 +75,7 @@ data class VideoHistory(
 )
 
 @Serializable
-data class VideoList(
+private data class VideoList(
     @SerialName("tlist")
     private val Types: Map<Int, JsonObject>,
     @SerialName("vlist")
