@@ -42,7 +42,7 @@ enum class QuestionType(val description: String, private val load: (QuestionData
     ENEMY("敌方相关", { randomEnemyInfoQuestion(it.excel().enemies) }),
     WEEKLY("周常相关", { randomWeeklyQuestion(it.excel().weeks) }),
     MUSIC("音乐相关", { randomMusicQuestion(it.video().music) }),
-    OTHER("自选相关", { requireNotNull(it.others().randomOrNull()) { "题目集为空" } });
+    OTHER("自选相关", { requireNotNull(it.others().values.randomOrNull()) { "题目集为空" } });
 
     fun build(loader: QuestionDataLoader): Question = load(loader).build(this)
 }
@@ -64,7 +64,7 @@ private val DefaultJudgmentOptions = mapOf('Y' to "对", 'N' to "错")
 data class QuestionDataLoader(
     val excel: () -> ExcelData,
     val video: () -> VideoData,
-    val others: () -> Collection<CustomQuestion>,
+    val others: () -> Map<String, CustomQuestion>,
 )
 
 sealed class QuestionBuild {

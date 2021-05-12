@@ -8,7 +8,6 @@ import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.event.events.BotJoinGroupEvent
 import net.mamoe.mirai.event.events.FriendAddEvent
 import net.mamoe.mirai.event.globalEventChannel
-import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import net.mamoe.mirai.utils.*

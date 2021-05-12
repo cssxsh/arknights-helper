@@ -20,7 +20,7 @@ internal val MicroBlogData by lazy { MicroBlogData(resolve("WeiboData")) }
 
 internal val ArknightsFaceData by lazy { ArknightsFaceData(resolve("ArknightsFaceData"), FaceItems) }
 
-internal val QuestionDataLoader = QuestionDataLoader({ ExcelData }, { VideoData }, { CustomQuestions.values })
+internal val QuestionDataLoader = QuestionDataLoader({ ExcelData }, { VideoData }, { CustomQuestions })
 
 internal val Obtain get() = ExcelData.characters.values
 
