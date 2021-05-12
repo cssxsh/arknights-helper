@@ -8,7 +8,7 @@ internal class StatusKtTest : JsonTest() {
 
     init {
         runBlocking {
-            BlogUser.values().toList().download(dir = weibo, flush = true)
+            blogs.download(flush = true)
         }
     }
 

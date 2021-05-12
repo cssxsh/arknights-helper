@@ -28,12 +28,14 @@ internal fun Headers.expires(): OffsetDateTime? = this[HttpHeaders.Expires].let 
 
 internal fun Headers.lastModified(): OffsetDateTime? = this[HttpHeaders.LastModified].let { OffsetDateTime.parse(it, formatter) }
 
-private val KOTLINX_SERIALIZER = KotlinxSerializer(Json {
+internal val CustomJson = Json {
     prettyPrint = true
     ignoreUnknownKeys = true
     isLenient = true
     allowStructuredMapKeys = true
-})
+}
+
+private val KOTLINX_SERIALIZER = KotlinxSerializer(CustomJson)
 
 private fun client() = HttpClient(OkHttp) {
     Json {

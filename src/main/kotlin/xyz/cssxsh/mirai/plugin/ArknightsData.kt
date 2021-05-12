@@ -7,6 +7,7 @@ import net.mamoe.mirai.console.data.PluginDataExtensions.withDefault
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.Group
 import xyz.cssxsh.arknights.excel.*
+import xyz.cssxsh.arknights.market.*
 import xyz.cssxsh.arknights.mine.*
 import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
@@ -107,8 +108,11 @@ object ArknightsTaskData : AutoSavePluginConfig("task") {
     @ValueDescription("Key 是QQ号/QQ群号，Value是是否开启了提醒")
     val contacts by value<MutableSet<Long>>()
 
-    @ValueDescription("蹲饼轮询间隔")
-    var interval by value<Int>()
+    @ValueDescription("蹲饼轮询间隔，单位分钟，默认5分钟")
+    var interval by value<Int>(5)
+
+    @ValueDescription("Key 是表情ID, Value 是表情Hash")
+    val faces by value(DefaultItems)
 }
 
 /**

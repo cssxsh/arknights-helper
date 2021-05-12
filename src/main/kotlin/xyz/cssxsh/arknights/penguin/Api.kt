@@ -8,8 +8,6 @@ private const val PENGUIN_STATS_CN = "penguin-stats.cn"
 
 private const val PENGUIN_STATS_IO = "penguin-stats.io"
 
-private val penguin = { type: PenguinDataType -> Url("https://${PENGUIN_STATS_CN}/PenguinStats/api/v2/${type.path}") }
-
 enum class PenguinDataType : GameDataType {
     // BASE
     ITEMS,
@@ -26,10 +24,10 @@ enum class PenguinDataType : GameDataType {
         override val path get() = "_private/result/pattern/${SERVER}/global.json"
     };
 
-    override val path = "${name.toLowerCase()}.json"
-}
+    override val path get() = "${name.toLowerCase()}.json"
 
-suspend fun Iterable<PenguinDataType>.download(dir: File, flush: Boolean): List<File> = load(dir, flush, penguin)
+    override val url: Url get() = Url("https://${PENGUIN_STATS_CN}/PenguinStats/api/v2/${path}")
+}
 
 private fun File.readItems(): List<Item> = read(PenguinDataType.ITEMS)
 
@@ -45,7 +43,7 @@ private fun File.readMatrices() = read<MatrixData>(PenguinDataType.RESULT_MATRIX
 
 private fun File.readPatterns() = read<PatternData>(PenguinDataType.RESULT_PATTERN).patterns
 
-class PenguinData(dir: File) {
+class PenguinData(val dir: File) {
     val items by lazy { dir.readItems() }
     val stages by lazy { dir.readStages() }
     val zones by lazy { dir.readZones() }
@@ -53,4 +51,6 @@ class PenguinData(dir: File) {
     val stats by lazy { dir.readStats() }
     val matrices by lazy { dir.readMatrices() }
     val patterns by lazy { dir.readPatterns() }
+
+    suspend fun download(flush: Boolean): List<File> = PenguinDataType.values().load(dir, flush)
 }

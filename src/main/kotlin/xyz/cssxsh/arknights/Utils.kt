@@ -3,7 +3,6 @@ package xyz.cssxsh.arknights
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import java.io.File
 import java.time.ZoneId
 import java.util.*
@@ -26,22 +25,25 @@ typealias Server<T> = Map<ServerType, T>
 
 interface GameDataType {
     val path: String
+    val url: Url
 }
 
-internal inline fun <reified T> File.read(type: GameDataType): T = Json.decodeFromString(resolve(type.path).readText())
+internal inline fun <reified T> File.read(type: GameDataType): T = CustomJson.decodeFromString(resolve(type.path).readText())
 
-suspend fun <T : GameDataType> Iterable<T>.load(dir: File, flush: Boolean, build: (path: T) -> Url): List<File> {
+suspend fun <T : GameDataType> Iterable<T>.load(dir: File, flush: Boolean): List<File> {
     return useHttpClient { client ->
         map { type ->
             dir.resolve(type.path).also { file ->
                 if (flush || file.exists().not()) {
                     file.parentFile.mkdirs()
-                    file.writeText(client.get(build(type)))
+                    file.writeText(client.get(type.url))
                 }
             }
         }
     }
 }
+
+suspend fun <T : GameDataType> Array<T>.load(dir: File, flush: Boolean): List<File> = toList().load(dir, flush)
 
 internal val SIGN = """<[^>]*>""".toRegex()
 

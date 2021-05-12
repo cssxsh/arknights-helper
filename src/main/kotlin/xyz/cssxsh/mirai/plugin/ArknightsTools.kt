@@ -6,9 +6,9 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.utils.*
 import xyz.cssxsh.arknights.excel.*
+import xyz.cssxsh.arknights.market.*
 import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.arknights.penguin.*
-import java.time.LocalTime
 import kotlin.time.*
 
 internal val logger get() = ArknightsHelperPlugin.logger
@@ -42,8 +42,8 @@ private fun Array<out String>.check(tags: Set<String> = ExcelData.gacha.tags()):
 internal fun recruit(vararg words: String) = ExcelData.characters.recruit(words.check(), ExcelData.gacha.recruit())
 
 @JvmName("buildRecruitMessage")
-internal fun RecruitResult.getContent() = buildMessageChain {
-    this@getContent.forEach { (rarity, character) ->
+internal fun RecruitResult.toMessage() = buildMessageChain {
+    this@toMessage.forEach { (rarity, character) ->
         val sum = character.groupBy { it.name }.mapValues { it.value.size }.entries.sortedBy { it.value }.map {
             "${it.key}${if (it.value == 1) "" else "*${it.value}"}"
         }
@@ -52,25 +52,39 @@ internal fun RecruitResult.getContent() = buildMessageChain {
 }
 
 @JvmName("buildRecruitMapMessage")
-internal fun RecruitMap.getContent() = buildMessageChain {
-    this@getContent.forEach { (tags, result) ->
+internal fun RecruitMap.toMessage() = buildMessageChain {
+    this@toMessage.forEach { (tags, result) ->
         append("====> $tags ")
         if ((result.keys - 0).all { it >= 3 }) {
             appendLine("${(result.keys - 0).minOrNull()!! + 1}星保底")
         } else {
             appendLine("")
         }
-        append(result.getContent())
+        append(result.toMessage())
     }
+}
+
+@JvmName("buildMarketFaceMapMessage")
+internal fun ArknightsFaceMap.toMessage() = buildMessageChain {
+    appendLine("共${this@toMessage.size}个表情")
+    this@toMessage.forEach { (name, list) ->
+        appendLine("$name ${list.first().detail}")
+    }
+}
+
+@JvmName("buildArknightsFaceMapMessage")
+internal fun ArknightsFace.toMessage() = buildMessageChain {
+    appendLine("表情名: $title $content")
+    appendLine("详情: $detail")
+    appendLine("原图: $image")
+    appendLine("Hash: $key")
 }
 
 private fun Double.intercept(decimal: Int = 2) = "%.${decimal}f".format(this)
 
 private fun Duration.text() = toComponents { m, s, _ -> (if (m > 0) "${m}m" else "") + (if (s > 0) "${s}s" else "") }
 
-internal operator fun LocalTime.minus(other: LocalTime): Int = toSecondOfDay() - other.toSecondOfDay()
-
-private fun Pair<Matrix, Stage>.getContent() = buildMessageChain {
+private fun Pair<Matrix, Stage>.toMessage() = buildMessageChain {
     appendLine("概率: ${first.quantity}/${first.times}=${first.probability.intercept()}")
     appendLine("单件期望理智: ${single.intercept()}")
     appendLine("最短通关用时: ${stage.clear.text()}")
@@ -88,7 +102,7 @@ internal fun item(name: String, limit: Int) = buildMessageChain {
     (list with PenguinData.stages).sortedBy { it.single }.forEach { pair ->
         if (pair.stage.isGacha || count >= limit) return@forEach
         appendLine("=======> 作战: ${pair.stage.code} (cost=${pair.stage.cost}) ")
-        append(pair.getContent())
+        append(pair.toMessage())
         count++
     }
 }
@@ -110,7 +124,7 @@ internal fun stage(code: String, limit: Int) = buildMessageChain {
     (list with PenguinData.items).sortedByDescending { it.rarity }.forEach { (matrix, item) ->
         if (item.type != ItemType.MATERIAL || count >= limit) return@forEach
         appendLine("=======> 掉落: ${item.name} (rarity=${item.rarity}) ")
-        append((matrix to stage).getContent())
+        append((matrix to stage).toMessage())
         count++
     }
 }
@@ -124,7 +138,7 @@ internal fun zone(name: String, limit: Int) = buildMessageChain {
 
 internal fun QuestionType.build() = build(QuestionDataLoader)
 
-internal fun Question.getContent() = buildMessageChain {
+internal fun Question.toMessage() = buildMessageChain {
     appendLine("[${type}]<${coin}>：${problem} (${timeout.milliseconds}内作答)")
     options.forEach { (index, text) ->
         appendLine("${index}.${text}")

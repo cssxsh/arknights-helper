@@ -175,7 +175,7 @@ internal fun WeeklyMap(table: ZoneTable): WeeklyMap {
     }
 }
 
-class ExcelData(dir: File) {
+class ExcelData(private val dir: File) {
     private val building by lazy { dir.readBuilding() }
     private val character by lazy { dir.readCharacterTable() }
     val const by lazy { dir.readConstInfo() }
@@ -195,6 +195,8 @@ class ExcelData(dir: File) {
     private val zone by lazy { dir.readZoneTable() }
     val zones by lazy { ZoneMap(zone) }
     val weeks by lazy { WeeklyMap(zone) }
+
+    suspend fun download(flush: Boolean = false): List<File> = ExcelDataType.values().load(dir, flush)
 }
 
 enum class ExcelDataType(file: String) : GameDataType {
@@ -210,6 +212,8 @@ enum class ExcelDataType(file: String) : GameDataType {
     ZONE("zone_table.json");
 
     override val path = "excel/${file}"
+
+    override val url: Url = jsdelivr(this)
 }
 
 private fun path(type: GameDataType): String = "${SERVER.locale}/gamedata/${type.path}"
@@ -217,5 +221,3 @@ private fun path(type: GameDataType): String = "${SERVER.locale}/gamedata/${type
 private val github = { type: ExcelDataType -> Url("https://raw.githubusercontent.com/$GITHUB_REPO/master/${path(type)}") }
 
 private val jsdelivr = { type: ExcelDataType -> Url("https://cdn.jsdelivr.net/gh/$GITHUB_REPO@master/${path(type)}") }
-
-suspend fun Iterable<ExcelDataType>.download(dir: File, flush: Boolean = false): List<File> = load(dir, flush, jsdelivr)

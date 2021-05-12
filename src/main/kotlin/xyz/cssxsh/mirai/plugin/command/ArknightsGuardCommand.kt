@@ -14,14 +14,14 @@ object ArknightsGuardCommand : CompositeCommand(
     @SubCommand("detail", "详情")
     @Description("查看蹲饼详情")
     suspend fun CommandSenderOnMessage<*>.detail() = sendMessage {
-        "当前蹲饼状态${fromEvent.subject.delegate in GuardContacts}, 蹲饼间隔${GuardInterval}".toPlainText()
+        "当前蹲饼状态${fromEvent.subject.delegate in GuardContacts}, 蹲饼间隔${GuardInterval.minutes}".toPlainText()
     }
 
     @SubCommand("speed", "速度")
     @Description("设置微博蹲饼速度")
     suspend fun CommandSenderOnMessage<*>.speed(duration: Int) = sendMessage {
         check(duration in 1..10) { "速度 不合法 1~10 分钟" }
-        GuardInterval = duration.minutes
+        GuardInterval = duration
         "蹲饼速度已设置 ${duration}分钟".toPlainText()
     }
 

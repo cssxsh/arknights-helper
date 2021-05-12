@@ -15,10 +15,10 @@ object ArknightsDataCommand : CompositeCommand(
     @Description("方舟数据下载")
     suspend fun CommandSenderOnMessage<*>.arknights() = sendMessage {
         runCatching {
-            downloadExcelData(flush = true)
-            "${ARKNIGHTS_EXCEL_DATA}数据加载完毕"
+            ExcelData.download(flush = true)
+            "ExcelData 数据加载完毕"
         }.getOrElse {
-            "${ARKNIGHTS_EXCEL_DATA}数据加载失败, ${it.message}"
+            "ExcelData 数据加载失败, ${it.message}"
         }.toPlainText()
     }
 
@@ -26,10 +26,10 @@ object ArknightsDataCommand : CompositeCommand(
     @Description("企鹅物流数据下载")
     suspend fun CommandSenderOnMessage<*>.penguin() = sendMessage {
         runCatching {
-            downloadPenguinData(flush = true)
-            "${PENGUIN_DATA}数据加载完毕"
+            PenguinData.download(flush = true)
+            "PenguinData 数据加载完毕"
         }.getOrElse {
-            "${PENGUIN_DATA}数据加载失败, ${it.message}"
+            "PenguinData 数据加载失败, ${it.message}"
         }.toPlainText()
     }
 

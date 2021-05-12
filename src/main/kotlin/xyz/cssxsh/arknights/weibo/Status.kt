@@ -21,10 +21,6 @@ const val BLOG_API = "https://m.weibo.cn/api/container/getIndex"
 
 const val CONTENT_API = "https://m.weibo.cn/statuses/extend"
 
-private val weibo = { type: BlogUser -> Url(BLOG_API).copy(parameters = type.parameters) }
-
-suspend fun Iterable<BlogUser>.download(dir: File, flush: Boolean): List<File> = load(dir, flush, weibo)
-
 private fun File.readMicroBlogHistory(type: BlogUser): List<MicroBlog> {
     return read<Temp<WeiboData>>(type).data().cards.map { it.blog }
 }
@@ -35,22 +31,34 @@ private suspend fun getLongTextContent(id: Long): String {
     }.data().content.replace("<br />", "\n").remove(SIGN)
 }
 
-class MicroBlogData(private val dir: File) {
+class MicroBlogData(val dir: File) {
     val arknights get() = dir.readMicroBlogHistory(BlogUser.ARKNIGHTS)
+    val byproduct get() = dir.readMicroBlogHistory(BlogUser.BYPRODUCT)
+    val historicus get() = dir.readMicroBlogHistory(BlogUser.HISTORICUS)
+    val mounten get() = dir.readMicroBlogHistory(BlogUser.MOUNTEN)
+
+    val all get() = arknights + byproduct + historicus + mounten
+
+    suspend fun download(flush: Boolean): List<File> = BlogUser.values().load(dir, flush)
 }
 
 enum class BlogUser(val id: Long) : GameDataType {
-    ARKNIGHTS(6279793937);
+    ARKNIGHTS(6279793937),
+    BYPRODUCT(6441489862),
+    MOUNTEN(7506039414),
+    HISTORICUS(7499841383);
 
     override val path = "Blog(${id}).json"
 
-    val parameters = Parameters.build {
+    private val parameters = Parameters.build {
         append("value", "$id")
         append("containerid", "107603$id")
     }
+
+    override val url = Url(BLOG_API).copy(parameters = parameters)
 }
 
-val MicroBlog.images get() = pictures.map { Url("https://wx4.sinaimg.cn/orj360/${it}") }
+val MicroBlog.images get() = pictures.map { Url("https://wx4.sinaimg.cn/orj1080/${it}") }
 
 val MicroBlog.content get() = raw ?: text.replace("<br />", "\n").remove(SIGN)
 

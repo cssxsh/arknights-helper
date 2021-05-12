@@ -35,7 +35,7 @@ object ArknightsMineCommand : SimpleCommand(
         // XXX
         val types = list.map { enumValueOf<QuestionType>(it.toUpperCase()) }.toTypedArray().ifEmpty { QuestionType.values() }
         val question = types.random().build()
-        sendMessage(question.getContent())
+        sendMessage(question.toMessage())
 
         val (reply, time) = mutex.withLock {
             measureTimedValue {
