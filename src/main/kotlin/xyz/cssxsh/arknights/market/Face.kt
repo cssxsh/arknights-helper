@@ -38,11 +38,11 @@ private fun FaceItemMap.types() = mapValues { (id, _) ->
 
 fun File.readMarketFaceMap(items: FaceItemMap): MarketFaceMap = items.types().mapValues { (_, type) -> read(type) }
 
-data class ArknightsFaceData(val dir: File, val items: FaceItemMap) {
+data class ArknightsFaceData(override val dir: File, val items: FaceItemMap): GameDataDownloader {
     val data by lazy { dir.readMarketFaceMap(items) }
     val faces by lazy { ArknightsFaceMap(data, items) }
 
-    suspend fun download(flush: Boolean) = items.types().values.load(dir, flush)
+    override val types: Iterable<GameDataType> get() = items.types().values
 }
 
 typealias MarketFaceMap = Map<Int, MarketFaceData>

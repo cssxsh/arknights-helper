@@ -43,7 +43,7 @@ private fun File.readMatrices() = read<MatrixData>(PenguinDataType.RESULT_MATRIX
 
 private fun File.readPatterns() = read<PatternData>(PenguinDataType.RESULT_PATTERN).patterns
 
-class PenguinData(val dir: File) {
+class PenguinData(override val dir: File): GameDataDownloader {
     val items by lazy { dir.readItems() }
     val stages by lazy { dir.readStages() }
     val zones by lazy { dir.readZones() }
@@ -52,5 +52,5 @@ class PenguinData(val dir: File) {
     val matrices by lazy { dir.readMatrices() }
     val patterns by lazy { dir.readPatterns() }
 
-    suspend fun download(flush: Boolean): List<File> = PenguinDataType.values().load(dir, flush)
+    override val types get() = PenguinDataType.values().asIterable()
 }

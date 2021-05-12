@@ -22,14 +22,14 @@ private fun File.readVideoHistory(type: VideoDataType): List<Video> {
     return read<Temp>(type).let { requireNotNull(it.data) { it.message } }.list.videos
 }
 
-class VideoData(val dir: File) {
+class VideoData(override val dir: File): GameDataDownloader {
     val anime get() = dir.readVideoHistory(VideoDataType.ANIME)
     val music get() = dir.readVideoHistory(VideoDataType.MUSIC)
     val game get() = dir.readVideoHistory(VideoDataType.GAME)
 
     val all get() = anime + music + game
 
-    suspend fun download(flush: Boolean) = VideoDataType.values().load(dir, flush)
+    override val types get() = VideoDataType.values().asIterable()
 }
 
 val Video.url get() = Url("https://www.bilibili.com/video/${bvid}")

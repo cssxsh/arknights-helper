@@ -28,6 +28,12 @@ interface GameDataType {
     val url: Url
 }
 
+interface GameDataDownloader {
+    val dir: File
+    val types: Iterable<GameDataType>
+    suspend fun download(flush: Boolean) = types.load(dir, flush)
+}
+
 internal inline fun <reified T> File.read(type: GameDataType): T = CustomJson.decodeFromString(resolve(type.path).readText())
 
 suspend fun <T : GameDataType> Iterable<T>.load(dir: File, flush: Boolean): List<File> {
@@ -42,8 +48,6 @@ suspend fun <T : GameDataType> Iterable<T>.load(dir: File, flush: Boolean): List
         }
     }
 }
-
-suspend fun <T : GameDataType> Array<T>.load(dir: File, flush: Boolean): List<File> = toList().load(dir, flush)
 
 internal val SIGN = """<[^>]*>""".toRegex()
 

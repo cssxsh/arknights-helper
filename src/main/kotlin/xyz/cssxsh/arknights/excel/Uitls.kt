@@ -175,7 +175,7 @@ internal fun WeeklyMap(table: ZoneTable): WeeklyMap {
     }
 }
 
-class ExcelData(private val dir: File) {
+class ExcelData(override val dir: File): GameDataDownloader {
     private val building by lazy { dir.readBuilding() }
     private val character by lazy { dir.readCharacterTable() }
     val const by lazy { dir.readConstInfo() }
@@ -196,7 +196,7 @@ class ExcelData(private val dir: File) {
     val zones by lazy { ZoneMap(zone) }
     val weeks by lazy { WeeklyMap(zone) }
 
-    suspend fun download(flush: Boolean = false): List<File> = ExcelDataType.values().load(dir, flush)
+    override val types get() = ExcelDataType.values().asIterable()
 }
 
 enum class ExcelDataType(file: String) : GameDataType {

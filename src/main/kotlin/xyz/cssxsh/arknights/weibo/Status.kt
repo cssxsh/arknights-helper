@@ -31,7 +31,7 @@ private suspend fun getLongTextContent(id: Long): String {
     }.data().content.replace("<br />", "\n").remove(SIGN)
 }
 
-class MicroBlogData(val dir: File) {
+class MicroBlogData(override val dir: File): GameDataDownloader {
     val arknights get() = dir.readMicroBlogHistory(BlogUser.ARKNIGHTS)
     val byproduct get() = dir.readMicroBlogHistory(BlogUser.BYPRODUCT)
     val historicus get() = dir.readMicroBlogHistory(BlogUser.HISTORICUS)
@@ -39,7 +39,7 @@ class MicroBlogData(val dir: File) {
 
     val all get() = arknights + byproduct + historicus + mounten
 
-    suspend fun download(flush: Boolean): List<File> = BlogUser.values().load(dir, flush)
+    override val types get() = BlogUser.values().asIterable()
 }
 
 enum class BlogUser(val id: Long) : GameDataType {
