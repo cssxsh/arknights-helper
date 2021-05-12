@@ -57,13 +57,13 @@ private suspend fun sendVideo(video: Video) = sendToTaskContacts { contact ->
     runCatching {
         val image = VideoData.dir.resolve(video.created.date()).resolve(video.url.filename).apply {
             if (exists().not()) {
-                mkdirs()
+                parentFile.mkdirs()
                 writeBytes(useHttpClient { it.get(video.pic) })
             }
         }
         append(image.uploadAsImage(contact))
     }.onFailure {
-        appendLine("添加图片[${video.url}]失败")
+        appendLine("添加图片[${video.url}]失败, ${it.message}")
     }
 }
 
@@ -82,13 +82,13 @@ private suspend fun sendMicroBlog(blog: MicroBlog) = sendToTaskContacts { contac
         runCatching {
             val file = MicroBlogData.dir.resolve(blog.createdAt.date()).resolve(url.filename).apply {
                 if (exists().not()) {
-                    mkdirs()
+                    parentFile.mkdirs()
                     writeBytes(useHttpClient { it.get(url) })
                 }
             }
             append(file.uploadAsImage(contact))
         }.onFailure {
-            appendLine("添加图片[${url}]失败")
+            appendLine("添加图片[${url}]失败, ${it.message}")
         }
     }
 }

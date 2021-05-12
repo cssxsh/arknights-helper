@@ -58,7 +58,7 @@ enum class BlogUser(val id: Long) : GameDataType {
     override val url = Url(BLOG_API).copy(parameters = parameters)
 }
 
-val MicroBlog.images get() = pictures.map { Url("https://wx4.sinaimg.cn/orj1080/${it}") }
+val MicroBlog.images get() = pictures.map { Url("https://wx4.sinaimg.cn/orj1080/${it}.jpg") }
 
 val MicroBlog.content get() = raw ?: text.replace("<br />", "\n").remove(SIGN)
 
