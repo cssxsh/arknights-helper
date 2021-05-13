@@ -4,8 +4,10 @@ import net.mamoe.mirai.console.command.CommandSenderOnMessage
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
+import net.mamoe.mirai.message.nextMessage
 import net.mamoe.mirai.utils.*
 import xyz.cssxsh.arknights.excel.*
+import xyz.cssxsh.arknights.intercept
 import xyz.cssxsh.arknights.market.*
 import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.arknights.penguin.*
@@ -24,9 +26,16 @@ internal suspend fun <T : CommandSenderOnMessage<*>> T.sendMessage(block: suspen
     }.isSuccess
 }
 
-private fun Array<out String>.check(tags: Set<String> = ExcelData.gacha.tags()): Set<String> {
-    return map { word ->
-        val temp = tags.map { it.substring(0..1) }
+internal suspend fun <T : CommandSenderOnMessage<*>> T.nextContent(): String {
+    return fromEvent.nextMessage { it.message.content.isNotBlank() }.content
+}
+
+/**
+ * 检查并转换TAG
+ */
+internal fun Collection<String>.tag(tags: Set<String> = ExcelData.gacha.tags()): Set<String> {
+    val temp = tags.map { it.substring(0..1) }
+    return map { it.trim() }.filter { it.isNotBlank() }.map { word ->
         when (word) {
             in tags -> word
             "高资" -> "高级资深干员"
@@ -39,7 +48,15 @@ private fun Array<out String>.check(tags: Set<String> = ExcelData.gacha.tags()):
     }.toSet()
 }
 
-internal fun recruit(vararg words: String) = ExcelData.characters.recruit(words.check(), ExcelData.gacha.recruit())
+internal fun recruit(words: List<String>) = ExcelData.characters.recruit(words.tag(), ExcelData.gacha.recruit())
+
+internal fun String.role(roles: Set<String> = ExcelData.gacha.recruit()) = trim().let { name ->
+    when (name) {
+        in roles -> name
+        in RoleAlias -> RoleAlias.getValue(name)
+        else -> throw IllegalArgumentException("未知干员: $name")
+    }
+}
 
 @JvmName("buildRecruitMessage")
 internal fun RecruitResult.toMessage() = buildMessageChain {
@@ -80,9 +97,7 @@ internal fun ArknightsFace.toMessage() = buildMessageChain {
     appendLine("Hash: $key")
 }
 
-private fun Double.intercept(decimal: Int = 2) = "%.${decimal}f".format(this)
-
-private fun Duration.text() = toComponents { m, s, _ -> (if (m > 0) "${m}m" else "") + (if (s > 0) "${s}s" else "") }
+private fun Duration.text() = toComponents { minutes, seconds, _ -> "${minutes}m${seconds}s" }
 
 private fun Pair<Matrix, Stage>.toMessage() = buildMessageChain {
     appendLine("概率: ${first.quantity}/${first.times}=${first.probability.intercept()}")

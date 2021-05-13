@@ -47,17 +47,17 @@ object ArknightsQuestionCommand : CompositeCommand(
     @Description("设置问题")
     suspend fun CommandSenderOnMessage<*>.add() = sendMessage {
         sendMessage("问题:")
-        val problem = fromEvent.nextMessage().content
+        val problem = nextContent()
         sendMessage("正确选项(按行分割):")
-        val right = fromEvent.nextMessage().content.lines()
+        val right = nextContent().lines()
         sendMessage("错误选项(按行分割):")
-        val error = fromEvent.nextMessage().content.lines()
+        val error = nextContent().lines()
         sendMessage("合成玉:")
-        val coin = fromEvent.nextMessage().content.toInt()
+        val coin = nextContent().toInt()
         sendMessage("提示:")
-        val tips = fromEvent.nextMessage().content
+        val tips = nextContent()
         sendMessage("时间(单位秒):")
-        val duration = fromEvent.nextMessage().content.toLong().seconds
+        val duration = nextContent().toLong().seconds
         val question = CustomQuestion(problem, right, error, coin, tips, duration)
         CustomQuestions += ("${fromEvent.sender.nick} ${OffsetDateTime.now().withNano(0)}" to question)
         "问题${question} 已添加".toPlainText()

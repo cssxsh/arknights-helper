@@ -52,3 +52,5 @@ suspend fun <T : GameDataType> Iterable<T>.load(dir: File, flush: Boolean): List
 internal val SIGN = """<[^>]*>""".toRegex()
 
 fun String.remove(regex: Regex) = replace(regex, "")
+
+fun Double.intercept(decimal: Int = 2) = "%.${decimal}f%%".format(this * 100)

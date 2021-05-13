@@ -55,4 +55,19 @@ internal var GuardInterval by ArknightsTaskData::interval
 /**
  * 要加载的表情列表
  */
-internal val FaceItems by ArknightsTaskData::faces
+internal val FaceItems by ArknightsConfig::faces
+
+/**
+ * 公招结果
+ */
+internal val RecruitResult by ArknightsUserData::result
+
+/**
+ * 自定义干员别名
+ */
+internal val RoleAlias by ArknightsConfig::roles
+
+/**
+ * 自定义材料别名
+ */
+internal val ItemAlias by ArknightsConfig::items

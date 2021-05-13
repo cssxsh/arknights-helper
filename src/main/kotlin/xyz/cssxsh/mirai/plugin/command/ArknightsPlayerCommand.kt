@@ -4,6 +4,7 @@ import net.mamoe.mirai.console.command.CommandSenderOnMessage
 import net.mamoe.mirai.console.command.CompositeCommand
 import net.mamoe.mirai.message.data.buildMessageChain
 import net.mamoe.mirai.message.data.toPlainText
+import xyz.cssxsh.arknights.user.table
 import xyz.cssxsh.mirai.plugin.*
 import java.time.Instant
 import java.time.OffsetDateTime
@@ -65,4 +66,8 @@ object ArknightsPlayerCommand : CompositeCommand(
         recruit = recruit + (site to time)
         "公招位置[${site}]设置 ${hours}小时${minutes}分 完成".toPlainText()
     }
+
+    @SubCommand("record", "记录")
+    @Description("公招结果记录")
+    suspend fun CommandSenderOnMessage<*>.record(page: Int = 1) = sendMessage { result.table(page).toPlainText() }
 }

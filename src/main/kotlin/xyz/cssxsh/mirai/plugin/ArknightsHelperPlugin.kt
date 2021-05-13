@@ -34,6 +34,7 @@ object ArknightsHelperPlugin : KotlinPlugin(
         ArknightsPoolData.reload()
         ArknightsMineData.reload()
         ArknightsTaskData.reload()
+        ArknightsConfig.reload()
         ArknightsRecruitCommand.register()
         ArknightsGachaCommand.register()
         ArknightsPlayerCommand.register()

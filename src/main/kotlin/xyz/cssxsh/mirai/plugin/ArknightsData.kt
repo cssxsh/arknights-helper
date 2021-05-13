@@ -9,9 +9,11 @@ import net.mamoe.mirai.contact.Group
 import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.market.*
 import xyz.cssxsh.arknights.mine.*
+import xyz.cssxsh.arknights.user.*
 import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
+import kotlin.time.seconds
 
 /**
  * 合成玉数量
@@ -32,6 +34,11 @@ var CommandSenderOnMessage<*>.reason: Long by ArknightsUserData.sender()
  * 玩家公招到达时间
  */
 var CommandSenderOnMessage<*>.recruit: Map<Int, Long> by ArknightsUserData.sender()
+
+/**
+ * 玩家公招结果
+ */
+var CommandSenderOnMessage<*>.result: List<UserRecruit> by ArknightsUserData.sender()
 
 /**
  * 玩家理智最大值
@@ -69,6 +76,10 @@ object ArknightsUserData : AutoSavePluginData("user") {
     @Suppress("unused")
     @ValueDescription("Key 是QQ号，Value是公招预警预警时间戳")
     val recruit by value<MutableMap<Long, Map<Int, Long>>>().withDefault { emptyMap() }
+
+    @Suppress("unused")
+    @ValueDescription("Key 是QQ号，Value是公招结果")
+    val result by value<MutableMap<Long, List<UserRecruit>>>().withDefault { emptyList() }
 }
 
 object ArknightsPoolData : AutoSavePluginConfig("pool") {
@@ -76,32 +87,28 @@ object ArknightsPoolData : AutoSavePluginConfig("pool") {
     @ValueDescription("Key 是QQ号/QQ群号，Value是规则名")
     val pool by value<MutableMap<Long, String>>().withDefault { GachaPoolRule.NORMAL.name }
 
-    private val default = GachaPoolRule.values().associate { it.name to it.rule }
+    private val default get() = GachaPoolRule.values().associate { it.name to it.rule }
 
     @ValueDescription("Key 规则名，Value是卡池规则")
     val rules by value<MutableMap<String, String>>().withDefault { default.getValue(it) }
 }
 
 object ArknightsMineData : AutoSavePluginData("mine") {
-    private val default: MutableMap<String, CustomQuestion>.() -> Unit = {
-        put(
-            "default", CustomQuestion(
-                problem = "以下那个干员被称为老女人",
-                options = mapOf(
-                    "凯尔希" to true,
-                    "华法琳" to false,
-                    "黑" to false,
-                    "斯卡蒂" to false
-                ),
-                tips = "还行，合成玉没有被扣",
-                coin = -1000,
-                timeout = 30000
-            )
-        )
-    }
+    private val default = CustomQuestion(
+        problem = "以下那个干员被称为老女人",
+        options = mapOf(
+            "凯尔希" to true,
+            "华法琳" to false,
+            "黑" to false,
+            "斯卡蒂" to false
+        ),
+        tips = "还行，合成玉没有被扣",
+        coin = -1000,
+        timeout = (30).seconds.toLongMilliseconds()
+    )
 
     @ValueDescription("Key 是问题ID，Value是问题")
-    val question by value(default)
+    val question by value(mutableMapOf("default" to default))
 }
 
 object ArknightsTaskData : AutoSavePluginConfig("task") {
@@ -110,9 +117,22 @@ object ArknightsTaskData : AutoSavePluginConfig("task") {
 
     @ValueDescription("蹲饼轮询间隔，单位分钟，默认5分钟")
     var interval by value<Int>(5)
+}
 
+object ArknightsConfig : ReadOnlyPluginConfig("config") {
     @ValueDescription("Key 是表情ID, Value 是表情Hash")
     val faces by value(DefaultItems)
+
+    private val DefaultRoles = mutableMapOf(
+        "羊" to "艾雅法拉",
+        "鳄鱼" to "艾丝黛尔"
+    )
+
+    @ValueDescription("Key 是别名 Value 是干员名")
+    val roles by value(DefaultRoles)
+
+    @ValueDescription("Key 是别名 Value 是材料名")
+    val items by value(mutableMapOf<String, String>())
 }
 
 /**

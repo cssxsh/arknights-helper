@@ -11,6 +11,11 @@ object ArknightsItemCommand : SimpleCommand(
 ) {
     @Handler
     suspend fun CommandSenderOnMessage<*>.handler(name: String, limit: Int = 5) = sendMessage {
-        item(name = name, limit = limit)
+        runCatching {
+            item(name = name, limit = limit)
+        }.recoverCatching {
+            sendMessage("查找失败, 尝试自定义别名, ${it.message}")
+            item(name = ItemAlias.getValue(name), limit = limit)
+        }.getOrThrow()
     }
 }
