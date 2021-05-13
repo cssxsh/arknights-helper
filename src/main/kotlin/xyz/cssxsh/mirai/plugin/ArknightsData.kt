@@ -153,15 +153,3 @@ fun <T, K, V> AbstractPluginData.delegate(key: T.() -> K) = object : ReadWritePr
 fun <V> AbstractPluginData.sender() = delegate<CommandSenderOnMessage<*>, Long, V> { fromEvent.sender.id }
 
 fun <V> AbstractPluginData.subject() = delegate<CommandSenderOnMessage<*>, Long, V> { fromEvent.subject.delegate }
-
-class SubjectDelegate<T>(private val default: (Contact) -> T) : ReadWriteProperty<CommandSenderOnMessage<*>, T> {
-    private val map: MutableMap<Contact, T> = mutableMapOf()
-
-    override fun setValue(thisRef: CommandSenderOnMessage<*>, property: KProperty<*>, value: T) {
-        map[thisRef.fromEvent.subject] = value
-    }
-
-    override fun getValue(thisRef: CommandSenderOnMessage<*>, property: KProperty<*>): T {
-        return map.getOrPut(thisRef.fromEvent.subject) { default(thisRef.fromEvent.subject) }
-    }
-}
