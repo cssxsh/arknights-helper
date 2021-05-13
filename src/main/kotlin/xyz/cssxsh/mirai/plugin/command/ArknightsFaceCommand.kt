@@ -34,7 +34,7 @@ object ArknightsFaceCommand: CompositeCommand(
     @Description("表情详情")
     suspend fun CommandSenderOnMessage<*>.detail() = sendMessage {
         val face = fromEvent.nextMessage { message.anyIsInstance<MarketFace>() }.firstIsInstance<MarketFace>()
-        "KEY: ${face.hash}\n".toPlainText() +
+        // logger.info { "KEY: ${face.hash}" }
         ArknightsFaceData.faces.getValue(face.id).first { it.md5 == face.md5 }.toMessage()
     }
 }

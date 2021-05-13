@@ -15,8 +15,7 @@ import kotlin.time.measureTimedValue
 object ArknightsMineCommand : SimpleCommand(
     owner = ArknightsHelperPlugin,
     "mine", "挖矿", "答题",
-    description = "明日方舟助手挖矿指令",
-    overrideContext = ArknightsCommandArgumentContext
+    description = "明日方舟助手挖矿指令"
 ) {
 
     private suspend inline fun <reified P : MessageEvent> P.nextAnswerOrNull(
@@ -31,10 +30,10 @@ object ArknightsMineCommand : SimpleCommand(
     }
 
     @Handler
-    suspend fun CommandSenderOnMessage<*>.handler(vararg list: String) {
+    suspend fun CommandSenderOnMessage<*>.handler(type: QuestionType? = null) {
         // XXX
-        val types = list.map { enumValueOf<QuestionType>(it.toUpperCase()) }.toTypedArray().ifEmpty { QuestionType.values() }
-        val question = types.random().build()
+        // val types = list.map { enumValueOf<QuestionType>(it.toUpperCase()) }.toTypedArray().ifEmpty { QuestionType.values() }
+        val question = (type ?: QuestionType.values().random()).build()
         sendMessage(question.toMessage())
 
         val (reply, time) = mutex.withLock {
@@ -46,31 +45,31 @@ object ArknightsMineCommand : SimpleCommand(
         }
         if (reply == null) {
             sendMessage("回答超时")
-        } else {
-            val answer = reply.message.content.toUpperCase().filter { it in question.options.keys }.toSet()
-            var multiple = 1
-            var deduct = false
-            val origin = fromEvent.sender
-            reply.toCommandSender().sendMessage {
-                buildMessageChain {
-                    if (reply.sender != origin) {
-                        multiple *= 10
-                        deduct = true
-                        appendLine("抢答（合成玉翻10倍）")
-                    }
-                    if (time.toLongMilliseconds() * 3 < question.timeout) {
-                        multiple *= 5
-                        appendLine("快速回答（合成玉翻5倍）")
-                    }
-                    if (answer == question.answer) {
-                        coin += (question.coin * multiple)
-                        appendLine("回答正确，合成玉${"%+d".format(question.coin)}*${multiple}")
-                    } else {
-                        appendLine("回答错误${answer}, ${question.tips ?: "参考答案${question.answer}"}")
-                        if (deduct) {
-                            coin -= (question.coin * multiple)
-                            appendLine("抢答，合成玉${"%+d".format(question.coin * -1)}*${multiple}")
-                        }
+            return
+        }
+        val answer = reply.message.content.toUpperCase().filter { it in question.options.keys }.toSet()
+        var multiple = 1
+        var deduct = false
+        val origin = fromEvent.sender
+        reply.toCommandSender().sendMessage {
+            buildMessageChain {
+                if (reply.sender != origin) {
+                    multiple *= 10
+                    deduct = true
+                    appendLine("抢答（合成玉翻10倍）")
+                }
+                if (time.toLongMilliseconds() * 3 < question.timeout) {
+                    multiple *= 5
+                    appendLine("快速回答（合成玉翻5倍）")
+                }
+                if (answer == question.answer) {
+                    coin += (question.coin * multiple)
+                    appendLine("回答正确，合成玉${"%+d".format(question.coin)}*${multiple}")
+                } else {
+                    appendLine("回答错误${answer}, ${question.tips ?: "参考答案${question.answer}"}")
+                    if (deduct) {
+                        coin -= (question.coin * multiple)
+                        appendLine("抢答，合成玉${"%+d".format(question.coin * -1)}*${multiple}")
                     }
                 }
             }
