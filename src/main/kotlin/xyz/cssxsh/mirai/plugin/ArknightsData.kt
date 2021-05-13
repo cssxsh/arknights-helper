@@ -135,11 +135,6 @@ object ArknightsConfig : ReadOnlyPluginConfig("config") {
     val items by value(mutableMapOf<String, String>())
 }
 
-/**
- * 通过正负号区分群和用户
- */
-internal val Contact.delegate get() = if (this is Group) id * -1 else id
-
 fun <T, K, V> AbstractPluginData.delegate(key: T.() -> K) = object : ReadWriteProperty<T, V> {
     override fun getValue(thisRef: T, property: KProperty<*>): V {
         return findBackingFieldValue<MutableMap<K, V>>(property.name)!!.value.getValue(thisRef.key())

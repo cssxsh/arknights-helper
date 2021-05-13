@@ -19,18 +19,6 @@ import java.time.OffsetDateTime
 import kotlin.math.abs
 import kotlin.time.*
 
-@Suppress("FunctionName")
-private fun UserOrNull(id: Long): User? {
-    Bot.instances.forEach { bot ->
-        bot.getFriend(id)?.let { return@UserOrNull it }
-        bot.getStranger(id)?.let { return@UserOrNull it }
-        bot.groups.forEach { group ->
-            group.getMember(id)?.let { return@UserOrNull it }
-        }
-    }
-    return null
-}
-
 private val Url.filename get() = encodedPath.substringAfterLast('/')
 
 private fun OffsetDateTime.date() = toLocalDate().toString()
@@ -94,7 +82,7 @@ private suspend fun sendMicroBlog(blog: MicroBlog) = sendToTaskContacts { contac
 
 private suspend fun sendReasonClock(id: Long) {
     runCatching {
-        val user = requireNotNull(UserOrNull(id)) { "未找到用户" }
+        val user = requireNotNull(findContact(id)) { "未找到用户" }
         val massage = " 理智警告 ".toPlainText()
         if (user is Member) {
             user.group.sendMessage(massage + At(user))
@@ -108,7 +96,7 @@ private suspend fun sendReasonClock(id: Long) {
 
 private suspend fun sendRecruitClock(id: Long, site: Int) {
     runCatching {
-        val user = requireNotNull(UserOrNull(id)) { "未找到用户" }
+        val user = requireNotNull(findContact(id)) { "未找到用户" }
         val massage = " 公招位置${site}警告 ".toPlainText()
         if (user is Member) {
             user.group.sendMessage(massage + At(user))

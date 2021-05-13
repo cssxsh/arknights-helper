@@ -1,11 +1,8 @@
 package xyz.cssxsh.mirai.plugin
 
 import net.mamoe.mirai.console.command.CommandSenderOnMessage
-import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.message.data.*
-import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.nextMessage
-import net.mamoe.mirai.utils.*
 import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.intercept
 import xyz.cssxsh.arknights.market.*
@@ -14,17 +11,6 @@ import xyz.cssxsh.arknights.penguin.*
 import kotlin.time.*
 
 internal val logger get() = ArknightsHelperPlugin.logger
-
-internal suspend fun <T : CommandSenderOnMessage<*>> T.sendMessage(block: suspend T.(Contact) -> Message): Boolean {
-    return runCatching {
-        block(fromEvent.subject)
-    }.onSuccess {
-        sendMessage(fromEvent.message.quote() + it)
-    }.onFailure {
-        logger.warning({ "对${fromEvent.subject}构建消息失败" }, it)
-        sendMessage(fromEvent.message.quote() + it.toString())
-    }.isSuccess
-}
 
 internal suspend fun <T : CommandSenderOnMessage<*>> T.nextContent(): String {
     return fromEvent.nextMessage { it.message.content.isNotBlank() }.content
