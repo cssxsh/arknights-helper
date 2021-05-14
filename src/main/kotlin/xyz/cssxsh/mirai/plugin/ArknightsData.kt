@@ -110,7 +110,7 @@ object ArknightsMineData : AutoSavePluginData("mine") {
 }
 
 object ArknightsTaskData : AutoSavePluginConfig("task") {
-    @ValueDescription("Key 是QQ号/QQ群号，Value是是否开启了提醒")
+    @ValueDescription("开启了提醒的QQ号/QQ群号(正负性区别，QQ群是负数)")
     val contacts by value<MutableSet<Long>>()
 
     @ValueDescription("蹲饼轮询间隔，单位分钟，默认5分钟")
