@@ -47,7 +47,7 @@ object ArknightsDataCommand : CompositeCommand(
         "数据已重载".toPlainText()
     }
 
-    @SubCommand("recruit", "公招", "公招结果")
+    @SubCommand("recruit", "公招")
     @Description("提交公招结果")
     suspend fun CommandSenderOnMessage<*>.recruit(times: Int = 1) = sendMessage {
         for (index in 1..times) {

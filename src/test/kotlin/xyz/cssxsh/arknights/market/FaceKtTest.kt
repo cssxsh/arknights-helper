@@ -7,7 +7,7 @@ import java.io.File
 
 internal class FaceKtTest {
 
-    private val data = ArknightsFaceData(File("./test/MarketFace/"), DefaultItems)
+    private val data = ArknightsFaceData(File("./test/MarketFace/"), DefaultFaceItems)
 
     @Test
     fun load(): Unit = runBlocking {

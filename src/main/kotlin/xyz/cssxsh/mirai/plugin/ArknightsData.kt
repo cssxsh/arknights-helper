@@ -4,8 +4,6 @@ import kotlinx.coroutines.sync.Mutex
 import net.mamoe.mirai.console.command.CommandSenderOnMessage
 import net.mamoe.mirai.console.data.*
 import net.mamoe.mirai.console.data.PluginDataExtensions.withDefault
-import net.mamoe.mirai.contact.Contact
-import net.mamoe.mirai.contact.Group
 import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.market.*
 import xyz.cssxsh.arknights.mine.*
@@ -121,7 +119,7 @@ object ArknightsTaskData : AutoSavePluginConfig("task") {
 
 object ArknightsConfig : ReadOnlyPluginConfig("config") {
     @ValueDescription("Key 是表情ID, Value 是表情Hash")
-    val faces by value(DefaultItems)
+    val faces by value(DefaultFaceItems)
 
     private val DefaultRoles = mutableMapOf(
         "羊" to "艾雅法拉",
@@ -131,8 +129,12 @@ object ArknightsConfig : ReadOnlyPluginConfig("config") {
     @ValueDescription("Key 是别名 Value 是干员名")
     val roles by value(DefaultRoles)
 
+    private val DefaultItems = mutableMapOf(
+        "绿管" to "晶体元件"
+    )
+
     @ValueDescription("Key 是别名 Value 是材料名")
-    val items by value(mutableMapOf<String, String>())
+    val items by value(DefaultItems)
 }
 
 fun <T, K, V> AbstractPluginData.delegate(key: T.() -> K) = object : ReadWriteProperty<T, V> {

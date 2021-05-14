@@ -10,7 +10,7 @@ import xyz.cssxsh.mirai.plugin.*
 
 object ArknightsFaceCommand: CompositeCommand(
     owner = ArknightsHelperPlugin,
-    "arknights", "方舟表情",
+    "arkface", "方舟表情",
     description = "明日方舟助手表情指令"
 ) {
 

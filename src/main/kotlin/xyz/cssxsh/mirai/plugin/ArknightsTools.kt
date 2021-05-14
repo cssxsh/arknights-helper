@@ -10,7 +10,7 @@ import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.arknights.penguin.*
 import kotlin.time.*
 
-internal val logger get() = ArknightsHelperPlugin.logger
+internal val logger by ArknightsHelperPlugin::logger
 
 internal suspend fun <T : CommandSenderOnMessage<*>> T.nextContent(): String {
     return fromEvent.nextMessage { it.message.content.isNotBlank() }.content
@@ -109,6 +109,7 @@ internal fun item(name: String, limit: Int) = buildMessageChain {
 }
 
 internal fun alias() = buildMessageChain {
+    appendLine("企鹅物流材料别名")
     PenguinData.items.forEach { item ->
         appendLine("名称: ${item.i18n.get()}，别名: ${item.alias.get()}")
     }

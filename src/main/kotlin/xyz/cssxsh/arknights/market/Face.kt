@@ -55,7 +55,7 @@ val ArknightsFace.image
 val ArknightsFace.detail
     get() = Url("https://zb.vip.qq.com/hybrid/emoticonmall/detail?id=$id")
 
-val DefaultItems: FaceItemMap by lazy {
+val DefaultFaceItems: FaceItemMap by lazy {
     mutableMapOf(
         // 官方
         209583 to "4b4fc6ec7911520c",
