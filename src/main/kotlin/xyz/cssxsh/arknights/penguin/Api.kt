@@ -4,13 +4,11 @@ import io.ktor.http.*
 import xyz.cssxsh.arknights.*
 import java.io.File
 
-const val PENGUIN_STATS_CN = "penguin-stats.cn"
+private const val PENGUIN_STATS_CN = "penguin-stats.cn"
 
-const val PENGUIN_STATS_IO = "penguin-stats.io"
+private const val PENGUIN_STATS_IO = "penguin-stats.io"
 
-val penguin = { type: PenguinDataType -> Url("https://${PENGUIN_STATS_CN}/PenguinStats/api/v2/${type.path}") }
-
-enum class PenguinDataType: GameDataType {
+enum class PenguinDataType : GameDataType {
     // BASE
     ITEMS,
     STAGES,
@@ -19,29 +17,33 @@ enum class PenguinDataType: GameDataType {
     STATS,
 
     // STATS
-    RESULT_MATRIX { override val path get() = "_private/result/matrix/${SERVER}/global.json" },
-    RESULT_PATTERN { override val path get() = "_private/result/pattern/${SERVER}/global.json" };
+    RESULT_MATRIX {
+        override val path get() = "_private/result/matrix/${SERVER}/global.json"
+    },
+    RESULT_PATTERN {
+        override val path get() = "_private/result/pattern/${SERVER}/global.json"
+    };
 
-    override val path = "${name.toLowerCase()}.json"
+    override val path get() = "${name.toLowerCase()}.json"
+
+    override val url: Url get() = Url("https://${PENGUIN_STATS_CN}/PenguinStats/api/v2/${path}")
 }
 
-suspend fun Iterable<PenguinDataType>.download(dir: File, flush: Boolean = false): List<File> = load(dir, flush, penguin)
+private fun File.readItems(): List<Item> = read(PenguinDataType.ITEMS)
 
-fun File.readItems(): List<Item> = read(PenguinDataType.ITEMS)
+private fun File.readStages(): List<Stage> = read(PenguinDataType.STAGES)
 
-fun File.readStages(): List<Stage> = read(PenguinDataType.STAGES)
+private fun File.readZones(): List<Zone> = read(PenguinDataType.ZONES)
 
-fun File.readZones(): List<Zone> = read(PenguinDataType.ZONES)
+private fun File.readPeriod(): List<Period> = read(PenguinDataType.PERIOD)
 
-fun File.readPeriod(): List<Period> = read(PenguinDataType.PERIOD)
+private fun File.readStats(): ServerStats = read(PenguinDataType.STATS)
 
-fun File.readStats(): ServerStats = read(PenguinDataType.STATS)
+private fun File.readMatrices() = read<MatrixData>(PenguinDataType.RESULT_MATRIX).matrices
 
-fun File.readMatrices() = read<MatrixData>(PenguinDataType.RESULT_MATRIX).matrices
+private fun File.readPatterns() = read<PatternData>(PenguinDataType.RESULT_PATTERN).patterns
 
-fun File.readPatterns() = read<PatternData>(PenguinDataType.RESULT_PATTERN).patterns
-
-class PenguinData(dir: File) {
+class PenguinData(override val dir: File): GameDataDownloader {
     val items by lazy { dir.readItems() }
     val stages by lazy { dir.readStages() }
     val zones by lazy { dir.readZones() }
@@ -49,4 +51,6 @@ class PenguinData(dir: File) {
     val stats by lazy { dir.readStats() }
     val matrices by lazy { dir.readMatrices() }
     val patterns by lazy { dir.readPatterns() }
+
+    override val types get() = PenguinDataType.values().asIterable()
 }

@@ -3,8 +3,6 @@ package xyz.cssxsh.arknights.excel
 import io.ktor.http.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import xyz.cssxsh.arknights.*
 import java.io.File
 import java.time.OffsetDateTime
@@ -95,9 +93,89 @@ data class LegacyItem(
     override val id: String,
     @SerialName("type")
     val type: String
-): Id
+) : Id
 
-class ExcelData(dir: File) {
+private fun File.readBuilding(): Building = read(type = ExcelDataType.BUILDING)
+
+private fun BuffMap(building: Building, characters: CharacterTable): BuffMap {
+    return building.characters.map { (id, info) ->
+        val list = info.buffs.flatMap { (data) -> data.map { it.buff } }.map { buff -> building.buffs.getValue(buff) }
+        characters.getValue(id).name to list
+    }.toMap()
+}
+
+typealias BuffMap = Map<String, List<BuildingBuff>>
+
+private fun File.readCharacterTable(): CharacterTable = read(type = ExcelDataType.CHARACTER)
+
+typealias CharacterMap = Map<String, Character>
+
+private fun CharacterMap(table: CharacterTable): CharacterMap = table.values.associateBy { it.name }
+
+private fun File.readConstInfo(): ConstInfo = read(type = ExcelDataType.CONST)
+
+private fun File.readEnemyTable(): EnemyTable = read(type = ExcelDataType.ENEMY)
+
+typealias EnemyMap = Map<EnemyLevel, List<Enemy>>
+
+private fun EnemyMap(table: EnemyTable): EnemyMap = table.values.groupBy { it.level }
+
+private fun File.readGachaTable(): GachaTable = read(type = ExcelDataType.GACHA)
+
+private fun File.readHandbookTable(): HandbookTable = read(type = ExcelDataType.HANDBOOK)
+
+typealias HandbookMap = Map<String, Handbook>
+
+private fun HandbookMap(book: HandbookTable, characters: CharacterTable): HandbookMap {
+    return book.handbooks.mapNotNull { (id, info) ->
+        characters[id]?.let { it.name to info }
+    }.toMap()
+}
+
+private fun File.readSkillTable(): SkillTable = read(type = ExcelDataType.SKILL)
+
+typealias SkillMap = Map<String, List<Skill>>
+
+private fun SkillMap(table: SkillTable, characters: CharacterTable): SkillMap {
+    return characters.values.associate { character ->
+        character.name to character.skills.mapNotNull { info -> info.skill?.let { table.getValue(it) } }
+    }
+}
+
+private fun File.readStoryTable(): StoryTable = read(type = ExcelDataType.STORY)
+
+typealias StoryMap = Map<ActionType, List<Story>>
+
+private fun StoryMap(table: StoryTable): StoryMap = table.values.groupBy { it.action }
+
+private fun File.readTeamTable(): TeamTable = read(type = ExcelDataType.TEAM)
+
+typealias PowerMap = Map<PowerLevel, Map<Team, List<String>>>
+
+private fun PowerMap(table: TeamTable, characters: CharacterTable): PowerMap {
+    val default = table.getValue(DefaultTeam)
+    return table.values.groupBy { team -> PowerLevel.values()[team.level] }.mapValues { (level, teams) ->
+        (teams + default).toSet().associateWith { team ->
+            characters.values.filter { level.get(it) == team.id }.map { it.name }
+        }
+    }
+}
+
+private fun File.readZoneTable(): ZoneTable = read(type = ExcelDataType.ZONE)
+
+typealias ZoneMap = Map<ZoneType, List<Zone>>
+
+internal fun ZoneMap(table: ZoneTable): ZoneMap = table.zones.values.groupBy { it.type }
+
+typealias WeeklyMap = Map<WeeklyType, List<Pair<Zone, Weekly>>>
+
+internal fun WeeklyMap(table: ZoneTable): WeeklyMap {
+    return table.weekly.entries.groupBy { it.value.type }.mapValues { (_, list) ->
+        list.map { (id, weekly) -> table.zones.getValue(id) to weekly }
+    }
+}
+
+class ExcelData(override val dir: File): GameDataDownloader {
     private val building by lazy { dir.readBuilding() }
     private val character by lazy { dir.readCharacterTable() }
     val const by lazy { dir.readConstInfo() }
@@ -117,9 +195,11 @@ class ExcelData(dir: File) {
     private val zone by lazy { dir.readZoneTable() }
     val zones by lazy { ZoneMap(zone) }
     val weeks by lazy { WeeklyMap(zone) }
+
+    override val types get() = ExcelDataType.values().asIterable()
 }
 
-enum class ExcelDataType(file: String): GameDataType {
+enum class ExcelDataType(file: String) : GameDataType {
     BUILDING("building_data.json"),
     CHARACTER("character_table.json"),
     CONST("gamedata_const.json"),
@@ -132,17 +212,12 @@ enum class ExcelDataType(file: String): GameDataType {
     ZONE("zone_table.json");
 
     override val path = "excel/${file}"
-}
 
+    override val url: Url = jsdelivr(this)
+}
 
 private fun path(type: GameDataType): String = "${SERVER.locale}/gamedata/${type.path}"
 
-internal val github = { type: ExcelDataType ->
-    Url("https://raw.githubusercontent.com/$GITHUB_REPO/master/${path(type)}")
-}
+private val github = { type: ExcelDataType -> Url("https://raw.githubusercontent.com/$GITHUB_REPO/master/${path(type)}") }
 
-internal val jsdelivr = { type: ExcelDataType ->
-    Url("https://cdn.jsdelivr.net/gh/$GITHUB_REPO@master/${path(type)}")
-}
-
-suspend fun Iterable<ExcelDataType>.download(dir: File, flush: Boolean = false): List<File> = load(dir, flush, jsdelivr)
+private val jsdelivr = { type: ExcelDataType -> Url("https://cdn.jsdelivr.net/gh/$GITHUB_REPO@master/${path(type)}") }

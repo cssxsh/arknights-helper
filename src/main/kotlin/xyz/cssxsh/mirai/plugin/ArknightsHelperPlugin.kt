@@ -4,7 +4,6 @@ import kotlinx.coroutines.Job
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
 import net.mamoe.mirai.console.plugin.jvm.*
-import net.mamoe.mirai.console.util.ConsoleExperimentalApi
 import xyz.cssxsh.mirai.plugin.command.*
 import kotlin.time.*
 
@@ -15,7 +14,7 @@ object ArknightsHelperPlugin : KotlinPlugin(
     }
 ) {
 
-    @ConsoleExperimentalApi
+
     override val autoSaveIntervalMillis: LongRange
         get() = (3).minutes.toLongMilliseconds()..(10).minutes.toLongMilliseconds()
 
@@ -25,13 +24,17 @@ object ArknightsHelperPlugin : KotlinPlugin(
 
     private lateinit var guard: Job
 
-    @ConsoleExperimentalApi
+    private lateinit var group: Job
+
+    private lateinit var friend: Job
+
     override fun onEnable() {
-        download()
+        downloadExternalData()
         ArknightsUserData.reload()
         ArknightsPoolData.reload()
         ArknightsMineData.reload()
         ArknightsTaskData.reload()
+        ArknightsConfig.reload()
         ArknightsRecruitCommand.register()
         ArknightsGachaCommand.register()
         ArknightsPlayerCommand.register()
@@ -42,13 +45,15 @@ object ArknightsHelperPlugin : KotlinPlugin(
         ArknightsMineCommand.register()
         ArknightsQuestionCommand.register()
         ArknightsGuardCommand.register()
+        ArknightsFaceCommand.register()
 
         clock = clock()
         subscribe = subscribe()
         guard = guard()
+        group = group()
+        friend = friend()
     }
 
-    @ConsoleExperimentalApi
     override fun onDisable() {
         ArknightsRecruitCommand.unregister()
         ArknightsGachaCommand.unregister()
@@ -60,9 +65,12 @@ object ArknightsHelperPlugin : KotlinPlugin(
         ArknightsMineCommand.unregister()
         ArknightsQuestionCommand.unregister()
         ArknightsGuardCommand.unregister()
+        ArknightsFaceCommand.unregister()
 
         clock.cancel()
         subscribe.cancel()
         guard.cancel()
+        group.cancel()
+        friend.cancel()
     }
 }

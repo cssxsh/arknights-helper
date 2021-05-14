@@ -9,7 +9,7 @@ internal class VideoKtTest : JsonTest() {
 
     init {
         runBlocking {
-            VideoDataType.values().toList().download(dir = bilibili, flush = true)
+            video.download(flush = true)
         }
     }
 

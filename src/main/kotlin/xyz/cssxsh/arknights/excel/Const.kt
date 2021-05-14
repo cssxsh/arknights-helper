@@ -3,11 +3,6 @@ package xyz.cssxsh.arknights.excel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
-import xyz.cssxsh.arknights.*
-import java.io.File
-
-fun File.readConstInfo(): ConstInfo = read(type = ExcelDataType.CONST)
-
 
 @Serializable
 data class ConstInfo(

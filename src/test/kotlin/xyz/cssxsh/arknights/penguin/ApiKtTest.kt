@@ -10,7 +10,7 @@ internal class ApiKtTest : JsonTest() {
 
     init {
         runBlocking {
-            PenguinDataType.values().toList().download(dir = data, flush = true)
+            PenguinData.download(flush = true)
         }
     }
 

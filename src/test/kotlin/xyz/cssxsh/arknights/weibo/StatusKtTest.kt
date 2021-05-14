@@ -1,7 +1,6 @@
 package xyz.cssxsh.arknights.weibo
 
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import xyz.cssxsh.arknights.JsonTest
 
@@ -9,7 +8,7 @@ internal class StatusKtTest : JsonTest() {
 
     init {
         runBlocking {
-            MicroBlogUser.values().toList().download(dir = weibo, flush = true)
+            blogs.download(flush = true)
         }
     }
 

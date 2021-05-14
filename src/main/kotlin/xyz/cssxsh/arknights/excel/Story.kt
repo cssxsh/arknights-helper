@@ -3,16 +3,9 @@ package xyz.cssxsh.arknights.excel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import xyz.cssxsh.arknights.*
-import java.io.File
 import java.time.OffsetDateTime
 
-fun File.readStoryTable(): StoryTable = read(type = ExcelDataType.STORY)
-
 typealias StoryTable = Map<String, Story>
-
-typealias StoryMap = Map<ActionType, List<Story>>
-
-fun StoryMap(table: StoryTable): StoryMap = table.values.groupBy { it.action }
 
 val Story.start get() = startTime.takeIf { it.toEpochSecond() > 1 } ?: startShowTime
 

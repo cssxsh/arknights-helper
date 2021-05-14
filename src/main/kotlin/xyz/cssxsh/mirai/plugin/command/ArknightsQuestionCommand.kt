@@ -19,7 +19,7 @@ object ArknightsQuestionCommand : CompositeCommand(
     @SubCommand("detail", "详情")
     @Description("查看问题详情")
     suspend fun CommandSenderOnMessage<*>.detail(name: String) = sendMessage {
-        requireNotNull(questions[name]) { "没有找到题目${name}" }.let {
+        requireNotNull(CustomQuestions[name]) { "没有找到题目${name}" }.let {
             buildMessageChain {
                 appendLine("问题：${it.problem}")
                 appendLine("选项：${it.options}")
@@ -32,7 +32,7 @@ object ArknightsQuestionCommand : CompositeCommand(
     @SubCommand("list", "列表")
     @Description("列出已经设置的自定义问题")
     suspend fun CommandSenderOnMessage<*>.list() = sendMessage {
-        questions.entries.joinToString("\n") { (name, question) ->
+        CustomQuestions.entries.joinToString("\n") { (name, question) ->
             "$name => ${question.problem}"
         }.toPlainText()
     }
@@ -40,26 +40,26 @@ object ArknightsQuestionCommand : CompositeCommand(
     @SubCommand("delete", "删除")
     @Description("删除指定问题")
     suspend fun CommandSenderOnMessage<*>.delete(name: String) = sendMessage {
-        (questions.remove(name)?.let { "问题：${it.problem} 已删除" } ?: "删除失败").toPlainText()
+        (CustomQuestions.remove(name)?.let { "问题：${it.problem} 已删除" } ?: "删除失败").toPlainText()
     }
 
     @SubCommand("add", "添加")
     @Description("设置问题")
     suspend fun CommandSenderOnMessage<*>.add() = sendMessage {
         sendMessage("问题:")
-        val problem = fromEvent.nextMessage().content
+        val problem = nextContent()
         sendMessage("正确选项(按行分割):")
-        val right = fromEvent.nextMessage().content.lines()
+        val right = nextContent().lines()
         sendMessage("错误选项(按行分割):")
-        val error = fromEvent.nextMessage().content.lines()
+        val error = nextContent().lines()
         sendMessage("合成玉:")
-        val coin = fromEvent.nextMessage().content.toInt()
+        val coin = nextContent().toInt()
         sendMessage("提示:")
-        val tips = fromEvent.nextMessage().content
+        val tips = nextContent()
         sendMessage("时间(单位秒):")
-        val duration = fromEvent.nextMessage().content.toLong().seconds
+        val duration = nextContent().toLong().seconds
         val question = CustomQuestion(problem, right, error, coin, tips, duration)
-        questions += ("${fromEvent.sender.nick} ${OffsetDateTime.now().withNano(0)}" to question)
+        CustomQuestions += ("${fromEvent.sender.nick} ${OffsetDateTime.now().withNano(0)}" to question)
         "问题${question} 已添加".toPlainText()
     }
 }

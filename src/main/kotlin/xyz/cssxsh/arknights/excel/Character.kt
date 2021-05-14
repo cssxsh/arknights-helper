@@ -3,16 +3,8 @@ package xyz.cssxsh.arknights.excel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
-import xyz.cssxsh.arknights.*
-import java.io.File
-
-fun File.readCharacterTable(): CharacterTable = read(type = ExcelDataType.CHARACTER)
 
 typealias CharacterTable = Map<String, Character>
-
-typealias CharacterMap = Map<String, Character>
-
-fun CharacterMap(table: CharacterTable): CharacterMap = table.values.associateBy { it.name }
 
 /**
  * @see Character.group

@@ -2,20 +2,8 @@ package xyz.cssxsh.arknights.excel
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import xyz.cssxsh.arknights.*
-import java.io.File
-
-fun File.readSkillTable(): SkillTable = read(type = ExcelDataType.SKILL)
-
-fun SkillMap(table: SkillTable, characters: CharacterTable): SkillMap {
-    return characters.values.associate { character ->
-        character.name to character.skills.mapNotNull { info -> info.skill?.let { table.getValue(it) } }
-    }
-}
 
 typealias SkillTable = Map<String, Skill>
-
-typealias SkillMap = Map<String, List<Skill>>
 
 @Serializable
 data class Skill(

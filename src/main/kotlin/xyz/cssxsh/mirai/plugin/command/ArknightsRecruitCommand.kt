@@ -11,6 +11,6 @@ object ArknightsRecruitCommand : SimpleCommand(
 ) {
     @Handler
     suspend fun CommandSenderOnMessage<*>.handler(vararg words: String) = sendMessage {
-        recruit(words = words).getContent()
+        recruit(words = words.asList()).toMessage()
     }
 }

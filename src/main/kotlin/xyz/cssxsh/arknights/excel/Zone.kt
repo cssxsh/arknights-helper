@@ -3,22 +3,7 @@ package xyz.cssxsh.arknights.excel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import xyz.cssxsh.arknights.*
-import java.io.File
 import java.time.OffsetDateTime
-
-fun File.readZoneTable(): ZoneTable = read(type = ExcelDataType.ZONE)
-
-typealias ZoneMap = Map<ZoneType, List<Zone>>
-
-fun ZoneMap(table: ZoneTable): ZoneMap = table.zones.values.groupBy { it.type }
-
-typealias WeeklyMap = Map<WeeklyType, List<Pair<Zone, Weekly>>>
-
-fun WeeklyMap(table: ZoneTable): WeeklyMap {
-    return table.weekly.entries.groupBy { it.value.type }.mapValues { (_, list) ->
-        list.map { (id, weekly) -> table.zones.getValue(id) to weekly }
-    }
-}
 
 val Zone.title get() = nameFirst?.let { "$it " }.orEmpty() + nameSecond.orEmpty() + nameThird?.let { " $it" }.orEmpty()
 

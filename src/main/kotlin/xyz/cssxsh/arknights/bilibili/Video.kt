@@ -18,20 +18,18 @@ private const val PAGE_NUM = 1
 
 private const val ORDER = "pubdate"
 
-val bilibili: (VideoDataType) -> Url = { type -> Url(BILIBILI_API).copy(parameters = type.parameters) }
-
-suspend fun Iterable<VideoDataType>.download(dir: File, flush: Boolean = false): List<File> = load(dir, flush, bilibili)
-
-fun File.readVideoHistory(type: VideoDataType): List<Video> {
+private fun File.readVideoHistory(type: VideoDataType): List<Video> {
     return read<Temp>(type).let { requireNotNull(it.data) { it.message } }.list.videos
 }
 
-class VideoData(private val dir: File) {
+class VideoData(override val dir: File): GameDataDownloader {
     val anime get() = dir.readVideoHistory(VideoDataType.ANIME)
     val music get() = dir.readVideoHistory(VideoDataType.MUSIC)
     val game get() = dir.readVideoHistory(VideoDataType.GAME)
 
     val all get() = anime + music + game
+
+    override val types get() = VideoDataType.values().asIterable()
 }
 
 val Video.url get() = Url("https://www.bilibili.com/video/${bvid}")
@@ -43,13 +41,15 @@ enum class VideoDataType(val id: Int) : GameDataType {
 
     override val path = name.toLowerCase() + ".json"
 
-    val parameters = Parameters.build {
+    private val parameters = Parameters.build {
         append("mid", BILIBILI_ID.toString())
         append("ps", PAGE_SIZE.toString())
         append("pn", PAGE_NUM.toString())
         append("order", ORDER)
         append("tid", id.toString())
     }
+
+    override val url: Url = Url(BILIBILI_API).copy(parameters = parameters)
 }
 
 @Serializable
@@ -65,7 +65,7 @@ private data class Temp(
 )
 
 @Serializable
-data class VideoHistory(
+private data class VideoHistory(
     @SerialName("episodic_button")
     private val episodicButton: JsonObject? = null,
     @SerialName("list")
@@ -75,7 +75,7 @@ data class VideoHistory(
 )
 
 @Serializable
-data class VideoList(
+private data class VideoList(
     @SerialName("tlist")
     private val Types: Map<Int, JsonObject>,
     @SerialName("vlist")
