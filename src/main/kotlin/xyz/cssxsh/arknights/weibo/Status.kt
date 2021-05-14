@@ -200,7 +200,7 @@ data class MicroBlog(
     @SerialName("reposts_count")
     private val repostsCount: Int? = null,
     @SerialName("retweeted_status")
-    private val retweetedStatus: JsonObject? = null,
+    val retweeted: MicroBlog? = null,
     @SerialName("reward_exhibition_type")
     private val rewardExhibitionType: Int? = null,
     @SerialName("rid")

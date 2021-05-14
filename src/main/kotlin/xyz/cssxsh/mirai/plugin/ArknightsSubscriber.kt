@@ -78,6 +78,32 @@ private suspend fun sendMicroBlog(blog: MicroBlog) = sendToTaskContacts { contac
             appendLine("添加图片[${url}]失败, ${it.message}")
         }
     }
+
+    blog.retweeted?.let { retweeted ->
+        appendLine("----------------")
+        appendLine("@${retweeted.user.name}")
+
+        runCatching {
+            appendLine(retweeted.content())
+        }.onFailure {
+            logger.warning({ "加载[${retweeted.url}]长微博失败" }, it)
+            appendLine(retweeted.content)
+        }
+
+        retweeted.images.forEach { url ->
+            runCatching {
+                val file = MicroBlogData.dir.resolve(blog.createdAt.date()).resolve(url.filename).apply {
+                    if (exists().not()) {
+                        parentFile.mkdirs()
+                        writeBytes(useHttpClient { it.get(url) })
+                    }
+                }
+                append(file.uploadAsImage(contact))
+            }.onFailure {
+                appendLine("添加图片[${url}]失败, ${it.message}")
+            }
+        }
+    }
 }
 
 private suspend fun sendReasonClock(id: Long) {
