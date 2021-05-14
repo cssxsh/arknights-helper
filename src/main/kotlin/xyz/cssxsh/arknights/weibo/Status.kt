@@ -58,7 +58,17 @@ enum class BlogUser(val id: Long) : GameDataType {
     override val url = Url(BLOG_API).copy(parameters = parameters)
 }
 
-val MicroBlog.images get() = pictures.map { Url("https://wx4.sinaimg.cn/orj1080/${it}.jpg") }
+private val ImageRegex = """(https://wx\d\.sinaimg\.cn)/([0-9A-z]+)/([^"]+)""".toRegex()
+
+private const val OriginalSize = "orj1080"
+
+private fun JsonObject.findImage(): Url {
+    return requireNotNull(ImageRegex.find(toString())) { "匹配失败" }.destructured.let { (host, _, name) ->
+        Url("$host/$OriginalSize/$name")
+    }
+}
+
+val MicroBlog.images get() = pics.map { it.findImage() }
 
 val MicroBlog.content get() = raw ?: text.replace("<br />", "\n").remove(SIGN)
 
@@ -182,7 +192,7 @@ data class MicroBlog(
     @SerialName("pic_types")
     private val picTypes: String? = null,
     @SerialName("pics")
-    private val pics: List<JsonObject> = emptyList(),
+    internal val pics: List<JsonObject> = emptyList(),
     @SerialName("raw_text")
     val raw: String? = null,
     @SerialName("repost_type")
