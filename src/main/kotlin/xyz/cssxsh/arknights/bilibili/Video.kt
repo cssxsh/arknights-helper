@@ -77,7 +77,7 @@ private data class VideoHistory(
 @Serializable
 private data class VideoList(
     @SerialName("tlist")
-    private val Types: Map<Int, JsonObject>,
+    private val types: Map<Int, JsonObject>?,
     @SerialName("vlist")
     val videos: List<Video>
 )
