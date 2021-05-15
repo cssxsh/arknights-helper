@@ -4,6 +4,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.*
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.event.events.BotJoinGroupEvent
 import net.mamoe.mirai.event.events.FriendAddEvent
@@ -40,6 +41,7 @@ private suspend fun sendVideo(video: Video) = sendToTaskContacts { contact ->
     appendLine("链接: ${video.url}")
     appendLine("标题: ${video.title}")
     appendLine("简介：${video.description}")
+    appendLine("发布时间: ${video.created}")
 
     runCatching {
         val image = VideoData.dir.resolve(video.created.date()).resolve(video.url.filename).apply {
@@ -56,6 +58,7 @@ private suspend fun sendVideo(video: Video) = sendToTaskContacts { contact ->
 
 private suspend fun sendMicroBlog(blog: MicroBlog) = sendToTaskContacts { contact ->
     appendLine("鹰角有新微博！@${blog.user.name}")
+    appendLine("时间: ${blog.createdAt}")
     appendLine("链接: ${blog.url}")
 
     runCatching {
@@ -76,6 +79,32 @@ private suspend fun sendMicroBlog(blog: MicroBlog) = sendToTaskContacts { contac
             append(file.uploadAsImage(contact))
         }.onFailure {
             appendLine("添加图片[${url}]失败, ${it.message}")
+        }
+    }
+
+    blog.retweeted?.let { retweeted ->
+        appendLine("----------------")
+        appendLine("@${retweeted.user.name}")
+
+        runCatching {
+            appendLine(retweeted.content())
+        }.onFailure {
+            logger.warning({ "加载[${retweeted.url}]长微博失败" }, it)
+            appendLine(retweeted.content)
+        }
+
+        retweeted.images.forEach { url ->
+            runCatching {
+                val file = MicroBlogData.dir.resolve(blog.createdAt.date()).resolve(url.filename).apply {
+                    if (exists().not()) {
+                        parentFile.mkdirs()
+                        writeBytes(useHttpClient { it.get(url) })
+                    }
+                }
+                append(file.uploadAsImage(contact))
+            }.onFailure {
+                appendLine("添加图片[${url}]失败, ${it.message}")
+            }
         }
     }
 }
@@ -168,112 +197,127 @@ private suspend fun CoroutineScope.waitBotImpl() {
     }
 }
 
-internal fun CoroutineScope.clock(interval: Duration = fast) = launch {
-    waitBotImpl()
-    logger.info { "明日方舟 定时器 订阅器开始运行" }
-    while (isActive) {
-        ArknightsUserData.reason.forEach { (id, timestamp) ->
-            if (abs(timestamp - System.currentTimeMillis()) < RegenSpeed.toLongMilliseconds()) {
-                launch {
-                    sendReasonClock(id)
-                }
-            }
-        }
-        ArknightsUserData.recruit.forEach { (id, sites) ->
-            sites.forEach { (site, timestamp) ->
+internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.childScope("ArknightsSubscriber") {
+
+    private fun clock(interval: Duration = fast) = launch {
+        waitBotImpl()
+        logger.info { "明日方舟 定时器 订阅器开始运行" }
+        while (isActive) {
+            ArknightsUserData.reason.forEach { (id, timestamp) ->
                 if (abs(timestamp - System.currentTimeMillis()) < RegenSpeed.toLongMilliseconds()) {
                     launch {
-                        sendRecruitClock(id, site)
+                        sendReasonClock(id)
                     }
                 }
             }
-        }
-        delay(interval)
-    }
-}
-
-internal fun CoroutineScope.subscribe(range: ClosedRange<Duration> = fast..slow) = launch {
-    var last = VideoData.all.maxOfOrNull { it.created } ?: OffsetDateTime.now()
-    var updated = false
-    val list = VideoData.all.map { it.created.toLocalTime() }.sorted()
-    val start = list.minOrNull() ?: LocalTime.of(9, 0, 0)
-    val end = list.maxOrNull() ?: LocalTime.of(22, 0, 0)
-    if (LocalTime.now() < start) delay(start - LocalTime.now())
-    waitBotImpl()
-    logger.info { "明日方舟 哔哩哔哩 订阅器开始运行" }
-    while (isActive) {
-
-        runCatching {
-            VideoData.download(flush = true)
-        }.onSuccess {
-            logger.info { "订阅器 VideoData 数据加载完毕" }
-        }.onFailure {
-            logger.warning({ "订阅器 VideoData 数据加载失败" }, it)
-        }
-        val new = VideoData.all.filter { it.created > last }
-        if (new.isNotEmpty()) {
-            logger.info { "哔哩哔哩 明日方舟 订阅器 捕捉到结果" }
-            launch {
-                new.sortedBy { it.created }.forEach { video -> sendVideo(video) }
+            ArknightsUserData.recruit.forEach { (id, sites) ->
+                sites.forEach { (site, timestamp) ->
+                    if (abs(timestamp - System.currentTimeMillis()) < RegenSpeed.toLongMilliseconds()) {
+                        launch {
+                            sendRecruitClock(id, site)
+                        }
+                    }
+                }
             }
-            updated = true
-            last = new.maxOfOrNull { it.created }!!
-        }
-
-        if (LocalTime.now() > end) {
-            logger.info { "哔哩哔哩 明日方舟 订阅器结束运行" }
-            return@launch
-        }
-
-        if (updated.not() && list.any { (it - LocalTime.now()).absoluteValue < range.endInclusive }) {
-            delay(range.start)
-        } else {
-            delay(range.endInclusive)
+            delay(interval)
         }
     }
-}
 
-internal fun CoroutineScope.guard() = launch {
-    var last = MicroBlogData.all.maxOfOrNull { it.createdAt } ?: OffsetDateTime.now()
-    val start = LocalTime.of(9, 0, 0)
-    val end = LocalTime.of(22, 0, 0)
-    if (LocalTime.now() < start) delay((start - LocalTime.now()))
-    waitBotImpl()
-    logger.info { "明日方舟 微博 订阅器开始运行" }
-    while (isActive) {
+    private fun subscribe(range: ClosedRange<Duration> = fast..slow) = launch {
+        var last = VideoData.all.maxOfOrNull { it.created } ?: OffsetDateTime.now()
+        var updated = false
+        val list = VideoData.all.map { it.created.toLocalTime() }.sorted()
+        val start = list.minOrNull() ?: LocalTime.of(9, 0, 0)
+        val end = list.maxOrNull() ?: LocalTime.of(22, 0, 0)
+        if (LocalTime.now() < start) delay(start - LocalTime.now())
+        waitBotImpl()
+        logger.info { "明日方舟 哔哩哔哩 订阅器开始运行" }
+        while (isActive) {
 
-        runCatching {
-            MicroBlogData.download(flush = true)
-        }.onSuccess {
-            logger.info { "订阅器 MicroBlogData 数据加载完毕" }
-        }.onFailure {
-            logger.warning({ "订阅器 MicroBlogData 数据加载失败" }, it)
-        }
-
-        val new = MicroBlogData.all.filter { it.createdAt > last }
-        if (new.isNotEmpty()) {
-            logger.info { "哔哩哔哩 微博 订阅器 捕捉到结果" }
-            launch {
-                new.sortedBy { it.createdAt }.forEach { blog -> sendMicroBlog(blog) }
+            runCatching {
+                VideoData.download(flush = true)
+            }.onSuccess {
+                logger.info { "订阅器 VideoData 数据加载完毕" }
+            }.onFailure {
+                logger.warning({ "订阅器 VideoData 数据加载失败" }, it)
             }
-            last = new.maxOfOrNull { it.createdAt }!!
-        }
+            val new = VideoData.all.filter { it.created > last }
+            if (new.isNotEmpty()) {
+                logger.info { "哔哩哔哩 明日方舟 订阅器 捕捉到结果" }
+                launch {
+                    new.sortedBy { it.created }.forEach { video -> sendVideo(video) }
+                }
+                updated = true
+                last = new.maxOfOrNull { it.created }!!
+            }
 
-        if (LocalTime.now() > end) {
-            logger.info { "明日方舟 微博 订阅器结束运行" }
-            return@launch
-        }
+            if (LocalTime.now() > end) {
+                logger.info { "哔哩哔哩 明日方舟 订阅器结束运行" }
+                return@launch
+            }
 
-        delay(GuardInterval.minutes)
+            if (updated.not() && list.any { (it - LocalTime.now()).absoluteValue < range.endInclusive }) {
+                delay(range.start)
+            } else {
+                delay(range.endInclusive)
+            }
+        }
     }
-}
 
-internal fun CoroutineScope.group() = globalEventChannel().subscribeAlways<BotJoinGroupEvent> {
-    GuardContacts.add(group.delegate)
-    group.sendMessage("机器人加添加群组，已自动开启蹲饼")
-}
+    private fun guard() = launch {
+        var last = MicroBlogData.all.maxOfOrNull { it.createdAt } ?: OffsetDateTime.now()
+        val start = LocalTime.of(9, 0, 0)
+        val end = LocalTime.of(22, 0, 0)
+        if (LocalTime.now() < start) delay((start - LocalTime.now()))
+        waitBotImpl()
+        logger.info { "明日方舟 微博 订阅器开始运行" }
+        while (isActive) {
 
-internal fun CoroutineScope.friend() = globalEventChannel().subscribeAlways<FriendAddEvent> {
-    GuardContacts.add(friend.delegate)
-    friend.sendMessage("机器人加添加好友，已自动开启蹲饼")
+            runCatching {
+                MicroBlogData.download(flush = true)
+            }.onSuccess {
+                logger.info { "订阅器 MicroBlogData 数据加载完毕" }
+            }.onFailure {
+                logger.warning({ "订阅器 MicroBlogData 数据加载失败" }, it)
+            }
+
+            val new = MicroBlogData.all.filter { it.createdAt > last }
+            if (new.isNotEmpty()) {
+                logger.info { "哔哩哔哩 微博 订阅器 捕捉到结果" }
+                launch {
+                    new.sortedBy { it.createdAt }.forEach { blog -> sendMicroBlog(blog) }
+                }
+                last = new.maxOfOrNull { it.createdAt }!!
+            }
+
+            if (LocalTime.now() > end) {
+                logger.info { "明日方舟 微博 订阅器结束运行" }
+                return@launch
+            }
+
+            delay(GuardInterval.minutes)
+        }
+    }
+
+    private fun group() = globalEventChannel().subscribeAlways<BotJoinGroupEvent> {
+        GuardContacts.add(group.delegate)
+        group.sendMessage("机器人加添加群组，已自动开启蹲饼")
+    }
+
+    private fun friend() = globalEventChannel().subscribeAlways<FriendAddEvent> {
+        GuardContacts.add(friend.delegate)
+        friend.sendMessage("机器人加添加好友，已自动开启蹲饼")
+    }
+
+    fun start() {
+        clock()
+        subscribe()
+        guard()
+        group()
+        friend()
+    }
+
+    fun stop() {
+        coroutineContext.cancelChildren()
+    }
 }
