@@ -59,29 +59,23 @@ val CommandSenderOnMessage<*>.rule: String by ReadOnlyProperty { that, _ -> Arkn
 val CommandSenderOnMessage<*>.mutex: Mutex by SubjectDelegate { Mutex() }
 
 object ArknightsUserData : AutoSavePluginData("user") {
-    @Suppress("unused")
     @ValueDescription("Key 是QQ号，Value是合成玉数值")
     val coin by value<MutableMap<Long, Int>>().withDefault { 3_000 }
 
-    @Suppress("unused")
     @ValueDescription("Key 是QQ号，Value是玩家等级")
     var level by value<MutableMap<Long, Int>>().withDefault { ExcelData.const.maxPlayerLevel }
 
-    @Suppress("unused")
     @ValueDescription("Key 是QQ号，Value是理智预警时间戳")
     val reason by value<MutableMap<Long, Long>>().withDefault { 0 }
 
-    @Suppress("unused")
     @ValueDescription("Key 是QQ号，Value是公招预警预警时间戳")
     val recruit by value<MutableMap<Long, Map<Int, Long>>>().withDefault { emptyMap() }
 
-    @Suppress("unused")
     @ValueDescription("Key 是QQ号，Value是公招结果")
     val result by value<MutableMap<Long, List<UserRecruit>>>().withDefault { emptyList() }
 }
 
 object ArknightsPoolData : AutoSavePluginConfig("pool") {
-    @Suppress("unused")
     @ValueDescription("Key 是QQ号/QQ群号，Value是规则名")
     val pool by value<MutableMap<Long, String>>().withDefault { GachaPoolRule.NORMAL.name }
 
