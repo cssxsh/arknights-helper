@@ -3,8 +3,6 @@ package xyz.cssxsh.arknights.market
 import io.ktor.http.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonObject
 import net.mamoe.mirai.message.data.MarketFace
 import okio.ByteString.Companion.decodeHex
 import okio.ByteString.Companion.toByteString
@@ -132,28 +130,28 @@ data class AppData(
 
 @Serializable
 data class FaceData(
-    @SerialName("additionInfo")
-    private val additions: JsonArray,
+//    @SerialName("additionInfo")
+//    val additions: JsonArray,
     @SerialName("baseInfo")
     val bases: List<BaseInfo>,
-    @SerialName("__bgColors")
-    private val bgColors: JsonObject,
-    @SerialName("diversionConfig")
-    private val diversionConfig: JsonArray,
-    @SerialName("diyEmojiCommonText")
-    private val diyEmojiCommonText: JsonArray,
+//    @SerialName("__bgColors")
+//    val bgColors: JsonObject,
+//    @SerialName("diversionConfig")
+//    val diversionConfig: JsonArray,
+//    @SerialName("diyEmojiCommonText")
+//    val diyEmojiCommonText: JsonArray,
     @SerialName("md5Info")
     val md5s: List<Md5Info>,
-    @SerialName("operationInfo")
-    private val operations: JsonArray,
+//    @SerialName("operationInfo")
+//    val operations: JsonArray,
 )
 
 @Serializable
 data class BaseInfo(
     @SerialName("authorId")
     val author: Int,
-    @SerialName("childMagicEmojiId")
-    private val childMagicEmojiId: String,
+//    @SerialName("childMagicEmojiId")
+//    val childMagicEmojiId: String,
     @SerialName("desc")
     val description: String,
     @SerialName("favourite")
@@ -162,8 +160,8 @@ data class BaseInfo(
     val fee: Int,
     @SerialName("icon")
     val icon: Int,
-    @SerialName("_id")
-    private val id_: String,
+//    @SerialName("_id")
+//    val id_: String,
     @SerialName("id")
     val id: String,
     @SerialName("isApng")
@@ -192,18 +190,18 @@ data class BaseInfo(
     val tag: String,
     @SerialName("type")
     val type: Int,
-    @SerialName("updateTipBeginTime")
-    private val updateTipBeginTime: Int,
-    @SerialName("updateTipEndTime")
-    private val updateTipEndTime: Int,
-    @SerialName("updateTipWording")
-    private val updateTipWording: String,
-    @SerialName("valid")
-    val valid: Int,
-    @SerialName("validArea")
-    val validArea: Int,
-    @SerialName("validBefore")
-    val validBefore: String,
+//    @SerialName("updateTipBeginTime")
+//    val updateTipBeginTime: Int,
+//    @SerialName("updateTipEndTime")
+//    val updateTipEndTime: Int,
+//    @SerialName("updateTipWording")
+//    val updateTipWording: String,
+//    @SerialName("valid")
+//    val valid: Int,
+//    @SerialName("validArea")
+//    val validArea: Int,
+//    @SerialName("validBefore")
+//    val validBefore: String,
     @SerialName("zip")
     val zip: String,
 )
