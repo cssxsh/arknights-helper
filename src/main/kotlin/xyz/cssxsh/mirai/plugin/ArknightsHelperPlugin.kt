@@ -7,7 +7,7 @@ import xyz.cssxsh.mirai.plugin.command.*
 import kotlin.time.*
 
 object ArknightsHelperPlugin : KotlinPlugin(
-    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "0.1.0-dev-1") {
+    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "1.2.1") {
         name("arknights-helper")
         author("cssxsh")
     }

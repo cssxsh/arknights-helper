@@ -143,4 +143,4 @@ fun <T, K, V> AbstractPluginData.delegate(key: T.() -> K) = object : ReadWritePr
 
 fun <V> AbstractPluginData.sender() = delegate<CommandSenderOnMessage<*>, Long, V> { fromEvent.sender.id }
 
-fun <V> AbstractPluginData.subject() = delegate<CommandSenderOnMessage<*>, Long, V> { fromEvent.subject.delegate }
+fun <V> AbstractPluginData.subject() = delegate<CommandSenderOnMessage<*>, Long, V> { fromEvent.subject.id }
