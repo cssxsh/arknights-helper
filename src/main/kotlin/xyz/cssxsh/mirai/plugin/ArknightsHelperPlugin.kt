@@ -1,6 +1,5 @@
 package xyz.cssxsh.mirai.plugin
 
-import kotlinx.coroutines.Job
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
 import net.mamoe.mirai.console.plugin.jvm.*
@@ -14,19 +13,8 @@ object ArknightsHelperPlugin : KotlinPlugin(
     }
 ) {
 
-
     override val autoSaveIntervalMillis: LongRange
         get() = (3).minutes.toLongMilliseconds()..(10).minutes.toLongMilliseconds()
-
-    private lateinit var clock: Job
-
-    private lateinit var subscribe: Job
-
-    private lateinit var guard: Job
-
-    private lateinit var group: Job
-
-    private lateinit var friend: Job
 
     override fun onEnable() {
         downloadExternalData()
@@ -47,11 +35,7 @@ object ArknightsHelperPlugin : KotlinPlugin(
         ArknightsGuardCommand.register()
         ArknightsFaceCommand.register()
 
-        clock = clock()
-        subscribe = subscribe()
-        guard = guard()
-        group = group()
-        friend = friend()
+        ArknightsSubscriber.start()
     }
 
     override fun onDisable() {
@@ -67,10 +51,6 @@ object ArknightsHelperPlugin : KotlinPlugin(
         ArknightsGuardCommand.unregister()
         ArknightsFaceCommand.unregister()
 
-        clock.cancel()
-        subscribe.cancel()
-        guard.cancel()
-        group.cancel()
-        friend.cancel()
+        ArknightsSubscriber.stop()
     }
 }
