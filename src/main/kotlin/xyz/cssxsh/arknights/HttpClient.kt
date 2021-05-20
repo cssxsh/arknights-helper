@@ -8,6 +8,7 @@ import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.http.*
 import io.ktor.utils.io.core.*
+import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -18,15 +19,6 @@ import kotlinx.serialization.json.Json
 import java.io.IOException
 import java.time.Instant
 import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
-
-private val formatter = DateTimeFormatter.RFC_1123_DATE_TIME
-
-internal fun Headers.date(): OffsetDateTime? = this[HttpHeaders.Date].let { OffsetDateTime.parse(it, formatter) }
-
-internal fun Headers.expires(): OffsetDateTime? = this[HttpHeaders.Expires].let { OffsetDateTime.parse(it, formatter) }
-
-internal fun Headers.lastModified(): OffsetDateTime? = this[HttpHeaders.LastModified].let { OffsetDateTime.parse(it, formatter) }
 
 internal val CustomJson = Json {
     prettyPrint = true
@@ -55,7 +47,7 @@ private fun client() = HttpClient(OkHttp) {
     }
 }
 
-private val DEFAULT_IGNORE: (exception: Throwable) -> Boolean = { it is IOException || it is HttpRequestTimeoutException }
+private val DEFAULT_IGNORE: (exception: Throwable) -> Boolean = { it is IOException || it is CancellationException }
 
 internal suspend fun <T> useHttpClient(
     ignore: (exception: Throwable) -> Boolean = DEFAULT_IGNORE,
@@ -75,8 +67,8 @@ internal suspend fun <T> useHttpClient(
 internal fun timestamp(value: Long) = OffsetDateTime.ofInstant(Instant.ofEpochSecond(value), SERVER_ZONE)
 
 object TimestampSerializer : KSerializer<OffsetDateTime> {
-    override val descriptor: SerialDescriptor
-        get() = buildSerialDescriptor(OffsetDateTime::class.qualifiedName!!, PrimitiveKind.LONG)
+    override val descriptor: SerialDescriptor =
+        buildSerialDescriptor(OffsetDateTime::class.qualifiedName!!, PrimitiveKind.LONG)
 
     override fun deserialize(decoder: Decoder): OffsetDateTime {
         return timestamp(decoder.decodeLong())

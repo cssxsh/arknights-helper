@@ -32,13 +32,14 @@ class VideoData(override val dir: File): GameDataDownloader {
 }
 
 val Video.url get() = Url("https://www.bilibili.com/video/${bvid}")
+val Video.cover get() = Url(pic)
 
 enum class VideoDataType(val id: Int) : GameDataType {
     ANIME(1),
     MUSIC(3),
     GAME(4);
 
-    override val path = name.toLowerCase() + ".json"
+    override val path = "$name.json"
 
     private val parameters = Parameters.build {
         append("mid", BILIBILI_ID.toString())
