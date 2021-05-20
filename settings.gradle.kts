@@ -9,10 +9,12 @@ pluginManagement {
     }
     repositories {
         mavenLocal()
-        gradlePluginPortal()
+        maven(url = "https://maven.aliyun.com/repository/releases")
+        maven(url = "https://maven.aliyun.com/repository/public")
         mavenCentral()
         jcenter()
-        maven("https://dl.bintray.com/kotlin/kotlin-eap")
+        maven(url = "https://maven.aliyun.com/repository/gradle-plugin")
+        gradlePluginPortal()
     }
 }
 rootProject.name = "arknights-helper"
