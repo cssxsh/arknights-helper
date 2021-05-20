@@ -1,5 +1,6 @@
 package xyz.cssxsh.mirai.plugin
 
+import xyz.cssxsh.arknights.announce.*
 import xyz.cssxsh.arknights.bilibili.*
 import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.market.*
@@ -19,6 +20,8 @@ internal val VideoData by lazy { VideoData(resolve("BilibiliData")) }
 internal val MicroBlogData by lazy { MicroBlogData(resolve("WeiboData")) }
 
 internal val ArknightsFaceData by lazy { ArknightsFaceData(resolve("ArknightsFaceData"), FaceItems) }
+
+internal val AnnouncementData by lazy { AnnouncementData(resolve("AnnouncementData")) }
 
 internal val QuestionDataLoader = QuestionDataLoader({ ExcelData }, { VideoData }, { CustomQuestions })
 
