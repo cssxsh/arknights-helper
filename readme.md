@@ -43,7 +43,7 @@ other:0.42
 
 | 指令                                    | 描述                               |
 |:----------------------------------------|:-----------------------------------|
-| `/<mine 挖矿 答题> [type]?`            | 机器人会提出一个问题               |
+| `/<mine 挖矿 答题> [type]?`             | 机器人会提出一个问题               |
 | `/<question 问题> <detail 详情> [name]` | 查看自定义问题的详情               |
 | `/<question 问题> <list 列表>`          | 列出已经设置的自定义问题           |
 | `/<question 问题> <delete 删除>`        | 删除指定问题                       |
@@ -152,7 +152,7 @@ items:
 
 ### 手动安装
 
-1. 运行 [Mirai Console](https://github.com/mamoe/mirai-console) 生成plugins文件夹
+1. 运行 [Mirai Console](https://github.com/mamoe/mirai-console) 生成`plugins`文件夹
 1. 从 [Releases](https://github.com/cssxsh/arknights-helper/releases) 下载`jar`并将其放入`plugins`文件夹中
 
 ## TODO
@@ -161,6 +161,7 @@ items:
 - [x] 自定义材料掉落别名(目前由企鹅物流数据提供支持) 21/05/14
 - [ ] 关卡规划
 - [ ] 剿灭和周常提醒
+- [x] 游戏公告
 
 ## 数据来源
 * 游戏数据 [Kengxxiao/ArknightsGameData](https://github.com/Kengxxiao/ArknightsGameData)
