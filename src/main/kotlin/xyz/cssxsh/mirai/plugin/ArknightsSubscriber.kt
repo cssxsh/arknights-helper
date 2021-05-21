@@ -289,7 +289,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
     }
 
     private fun weibo() = launch {
-        var last = runCatching { MicroBlogData.all.maxOf { it.createdAt } }.getOrElse { OffsetDateTime.now() }
+        var last = runCatching { MicroBlogData.all.maxOf { it.id } }.getOrElse { 0 }
         if (LocalTime.now() < Start) delay((Start - LocalTime.now()))
         waitBotImpl()
         logger.info { "明日方舟 微博 订阅器开始运行" }
@@ -303,13 +303,13 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
                 logger.warning({ "订阅器 MicroBlogData 数据加载失败" }, it)
             }
 
-            val new = MicroBlogData.all.filter { it.createdAt > last }
+            val new = MicroBlogData.all.filter { it.id > last }
             if (new.isNotEmpty()) {
                 logger.info { "明日方舟 微博 订阅器 捕捉到结果" }
                 runCatching {
-                    new.sortedBy { it.createdAt }.forEach { blog -> sendMicroBlog(blog) }
+                    new.sortedBy { it.id }.forEach { blog -> sendMicroBlog(blog) }
                 }
-                last = new.maxOfOrNull { it.createdAt }!!
+                last = new.maxOf { it.id }
             }
 
             if (LocalTime.now() > End) {
