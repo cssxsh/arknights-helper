@@ -81,7 +81,7 @@ private suspend fun MicroBlog.toMessage(contact: Contact): Message = buildMessag
 }
 
 private suspend fun sendMicroBlog(blog: MicroBlog) = sendToTaskContacts { contact ->
-    appendLine("鹰角有新微博！@${blog.user.name}")
+    appendLine("鹰角有新微博！@${blog.user?.name}")
     appendLine("时间: ${blog.createdAt}")
     appendLine("链接: ${blog.url}")
 
@@ -89,7 +89,7 @@ private suspend fun sendMicroBlog(blog: MicroBlog) = sendToTaskContacts { contac
 
     blog.retweeted?.let { retweeted ->
         appendLine("----------------")
-        appendLine("@${retweeted.user.name}")
+        appendLine("@${retweeted.user?.name}")
 
         append(retweeted.toMessage(contact))
     }

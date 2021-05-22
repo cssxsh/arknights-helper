@@ -117,7 +117,7 @@ data class MicroBlog(
     val retweeted: MicroBlog? = null,
     val text: String,
     @SerialName("user")
-    val user: MicroBlogUser = PictureUser,
+    val user: MicroBlogUser? = PictureUser,
 )
 
 @Serializable
