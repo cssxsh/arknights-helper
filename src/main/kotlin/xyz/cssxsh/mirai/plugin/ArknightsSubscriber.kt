@@ -16,6 +16,7 @@ import xyz.cssxsh.arknights.announce.*
 import xyz.cssxsh.arknights.bilibili.*
 import xyz.cssxsh.arknights.useHttpClient
 import xyz.cssxsh.arknights.weibo.*
+import java.time.LocalDate
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import kotlin.math.abs
@@ -317,7 +318,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
             if (new.isNotEmpty()) {
                 logger.info { "明日方舟 微博 订阅器 捕捉到结果" }
                 new.sortedBy { it.id }.forEach { blog ->
-                    if (blog.id in history) return@forEach
+                    if (blog.id in history || blog.createdAt.toLocalDate() != LocalDate.now()) return@forEach
                     runCatching {
                         sendMicroBlog(blog)
                     }.onSuccess {
