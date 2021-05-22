@@ -16,7 +16,6 @@ import xyz.cssxsh.arknights.announce.*
 import xyz.cssxsh.arknights.bilibili.*
 import xyz.cssxsh.arknights.useHttpClient
 import xyz.cssxsh.arknights.weibo.*
-import java.time.LocalDate
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import kotlin.math.abs
@@ -202,13 +201,21 @@ internal fun downloadExternalData(): Unit = runBlocking {
     }.onFailure {
         logger.warning({ "ArknightsFaceData 数据加载失败" }, it)
     }
+
+    runCatching {
+        AnnouncementData.download(flush = false)
+    }.onSuccess {
+        logger.info { "AnnouncementData 数据加载完毕" }
+    }.onFailure {
+        logger.warning({ "AnnouncementData 数据加载失败" }, it)
+    }
 }
 
 private val Fast = (3).minutes
 
 private val Slow = (10).minutes
 
-private val Start = LocalTime.of(9, 0, 0)
+private val Start = LocalTime.of(7, 30, 0)
 
 private val End = LocalTime.of(22, 0, 0)
 
@@ -248,7 +255,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
     }
 
     private fun bilibili() = launch {
-        var last: OffsetDateTime = runCatching { VideoData.all.maxOf { it.created } }.getOrElse { OffsetDateTime.now() }
+        val history = runCatching { VideoData.all.map { it.bvid } }.getOrNull().orEmpty().toMutableSet()
         var updated = false
         val list = VideoData.all.map { it.created.toLocalTime() }.sorted()
         val start = list.minOrNull() ?: Start
@@ -265,14 +272,17 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
             }.onFailure {
                 logger.warning({ "订阅器 VideoData 数据加载失败" }, it)
             }
-            val new = VideoData.all.filter { it.created > last }
+            val new = VideoData.all.filterNot { it.bvid in history }
             if (new.isNotEmpty()) {
                 logger.info { "明日方舟 哔哩哔哩  订阅器 捕捉到结果" }
-                runCatching {
-                    new.sortedBy { it.created }.forEach { video -> sendVideo(video) }
+                new.sortedBy { it.created }.forEach { video ->
+                    runCatching {
+                        sendVideo(video)
+                    }.onSuccess {
+                        history.add(video.bvid)
+                    }
                 }
                 updated = true
-                last = new.maxOfOrNull { it.created }!!
             }
 
             if (LocalTime.now() > end) {
@@ -289,7 +299,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
     }
 
     private fun weibo() = launch {
-        var last = runCatching { MicroBlogData.all.maxOf { it.id } }.getOrElse { 0 }
+        val history = runCatching { MicroBlogData.all.map { it.id } }.getOrNull().orEmpty().toMutableSet()
         if (LocalTime.now() < Start) delay((Start - LocalTime.now()))
         waitBotImpl()
         logger.info { "明日方舟 微博 订阅器开始运行" }
@@ -303,13 +313,17 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
                 logger.warning({ "订阅器 MicroBlogData 数据加载失败" }, it)
             }
 
-            val new = MicroBlogData.all.filter { it.id > last }
+            val new = MicroBlogData.all.filterNot { it.id in history }
             if (new.isNotEmpty()) {
                 logger.info { "明日方舟 微博 订阅器 捕捉到结果" }
-                runCatching {
-                    new.sortedBy { it.id }.forEach { blog -> sendMicroBlog(blog) }
+                new.sortedBy { it.id }.forEach { blog ->
+                    if (blog.id in history) return@forEach
+                    runCatching {
+                        sendMicroBlog(blog)
+                    }.onSuccess {
+                        history.add(blog.id)
+                    }
                 }
-                last = new.maxOf { it.id }
             }
 
             if (LocalTime.now() > End) {
@@ -322,7 +336,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
     }
 
     private fun announce() = launch {
-        var last = runCatching { AnnouncementData.all.maxOf { it.id } }.getOrElse { 0 }
+        val history = runCatching { AnnouncementData.all.map { it.id } }.getOrNull().orEmpty().toMutableSet()
         if (LocalTime.now() < Start) delay((Start - LocalTime.now()))
         waitBotImpl()
         logger.info { "明日方舟 公告 订阅器开始运行" }
@@ -336,12 +350,15 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
                 logger.warning({ "订阅器 AnnouncementData 数据加载失败" }, it)
             }
 
-            AnnouncementData.all.sortedBy { it.id }.forEach { announcement ->
-                if (announcement.id > last && announcement.date == LocalDate.now()) {
+            val new = AnnouncementData.all.filterNot { it.id in history }
+            if (new.isNotEmpty()) {
+                logger.info { "明日方舟 公告 订阅器 捕捉到结果" }
+                new.sortedBy { it.id }.forEach { announcement ->
                     runCatching {
                         sendAnnouncement(announcement)
+                    }.onSuccess {
+                        history.add(announcement.id)
                     }
-                    last = announcement.id
                 }
             }
 

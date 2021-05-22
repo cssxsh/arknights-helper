@@ -39,7 +39,7 @@ class MicroBlogData(override val dir: File): GameDataDownloader {
     val mounten get() = dir.readMicroBlogHistory(BlogUser.MOUNTEN)
     val picture get() = dir.readMicroBlogPicture(BlogUser.PICTURE)
 
-    val all get() = arknights + byproduct + historicus + mounten
+    val all get() = arknights + byproduct + historicus + mounten + picture
 
     override val types get() = BlogUser.values().asIterable()
 }
