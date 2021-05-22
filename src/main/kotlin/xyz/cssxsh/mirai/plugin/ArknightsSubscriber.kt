@@ -255,7 +255,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
     }
 
     private fun bilibili() = launch {
-        val history = runCatching { VideoData.all.map { it.bvid } }.getOrNull().orEmpty().toMutableSet()
+        val history = VideoData.all.map { it.bvid }.toMutableSet()
         var updated = false
         val list = VideoData.all.map { it.created.toLocalTime() }.sorted()
         val start = list.minOrNull() ?: Start
@@ -299,7 +299,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
     }
 
     private fun weibo() = launch {
-        val history = runCatching { MicroBlogData.all.map { it.id } }.getOrNull().orEmpty().toMutableSet()
+        val history = MicroBlogData.all.map { it.id }.toMutableSet()
         if (LocalTime.now() < Start) delay((Start - LocalTime.now()))
         waitBotImpl()
         logger.info { "明日方舟 微博 订阅器开始运行" }
@@ -336,7 +336,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
     }
 
     private fun announce() = launch {
-        val history = runCatching { AnnouncementData.all.map { it.id } }.getOrNull().orEmpty().toMutableSet()
+        val history = AnnouncementData.all.map { it.id }.toMutableSet()
         if (LocalTime.now() < Start) delay((Start - LocalTime.now()))
         waitBotImpl()
         logger.info { "明日方舟 公告 订阅器开始运行" }
