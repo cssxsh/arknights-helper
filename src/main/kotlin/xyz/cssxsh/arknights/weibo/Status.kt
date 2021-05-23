@@ -8,7 +8,6 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.JsonObject
 import xyz.cssxsh.arknights.*
 import java.io.File
 import java.time.OffsetDateTime
@@ -23,6 +22,10 @@ private fun File.readMicroBlogHistory(type: BlogUser): List<MicroBlog> {
     return read<Temp<WeiboData>>(type).data().cards.map { it.blog }
 }
 
+private fun File.readMicroBlogPicture(type: BlogUser): List<MicroBlog> {
+    return read<Temp<PictureData>>(type).data().blogs.associateBy { it.id }.values.toList()
+}
+
 private suspend fun getLongTextContent(id: Long): String {
     return useHttpClient<Temp<LongTextContent>> { client ->
         client.get(CONTENT_API) { parameter("id", id) }
@@ -34,8 +37,9 @@ class MicroBlogData(override val dir: File): GameDataDownloader {
     val byproduct get() = dir.readMicroBlogHistory(BlogUser.BYPRODUCT)
     val historicus get() = dir.readMicroBlogHistory(BlogUser.HISTORICUS)
     val mounten get() = dir.readMicroBlogHistory(BlogUser.MOUNTEN)
+    val picture get() = dir.readMicroBlogPicture(BlogUser.PICTURE)
 
-    val all get() = arknights + byproduct + historicus + mounten
+    val all get() = arknights + byproduct + historicus + mounten + picture
 
     override val types get() = BlogUser.values().asIterable()
 }
@@ -44,16 +48,20 @@ enum class BlogUser(val id: Long) : GameDataType {
     ARKNIGHTS(6279793937),
     BYPRODUCT(6441489862),
     MOUNTEN(7506039414),
-    HISTORICUS(7499841383);
+    HISTORICUS(7499841383),
+    PICTURE(6279793937) {
+        override val path: String = "BlogPicture(${id}).json"
+        override val url: Url = Url("$BLOG_API?containerid=107803$id")
+    };
 
     override val path = "Blog(${id}).json"
 
-    private val parameters = Parameters.build {
-        append("value", "$id")
-        append("containerid", "107603$id")
-    }
+//    private val parameters = Parameters.build {
+//        append("value", "$id")
+//        append("containerid", "107603$id")
+//    }
 
-    override val url = Url(BLOG_API).copy(parameters = parameters)
+    override val url = Url("$BLOG_API?containerid=107603$id")
 }
 
 private val ImageSizeRegex = """(?<=https://wx\d\.sinaimg\.cn/)([0-9A-z]+)""".toRegex()
@@ -82,141 +90,34 @@ private data class Temp<T>(
 
 @Serializable
 private data class WeiboData(
-    @SerialName("cardlistInfo")
-    private val cardListInfo: JsonObject? = null,
     @SerialName("cards")
     val cards: List<Card> = emptyList(),
-    @SerialName("scheme")
-    val scheme: String? = null,
-    @SerialName("showAppTips")
-    private val showAppTips: Int? = null
 )
 
 @Serializable
 private data class Card(
-    @SerialName("card_type")
-    val type: Int,
-    @SerialName("itemid")
-    val itemId: String,
     @SerialName("mblog")
     val blog: MicroBlog,
-    @SerialName("scheme")
-    val scheme: String
 )
 
 @Serializable
 data class MicroBlog(
-//    @SerialName("ad_state")
-//    val adState: Int? = null,
-//    @SerialName("alchemy_params")
-//    val alchemyParams: JsonObject? = null,
-//    @SerialName("attitudes_count")
-//    val attitudesCount: Int? = null,
-//    @SerialName("bid")
-//    val bid: String,
-//    @SerialName("bmiddle_pic")
-//    val middle: String? = null,
-//    @SerialName("can_edit")
-//    val canEdit: Boolean? = null,
-//    @SerialName("comments_count")
-//    val commentsCount: Int? = null,
-//    @SerialName("content_auth")
-//    val contentAuth: Int? = null,
     @SerialName("created_at")
     @Serializable(WeiboDateTimeSerializer::class)
-    val createdAt: OffsetDateTime,
-//    @SerialName("darwin_tags")
-//    val darwinTags: List<JsonObject> = emptyList(),
-//    @SerialName("edit_at")
-//    val editAt: String? = null,
-//    @SerialName("edit_config")
-//    val editConfig: JsonObject? = null,
-//    @SerialName("edit_count")
-//    val editCount: Int? = null,
-//    @SerialName("enable_comment_guide")
-//    val enableCommentGuide: Boolean? = null,
-//    @SerialName("expire_time")
-//    val expireTime: Int? = null,
-//    @SerialName("extern_safe")
-//    val externSafe: Int? = null,
-//    @SerialName("favorited")
-//    val favorited: Boolean? = null,
-//    @SerialName("fid")
-//    val fid: Long? = null,
-//    @SerialName("hide_flag")
-//    val hideFlag: Int? = null,
-//    @SerialName("id")
+    val createdAt: OffsetDateTime = OffsetDateTime.now(),
+    @SerialName("id")
     val id: Long,
     @SerialName("isLongText")
     val isLongText: Boolean = false,
-//    @SerialName("is_paid")
-//    val isPaid: Boolean? = null,
-//    @SerialName("isTop")
-//    val isTop: Int? = null,
-//    @SerialName("mark")
-//    val mark: String? = null,
-//    @SerialName("mblog_menu_new_style")
-//    val mblogMenuNewStyle: Int? = null,
-//    @SerialName("mblog_vip_type")
-//    val mblogVipType: Int? = null,
-//    @SerialName("mblogtype")
-//    val mblogtype: Int? = null,
-//    @SerialName("mid")
-//    val mid: String,
-//    @SerialName("mlevel")
-//    val mlevel: Int? = null,
-//    @SerialName("more_info_type")
-//    val moreInfoType: Int? = null,
-//    @SerialName("number_display_strategy")
-//    val numberDisplayStrategy: JsonObject? = null,
-//    @SerialName("original_pic")
-//    val original: String? = null,
-//    @SerialName("page_info")
-//    val pageInfo: JsonObject? = null,
-//    @SerialName("pending_approval_count")
-//    val pendingApprovalCount: Int? = null,
-//    @SerialName("pic_ids")
-//    val pictures: List<String> = emptyList(),
-//    @SerialName("pic_num")
-//    val picNum: Int? = null,
-//    @SerialName("picStatus")
-//    val picStatus: String? = null,
-//    @SerialName("pic_types")
-//    val picTypes: String? = null,
     @SerialName("pics")
     val pictures: List<MicroPicture> = emptyList(),
     @SerialName("raw_text")
     val raw: String? = null,
-//    @SerialName("repost_type")
-//    val repostType: Int? = null,
-//    @SerialName("reposts_count")
-//    val repostsCount: Int? = null,
     @SerialName("retweeted_status")
     val retweeted: MicroBlog? = null,
-//    @SerialName("reward_exhibition_type")
-//    val rewardExhibitionType: Int? = null,
-//    @SerialName("rid")
-//    val rid: String? = null,
-//    @SerialName("safe_tags")
-//    val safeTags: Int? = null,
-//    @SerialName("show_additional_indication")
-//    val showAdditionalIndication: Int? = null,
-//    @SerialName("source")
-//    val source: String? = null,
-//    @SerialName("text")
     val text: String,
-//    @SerialName("textLength")
-//    val textLength: Int? = null,
-//    @SerialName("thumbnail_pic")
-//    val thumbnail: String? = null,
-//    @SerialName("title")
-//    val title: JsonObject? = null,
     @SerialName("user")
-    val user: MicroBlogUser,
-//    @SerialName("version")
-//    val version: Int? = null,
-//    @SerialName("visible")
-//    val visible: JsonObject? = null
+    val user: MicroBlogUser? = PictureUser,
 )
 
 @Serializable
@@ -229,38 +130,10 @@ data class MicroPicture(
 data class MicroBlogUser(
     @SerialName("avatar_hd")
     val avatar: String,
-//    @SerialName("badge")
-//    val badge: JsonObject,
-//    @SerialName("close_blue_v")
-//    val closeBlueV: Boolean,
-//    @SerialName("cover_image_phone")
-//    val coverImagePhone: String,
     @SerialName("description")
     val description: String,
-//    @SerialName("follow_count")
-//    val followCount: Int,
-//    @SerialName("follow_me")
-//    val followMe: Boolean,
-//    @SerialName("followers_count")
-//    val followersCount: Int,
-//    @SerialName("following")
-//    val following: Boolean,
-//    @SerialName("gender")
-//    val gender: String,
     @SerialName("id")
     val id: Long,
-//    @SerialName("like")
-//    val like: Boolean,
-//    @SerialName("like_me")
-//    val likeMe: Boolean,
-//    @SerialName("mbrank")
-//    val mbrank: Int,
-//    @SerialName("mbtype")
-//    val mbtype: Int,
-//    @SerialName("profile_image_url")
-//    val profileImageUrl: String,
-//    @SerialName("profile_url")
-//    val profileUrl: String,
     @SerialName("screen_name")
     val name: String
 )
@@ -283,14 +156,41 @@ object WeiboDateTimeSerializer : KSerializer<OffsetDateTime> {
 
 @Serializable
 data class LongTextContent(
-//    @SerialName("attitudes_count")
-//    val attitudesCount: Int = 0,
-//    @SerialName("comments_count")
-//    val commentsCount: Int = 0,
     @SerialName("longTextContent")
     val content: String,
     @SerialName("ok")
     val ok: Int,
-//    @SerialName("reposts_count")
-//    val repostsCount: Int = 0
+)
+
+private val PictureUser = MicroBlogUser(
+    "",
+    "",
+    0,
+    "此微博被锁定为热门，机器人无法获取详情，请打开链接自行查看"
+)
+
+private val PictureData.blogs get() = cards.flatMap { it.group }.flatMap { it.pictures }.map { it.blog }
+
+@Serializable
+private data class PictureData(
+    @SerialName("cards")
+    val cards: List<PictureCard>
+)
+
+@Serializable
+private data class PictureCard(
+    @SerialName("card_group")
+    val group: List<PictureCardGroup>,
+)
+
+@Serializable
+private data class PictureCardGroup(
+    @SerialName("pics")
+    val pictures: List<PictureItem> = emptyList()
+)
+
+@Serializable
+private data class PictureItem(
+    @SerialName("mblog")
+    val blog: MicroBlog,
 )
