@@ -4,7 +4,7 @@ import net.mamoe.mirai.console.command.CommandSenderOnMessage
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.nextMessage
 import xyz.cssxsh.arknights.excel.*
-import xyz.cssxsh.arknights.intercept
+import xyz.cssxsh.arknights.*
 import xyz.cssxsh.arknights.market.*
 import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.arknights.penguin.*
@@ -86,7 +86,7 @@ internal fun ArknightsFace.toMessage() = buildMessageChain {
 private fun Duration.text() = toComponents { minutes, seconds, _ -> "${minutes}m${seconds}s" }
 
 private fun Pair<Matrix, Stage>.toMessage() = buildMessageChain {
-    appendLine("概率: ${first.quantity}/${first.times}=${first.probability.intercept()}")
+    appendLine("概率: ${first.quantity}/${first.times}=${first.probability.percentage()}")
     appendLine("单件期望理智: ${single.intercept()}")
     appendLine("最短通关用时: ${stage.clear.text()}")
     appendLine("单件期望用时: ${short.text()}")

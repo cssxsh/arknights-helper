@@ -2,8 +2,7 @@ package xyz.cssxsh.arknights.user
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import xyz.cssxsh.arknights.intercept
-import xyz.cssxsh.arknights.timestamp
+import xyz.cssxsh.arknights.*
 import java.time.format.DateTimeFormatter
 import kotlin.time.minutes
 
@@ -64,7 +63,7 @@ fun Collection<UserRecruit>.tag(): String = buildString {
         appendLine("| TAG | 概率 |")
         appendLine("|:---:|:---:|")
         tags.entries.sortedByDescending { it.value }.forEach { (tag, probability) ->
-            appendLine("| $tag | ${probability.intercept()} |")
+            appendLine("| $tag | ${probability.percentage()} |")
         }
     }
 }
