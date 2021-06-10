@@ -59,8 +59,6 @@ private fun OffsetDateTime.randomMinutes(offset: Int = 30) = plusMinutes(offset 
 
 private val DefaultChoiceRange = 'A'..'D'
 
-private val DefaultJudgmentOptions = mapOf('Y' to "对", 'N' to "错")
-
 data class QuestionDataLoader(
     val excel: () -> ExcelData,
     val video: () -> VideoData,
@@ -167,7 +165,7 @@ data class JudgmentQuestion(val generate: (Boolean) -> Pair<String, String>) : Q
         val (problem, tips) = generate(state)
         return Question(
             problem = problem,
-            options = DefaultJudgmentOptions,
+            options = mapOf('Y' to "对", 'N' to "错"),
             answer = setOf(if (state) 'Y' else 'N'),
             coin = 600,
             tips = tips,
@@ -198,19 +196,19 @@ typealias EnemyQuestion = (enemies: EnemyMap) -> QuestionBuild
 typealias WeeklyQuestion = (zones: WeeklyMap) -> QuestionBuild
 
 val randomPlayerQuestion: ConstInfoQuestion = { const ->
-    val list = buildMap<String, Pair<Int, Int>> {
+    val list = buildMap<String, Pair<Int, Set<Int>>> {
         val speed = const.playerApRegenSpeed
-        put("理智回复速度是每%d分钟1理智", speed to ((1..10).toSet() - speed).random())
+        put("理智回复速度是每%d分钟1理智", speed to ((1..10).toSet() - speed))
         val level = (1..const.maxPlayerLevel).random()
         val ap = const.playerApMap[level - 1]
         val exp = const.playerExpMap[level - 1]
-        put("等级为${level}, 理智回复上限为%d", ap to (const.playerApMap - ap).random())
-        put("等级为${level}, 升级所需经验为%d", exp to (const.playerExpMap - exp).random())
+        put("等级为${level}, 理智回复上限为%d", ap to (const.playerApMap.toSet() - ap))
+        put("等级为${level}, 升级所需经验为%d", exp to (const.playerExpMap.toSet() - exp))
     }
 
     JudgmentQuestion { state ->
         list.entries.random().let { (text, param) ->
-            text.format(if (state) param.first else param.second) to param.first.toString()
+            text.format(if (state) param.first else param.second.random()) to param.first.toString()
         }
     }
 }
