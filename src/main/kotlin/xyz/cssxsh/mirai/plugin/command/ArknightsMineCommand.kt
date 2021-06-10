@@ -53,6 +53,7 @@ object ArknightsMineCommand : SimpleCommand(
         val origin = fromEvent.sender
         reply.toCommandSender().sendMessage {
             buildMessageChain {
+                appendLine(question.problem)
                 if (reply.sender != origin) {
                     multiple *= 10
                     deduct = true
