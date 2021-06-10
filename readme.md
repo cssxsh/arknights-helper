@@ -1,7 +1,8 @@
-# Arknights Helper
+# [Arknights Helper](https://github.com/cssxsh/arknights-helper)
 > 基于 [Mirai Console](https://github.com/mamoe/mirai-console) 的 [明日方舟](https://ak.hypergryph.com/) 助手插件
 
 [![Release](https://img.shields.io/github/v/release/cssxsh/arknights-helper)](https://github.com/cssxsh/arknights-helper/releases)
+[![Release](https://img.shields.io/github/downloads/cssxsh/arknights-helper/total)](https://shields.io/category/downloads)
 
 ## 指令
 注意: 使用前请确保可以 [在聊天环境执行指令](https://github.com/project-mirai/chat-command)  
