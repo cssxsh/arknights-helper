@@ -355,6 +355,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
             if (new.isNotEmpty()) {
                 logger.info { "明日方舟 公告 订阅器 捕捉到结果" }
                 new.sortedBy { it.id }.forEach { announcement ->
+                    if (announcement.id in history) return@forEach
                     runCatching {
                         sendAnnouncement(announcement)
                     }.onSuccess {
