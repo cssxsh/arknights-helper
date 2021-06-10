@@ -51,6 +51,11 @@ internal val GuardContacts by ArknightsTaskData::contacts
 internal val CustomQuestions by ArknightsMineData::question
 
 /**
+ * 答题统计
+ */
+internal val MineCount by ArknightsMineData::count
+
+/**
  * 轮询速度
  */
 internal var GuardInterval by ArknightsTaskData::interval

@@ -101,6 +101,9 @@ object ArknightsMineData : AutoSavePluginData("mine") {
 
     @ValueDescription("Key 是问题ID，Value是问题")
     val question by value(mutableMapOf("default" to default))
+
+    @ValueDescription("正确数 错误数 和 超时数")
+    val count by value(mutableMapOf<QuestionType, MutableList<Int>>())
 }
 
 object ArknightsTaskData : AutoSavePluginConfig("task") {

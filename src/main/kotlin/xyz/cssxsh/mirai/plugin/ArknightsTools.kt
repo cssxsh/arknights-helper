@@ -138,7 +138,22 @@ internal fun zone(name: String, limit: Int) = buildMessageChain {
     }
 }
 
-internal fun QuestionType.build() = build(QuestionDataLoader)
+internal fun QuestionType.random() = random(QuestionDataLoader)
+
+internal fun countQuestionType(type: QuestionType, mode: Int) {
+    MineCount.compute(type) { _, s ->
+        (s ?: mutableListOf(0, 0, 0)).apply { this[mode] += 1 }
+    }
+}
+
+internal fun tableMineCount() = buildString {
+    appendLine("# 答题统计")
+    appendLine("| 类型 | 正确 | 错误 | 超时 | 总计 |")
+    appendLine("|:----:|:----:|:----:|:----:|:----:|")
+    MineCount.forEach { type, (f, s, t) ->
+        appendLine("| $type | $f | $s | $t | ${f + s + t} |")
+    }
+}
 
 internal fun Question.toMessage() = buildMessageChain {
     appendLine("[${type}]<${coin}>：${problem} (${timeout.milliseconds}内作答)")

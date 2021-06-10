@@ -62,4 +62,8 @@ object ArknightsQuestionCommand : CompositeCommand(
         CustomQuestions += ("${fromEvent.sender.nick} ${OffsetDateTime.now().withNano(0)}" to question)
         "问题${question} 已添加".toPlainText()
     }
+
+    @SubCommand("count", "统计")
+    @Description("问题统计")
+    suspend fun CommandSenderOnMessage<*>.count() = sendMessage { tableMineCount().toPlainText() }
 }

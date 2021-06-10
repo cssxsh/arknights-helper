@@ -30,10 +30,8 @@ object ArknightsMineCommand : SimpleCommand(
     }
 
     @Handler
-    suspend fun CommandSenderOnMessage<*>.handler(type: QuestionType? = null) {
-        // XXX
-        // val types = list.map { enumValueOf<QuestionType>(it.toUpperCase()) }.toTypedArray().ifEmpty { QuestionType.values() }
-        val question = (type ?: QuestionType.values().random()).build()
+    suspend fun CommandSenderOnMessage<*>.handler(type: QuestionType = QuestionType.values().random()) {
+        val question = type.random()
         sendMessage(question.toMessage())
 
         val (reply, time) = mutex.withLock {
@@ -45,6 +43,7 @@ object ArknightsMineCommand : SimpleCommand(
         }
         if (reply == null) {
             sendMessage("回答超时")
+            countQuestionType(type, 2)
             return
         }
         val answer = reply.message.content.toUpperCase().filter { it in question.options.keys }.toSet()
@@ -64,9 +63,11 @@ object ArknightsMineCommand : SimpleCommand(
                     appendLine("快速回答（合成玉翻5倍）")
                 }
                 if (answer == question.answer) {
+                    countQuestionType(type, 0)
                     coin += (question.coin * multiple)
                     appendLine("回答正确，合成玉${"%+d".format(question.coin)}*${multiple}")
                 } else {
+                    countQuestionType(type, 1)
                     appendLine("回答错误${answer}, ${question.tips ?: "参考答案${question.answer}"}")
                     if (deduct) {
                         coin -= (question.coin * multiple)

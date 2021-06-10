@@ -44,7 +44,7 @@ enum class QuestionType(val description: String, private val load: (QuestionData
     MUSIC("音乐相关", { randomMusicQuestion(it.video().music) }),
     OTHER("自选相关", { requireNotNull(it.others().values.randomOrNull()) { "题目集为空" } });
 
-    fun build(loader: QuestionDataLoader): Question = load(loader).build(this)
+    fun random(loader: QuestionDataLoader): Question = load(loader).build(this)
 }
 
 private fun Boolean.Companion.random() = listOf(true, false).random()
