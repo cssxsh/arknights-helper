@@ -6,7 +6,6 @@ import net.mamoe.mirai.message.data.toPlainText
 import xyz.cssxsh.arknights.excel.rarities
 import xyz.cssxsh.arknights.user.*
 import xyz.cssxsh.mirai.plugin.*
-import kotlin.time.minutes
 
 object ArknightsDataCommand : CompositeCommand(
     owner = ArknightsHelperPlugin,
@@ -60,8 +59,8 @@ object ArknightsDataCommand : CompositeCommand(
             runCatching {
                 val list = content.split(',', '，', ';', '；', '\n', '\\', '|')
 
-                val time = list[0].split(':', '：', '.', '-').let { (h, m) -> h.toInt() * 60 + m.toInt() }
-                check(time.minutes in RecruitTime) { "招募时间不正确" }
+                val time = list[0].split(':', '：', '.', '-').let { (h, m) -> h.toLong() * 60 + m.toLong() }
+                check(time * 60 * 1000 in RecruitTime) { "招募时间不正确" }
 
                 val role = list[1].role()
 

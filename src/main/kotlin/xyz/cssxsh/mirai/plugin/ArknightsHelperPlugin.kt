@@ -4,7 +4,6 @@ import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
 import net.mamoe.mirai.console.plugin.jvm.*
 import xyz.cssxsh.mirai.plugin.command.*
-import kotlin.time.*
 
 object ArknightsHelperPlugin : KotlinPlugin(
     JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "1.2.1") {
@@ -12,9 +11,6 @@ object ArknightsHelperPlugin : KotlinPlugin(
         author("cssxsh")
     }
 ) {
-
-    override val autoSaveIntervalMillis: LongRange
-        get() = (3).minutes.toLongMilliseconds()..(10).minutes.toLongMilliseconds()
 
     override fun onEnable() {
         downloadExternalData()

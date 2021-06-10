@@ -6,7 +6,6 @@ import xyz.cssxsh.arknights.bilibili.*
 import xyz.cssxsh.arknights.excel.*
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.time.*
 
 @Serializable
 data class Question(
@@ -91,7 +90,7 @@ data class ChoiceQuestion(
             options = options.mapValues { (_, entry) -> entry.key },
             answer = answer,
             coin = options.size * 100,
-            timeout = (options.size * 10).seconds.toLongMilliseconds(),
+            timeout = options.size * 10_000L,
             type = type
         )
     }
@@ -110,12 +109,12 @@ data class CustomQuestion(
     @SerialName("timeout")
     val timeout: Long
 ) : QuestionBuild() {
-    constructor(problem: String, right: List<String>, error: List<String>, coin: Int, tips: String, duration: Duration): this(
+    constructor(problem: String, right: List<String>, error: List<String>, coin: Int, tips: String, timeout: Long): this(
         problem = problem,
         options = right.associateWith { true } + error.associateWith { false },
         coin = coin,
         tips = tips,
-        timeout = duration.toLongMilliseconds()
+        timeout = timeout
     )
 
     override fun build(type: QuestionType): Question {
@@ -153,7 +152,7 @@ data class DateTimeQuestion(
             options = map.mapValues { (_, datetime) -> datetime.format(formatter) },
             answer = answer,
             coin = 1800,
-            timeout = (3).minutes.toLongMilliseconds(),
+            timeout = 3 * 60_000L,
             type = type
         )
     }
@@ -169,7 +168,7 @@ data class JudgmentQuestion(val generate: (Boolean) -> Pair<String, String>) : Q
             answer = setOf(if (state) 'Y' else 'N'),
             coin = 600,
             tips = tips,
-            timeout = (1).minutes.toLongMilliseconds(),
+            timeout = 60_000L,
             type = type
         )
     }

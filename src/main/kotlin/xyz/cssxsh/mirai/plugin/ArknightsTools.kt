@@ -8,7 +8,7 @@ import xyz.cssxsh.arknights.*
 import xyz.cssxsh.arknights.market.*
 import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.arknights.penguin.*
-import kotlin.time.*
+import java.time.Duration
 
 internal val logger by ArknightsHelperPlugin::logger
 
@@ -83,13 +83,13 @@ internal fun ArknightsFace.toMessage() = buildMessageChain {
     appendLine("Hash: $key")
 }
 
-private fun Duration.text() = toComponents { minutes, seconds, _ -> "${minutes}m${seconds}s" }
+private fun duration(millis: Long) = Duration.ofMillis(millis).run { "${toMinutesPart()}m${toSecondsPart()}s" }
 
 private fun Pair<Matrix, Stage>.toMessage() = buildMessageChain {
     appendLine("概率: ${first.quantity}/${first.times}=${first.probability.percentage()}")
     appendLine("单件期望理智: ${single.intercept()}")
-    appendLine("最短通关用时: ${stage.clear.text()}")
-    appendLine("单件期望用时: ${short.text()}")
+    appendLine("最短通关用时: ${duration(stage.minClearTime)}")
+    appendLine("单件期望用时: ${duration(short)}")
 }
 
 internal fun item(name: String, limit: Int) = buildMessageChain {
@@ -156,7 +156,7 @@ internal fun tableMineCount() = buildString {
 }
 
 internal fun Question.toMessage() = buildMessageChain {
-    appendLine("[${type}]<${coin}>：${problem} (${timeout.milliseconds}内作答)")
+    appendLine("[${type}]<${coin}>：${problem} (${timeout / 1000}s内作答)")
     options.forEach { (index, text) ->
         appendLine("${index}.${text}")
     }

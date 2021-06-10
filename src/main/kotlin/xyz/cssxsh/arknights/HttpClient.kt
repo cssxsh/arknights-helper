@@ -3,12 +3,7 @@ package xyz.cssxsh.arknights
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.features.*
-import io.ktor.client.features.compression.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.http.*
 import io.ktor.utils.io.core.*
-import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -27,27 +22,18 @@ internal val CustomJson = Json {
     allowStructuredMapKeys = true
 }
 
-private val KOTLINX_SERIALIZER = KotlinxSerializer(CustomJson)
-
 private fun client() = HttpClient(OkHttp) {
-    Json {
-        serializer = KOTLINX_SERIALIZER
-        acceptContentTypes = acceptContentTypes + ContentType.Text.Plain
-    }
     install(HttpTimeout) {
         socketTimeoutMillis = 10_000
         connectTimeoutMillis = 10_000
         requestTimeoutMillis = 10_000
     }
     BrowserUserAgent()
-    ContentEncoding {
-        gzip()
-        deflate()
-        identity()
-    }
 }
 
-private val DEFAULT_IGNORE: (exception: Throwable) -> Boolean = { it is IOException || it is CancellationException }
+private val DEFAULT_IGNORE: (exception: Throwable) -> Boolean = {
+    it is IOException || it is HttpRequestTimeoutException
+}
 
 internal suspend fun <T> useHttpClient(
     ignore: (exception: Throwable) -> Boolean = DEFAULT_IGNORE,

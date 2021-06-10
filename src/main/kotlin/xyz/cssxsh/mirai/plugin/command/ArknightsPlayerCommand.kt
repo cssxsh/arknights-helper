@@ -9,7 +9,6 @@ import xyz.cssxsh.mirai.plugin.*
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneId
-import kotlin.time.*
 
 object ArknightsPlayerCommand : CompositeCommand(
     owner = ArknightsHelperPlugin,
@@ -53,16 +52,16 @@ object ArknightsPlayerCommand : CompositeCommand(
     suspend fun CommandSenderOnMessage<*>.reason(init: Int) = sendMessage {
         check(init in 0 until max) { "理智不合法，level.${level}[${(0 until max)}]" }
         val duration = RegenSpeed * (max - init)
-        reason = System.currentTimeMillis() + duration.toLongMilliseconds()
+        reason = System.currentTimeMillis() + duration
         "${init}->${max}理智提醒(level.${level})设置完毕, 预计倒计时${duration}".toPlainText()
     }
 
     @SubCommand("recruit", "公招")
     @Description("设置公招位时间并定时提醒")
     suspend fun CommandSenderOnMessage<*>.recruit(site: Int, hours: Int = 9, minutes: Int = 0) = sendMessage {
-        val duration = hours.hours + minutes.minutes
+        val duration = (hours * 60 + minutes) * 60 * 1000
         check(duration in RecruitTime) { "公招时间${duration}不合法" }
-        val time = System.currentTimeMillis() + duration.toLongMilliseconds()
+        val time = System.currentTimeMillis() + duration
         recruit = recruit + (site to time)
         "公招位置[${site}]设置 ${hours}小时${minutes}分 完成".toPlainText()
     }

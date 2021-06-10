@@ -10,7 +10,6 @@ import net.mamoe.mirai.event.syncFromEventOrNull
 import net.mamoe.mirai.message.data.*
 import xyz.cssxsh.arknights.mine.QuestionType
 import xyz.cssxsh.mirai.plugin.*
-import kotlin.time.measureTimedValue
 
 object ArknightsMineCommand : SimpleCommand(
     owner = ArknightsHelperPlugin,
@@ -35,18 +34,17 @@ object ArknightsMineCommand : SimpleCommand(
         sendMessage(question.toMessage())
 
         val (reply, time) = mutex.withLock {
-            measureTimedValue {
-                fromEvent.nextAnswerOrNull(question.timeout) { next ->
-                    next.message.content.toUpperCase().any { it in question.options.keys }
-                }
-            }
+            val start = System.currentTimeMillis()
+            fromEvent.nextAnswerOrNull(question.timeout) { next ->
+                next.message.content.uppercase().any { it in question.options.keys }
+            } to System.currentTimeMillis() - start
         }
         if (reply == null) {
             sendMessage("回答超时")
             countQuestionType(type, 2)
             return
         }
-        val answer = reply.message.content.toUpperCase().filter { it in question.options.keys }.toSet()
+        val answer = reply.message.content.uppercase().filter { it in question.options.keys }.toSet()
         var multiple = 1
         var deduct = false
         val origin = fromEvent.sender
@@ -58,7 +56,7 @@ object ArknightsMineCommand : SimpleCommand(
                     deduct = true
                     appendLine("抢答（合成玉翻10倍）")
                 }
-                if (time.toLongMilliseconds() * 3 < question.timeout) {
+                if (time * 3 < question.timeout) {
                     multiple *= 5
                     appendLine("快速回答（合成玉翻5倍）")
                 }

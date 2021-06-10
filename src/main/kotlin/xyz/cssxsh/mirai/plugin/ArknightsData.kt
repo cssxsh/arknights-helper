@@ -11,7 +11,6 @@ import xyz.cssxsh.arknights.user.*
 import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
-import kotlin.time.seconds
 
 /**
  * 合成玉数量
@@ -96,7 +95,7 @@ object ArknightsMineData : AutoSavePluginData("mine") {
         ),
         tips = "还行，合成玉没有被扣",
         coin = -1000,
-        timeout = (30).seconds.toLongMilliseconds()
+        timeout = 30 * 1000L
     )
 
     @ValueDescription("Key 是问题ID，Value是问题")
