@@ -27,9 +27,11 @@ private fun File.readMicroBlogPicture(type: BlogUser): List<MicroBlog> {
 }
 
 private suspend fun getLongTextContent(id: Long): String {
-    return useHttpClient<Temp<LongTextContent>> { client ->
+    val json = useHttpClient<String> { client ->
         client.get(CONTENT_API) { parameter("id", id) }
-    }.data().content.replace("<br />", "\n").remove(SIGN)
+    }
+    val content = CustomJson.decodeFromString<Temp<LongTextContent>>(json).data().content
+    return content.replace("<br />", "\n").remove(SIGN)
 }
 
 class MicroBlogData(override val dir: File): GameDataDownloader {

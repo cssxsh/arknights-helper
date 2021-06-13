@@ -16,15 +16,17 @@ import xyz.cssxsh.arknights.announce.*
 import xyz.cssxsh.arknights.bilibili.*
 import xyz.cssxsh.arknights.useHttpClient
 import xyz.cssxsh.arknights.weibo.*
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import kotlin.math.abs
-import kotlin.time.*
 
 private val Url.filename get() = encodedPath.substringAfterLast('/')
 
 private fun OffsetDateTime.date() = toLocalDate().toString()
+
+private suspend fun delay(duration: Duration) = delay(duration.toMillis())
 
 private suspend fun sendToTaskContacts(block: suspend MessageChainBuilder.(Contact) -> Unit) {
     Bot.instances.flatMap { bot ->
@@ -212,15 +214,16 @@ internal fun downloadExternalData(): Unit = runBlocking {
     }
 }
 
-private val Fast = (3).minutes
+private val Fast = Duration.ofMinutes(3)
 
-private val Slow = (10).minutes
+private val Slow = Duration.ofMinutes(10)
 
 private val Start = LocalTime.of(7, 30, 0)
 
 private val End = LocalTime.of(22, 0, 0)
 
-private operator fun LocalTime.minus(other: LocalTime) = (toSecondOfDay() - other.toSecondOfDay()).seconds
+private operator fun LocalTime.minus(other: LocalTime): Duration =
+    Duration.ofSeconds((toSecondOfDay() - other.toSecondOfDay()).toLong())
 
 private suspend fun CoroutineScope.waitBotImpl() {
     while (isActive && Bot.instances.isEmpty()) {
@@ -236,7 +239,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
         logger.info { "明日方舟 定时器 订阅器开始运行" }
         while (isActive) {
             ArknightsUserData.reason.forEach { (id, timestamp) ->
-                if (abs(timestamp - System.currentTimeMillis()) < RegenSpeed.toLongMilliseconds()) {
+                if (abs(timestamp - System.currentTimeMillis()) < RegenSpeed) {
                     launch {
                         sendReasonClock(id)
                     }
@@ -244,7 +247,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
             }
             ArknightsUserData.recruit.forEach { (id, sites) ->
                 sites.forEach { (site, timestamp) ->
-                    if (abs(timestamp - System.currentTimeMillis()) < RegenSpeed.toLongMilliseconds()) {
+                    if (abs(timestamp - System.currentTimeMillis()) < RegenSpeed) {
                         launch {
                             sendRecruitClock(id, site)
                         }
@@ -288,10 +291,10 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
 
             if (LocalTime.now() > end) {
                 logger.info { "明日方舟 哔哩哔哩 订阅器进入休眠" }
-                delay((1).days - (LocalTime.now() - start))
+                delay(Duration.ofDays(1) - (LocalTime.now() - start))
             }
 
-            if (updated.not() && list.any { (it - LocalTime.now()).absoluteValue < Slow }) {
+            if (updated.not() && list.any { (it - LocalTime.now()).abs() < Slow }) {
                 delay(Fast)
             } else {
                 delay(Slow)
@@ -329,10 +332,10 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
 
             if (LocalTime.now() > End) {
                 logger.info { "明日方舟 微博 订阅器进入休眠" }
-                delay((1).days - (LocalTime.now() - Start))
+                delay(Duration.ofDays(1) - (LocalTime.now() - Start))
             }
 
-            delay(GuardInterval.minutes)
+            delay(Duration.ofMinutes(GuardInterval.toLong()))
         }
     }
 
@@ -355,6 +358,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
             if (new.isNotEmpty()) {
                 logger.info { "明日方舟 公告 订阅器 捕捉到结果" }
                 new.sortedBy { it.id }.forEach { announcement ->
+                    if (announcement.id in history) return@forEach
                     runCatching {
                         sendAnnouncement(announcement)
                     }.onSuccess {
@@ -365,7 +369,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
 
             if (LocalTime.now() > End) {
                 logger.info { "明日方舟 公告 订阅器进入休眠" }
-                delay((1).days - (LocalTime.now() - Start))
+                delay(Duration.ofDays(1) - (LocalTime.now() - Start))
             }
 
             delay(Fast)

@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "xyz.cssxsh.mirai.plugin"
-version = "1.2.1-dev-3"
+version = "1.2.1-dev-4"
 
 repositories {
     mavenLocal()
@@ -23,7 +23,6 @@ kotlin {
         all {
             languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
             languageSettings.useExperimentalAnnotation("kotlin.ExperimentalStdlibApi")
-            languageSettings.useExperimentalAnnotation("kotlin.time.ExperimentalTime")
             languageSettings.useExperimentalAnnotation("io.ktor.util.KtorExperimentalAPI")
             languageSettings.useExperimentalAnnotation("kotlinx.serialization.InternalSerializationApi")
             languageSettings.useExperimentalAnnotation("kotlinx.serialization.ExperimentalSerializationApi")
@@ -37,8 +36,8 @@ kotlin {
 }
 
 dependencies {
-    implementation(ktor("client-serialization", Versions.ktor))
-    implementation(ktor("client-encoding", Versions.ktor))
+    // implementation(ktor("client-serialization", Versions.ktor))
+    // implementation(ktor("client-encoding", Versions.ktor))
     implementation(project(":tools"))
 
     testImplementation(junit("api", Versions.junit))

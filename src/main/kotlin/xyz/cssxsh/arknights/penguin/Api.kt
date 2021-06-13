@@ -24,7 +24,7 @@ enum class PenguinDataType : GameDataType {
         override val path get() = "_private/result/pattern/${SERVER}/global.json"
     };
 
-    override val path get() = "${name.toLowerCase()}.json"
+    override val path get() = "${name.lowercase()}.json"
 
     override val url: Url get() = Url("https://${PENGUIN_STATS_CN}/PenguinStats/api/v2/${path}")
 }

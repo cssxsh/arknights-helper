@@ -53,4 +53,6 @@ internal val SIGN = """<[^>]*>""".toRegex()
 
 fun String.remove(regex: Regex) = replace(regex, "")
 
-fun Double.intercept(decimal: Int = 2) = "%.${decimal}f%%".format(this * 100)
+fun Double.intercept(decimal: Int = 2) = "%.${decimal}f".format(this)
+
+fun Double.percentage(decimal: Int = 2) = "${(this * 100).intercept(decimal)}%"

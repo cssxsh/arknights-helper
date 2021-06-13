@@ -11,7 +11,6 @@ import kotlinx.serialization.encoding.Encoder
 import xyz.cssxsh.arknights.*
 import java.time.Instant
 import java.time.OffsetDateTime
-import kotlin.time.milliseconds
 
 /**
  * 根据名字查找
@@ -161,7 +160,7 @@ val Pair<Frequency, Stage>.single get() = stage.cost / first.probability
 /**
  * XXX
  */
-val Pair<Frequency, Stage>.short get() = stage.clear / first.probability
+val Pair<Frequency, Stage>.short get() = (stage.minClearTime / first.probability).toLong()
 
 /**
  * 根据时间戳过滤
@@ -174,13 +173,6 @@ fun <V : TimePeriod> Iterable<V>.time(time: OffsetDateTime) = filter { time in i
  * @see TimePeriod
  */
 fun <V : TimePeriod> Iterable<V>.now() = time(OffsetDateTime.now())
-
-/**
- * 最短通关用时
- * @see kotlin.time.Duration
- * @see Stage.minClearTime
- */
-val Stage.clear get() = minClearTime.milliseconds
 
 typealias I18n<T> = Map<String, T>
 

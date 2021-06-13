@@ -4,7 +4,6 @@ import net.mamoe.mirai.console.command.CommandSenderOnMessage
 import net.mamoe.mirai.console.command.CompositeCommand
 import net.mamoe.mirai.message.data.toPlainText
 import xyz.cssxsh.mirai.plugin.*
-import kotlin.time.minutes
 
 object ArknightsGuardCommand : CompositeCommand(
     owner = ArknightsHelperPlugin,
@@ -14,7 +13,7 @@ object ArknightsGuardCommand : CompositeCommand(
     @SubCommand("detail", "详情")
     @Description("查看蹲饼详情")
     suspend fun CommandSenderOnMessage<*>.detail() = sendMessage {
-        "当前蹲饼状态${fromEvent.subject.delegate in GuardContacts}, 蹲饼间隔${GuardInterval.minutes}".toPlainText()
+        "当前蹲饼状态${fromEvent.subject.delegate in GuardContacts}, 蹲饼间隔${GuardInterval}m".toPlainText()
     }
 
     @SubCommand("speed", "速度")

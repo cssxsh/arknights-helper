@@ -2,10 +2,9 @@ package xyz.cssxsh.arknights.user
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import xyz.cssxsh.arknights.intercept
-import xyz.cssxsh.arknights.timestamp
+import xyz.cssxsh.arknights.*
+import java.time.Duration
 import java.time.format.DateTimeFormatter
-import kotlin.time.minutes
 
 @Serializable
 data class UserRecruit(
@@ -16,7 +15,7 @@ data class UserRecruit(
     @SerialName("removed")
     val removed: Set<String>,
     @SerialName("time")
-    val time: Int,
+    val time: Long,
     @SerialName("role")
     val role: String,
     @SerialName("timestamp")
@@ -38,7 +37,7 @@ fun Collection<UserRecruit>.table(page: Int): String = buildString {
     appendLine("|:---:|:---:|:---:|:---:|")
     records.forEach { recruit ->
         val timestamp = timestamp(recruit.timestamp / 1_000).format(formatter)
-        val time = recruit.time.minutes.toComponents { hours, minutes, _, _ -> "%d:%02d".format(hours, minutes) }
+        val time = Duration.ofMinutes(recruit.time).run { "%d:%02d".format(toHours(), toMinutesPart()) }
         val words = recruit.words.joinToString(" ") { word ->
             when (word) {
                 in recruit.removed -> "<$word>"
@@ -64,7 +63,7 @@ fun Collection<UserRecruit>.tag(): String = buildString {
         appendLine("| TAG | 概率 |")
         appendLine("|:---:|:---:|")
         tags.entries.sortedByDescending { it.value }.forEach { (tag, probability) ->
-            appendLine("| $tag | ${probability.intercept()} |")
+            appendLine("| $tag | ${probability.percentage()} |")
         }
     }
 }

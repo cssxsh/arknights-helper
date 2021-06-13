@@ -1,7 +1,8 @@
-# Arknights Helper
+# [Arknights Helper](https://github.com/cssxsh/arknights-helper)
 > 基于 [Mirai Console](https://github.com/mamoe/mirai-console) 的 [明日方舟](https://ak.hypergryph.com/) 助手插件
 
 [![Release](https://img.shields.io/github/v/release/cssxsh/arknights-helper)](https://github.com/cssxsh/arknights-helper/releases)
+[![Release](https://img.shields.io/github/downloads/cssxsh/arknights-helper/total)](https://shields.io/category/downloads)
 
 ## 指令
 注意: 使用前请确保可以 [在聊天环境执行指令](https://github.com/project-mirai/chat-command)  
@@ -48,12 +49,14 @@ other:0.42
 | `/<question 问题> <list 列表>`          | 列出已经设置的自定义问题           |
 | `/<question 问题> <delete 删除>`        | 删除指定问题                       |
 | `/<question 问题> <add 添加>`           | 与机器人互动，输入条件，设置新问题 |
+| `/<question 问题> <count 统计>`         | 答题情况统计                       |
 
 回复选项序号`A~Z`，即算回答问题
 `type`是提问问题类型，默认为全部类型
 多个问题存在时，作答会按先出先答的原则提交答案  
 快速回答(规定时间的1/3内)会有相应奖励  
 群聊模式的其他群员亦可回答题目，但题目只能被回答一次，且其他人作为抢答者有相应奖励和惩罚  
+回答者需要也需要答题指令的权限  
 题目结构如下
 ```
 [类型](得分) 问题
@@ -157,6 +160,7 @@ items:
 
 ## TODO
 - [ ] 配置问题类型出现的概率
+- [x] 记录答题正确率 21/06/10
 - [x] 明日方舟官方QQ表情，下载、发送更新提醒等 21/05/14
 - [x] 自定义材料掉落别名(目前由企鹅物流数据提供支持) 21/05/14
 - [ ] 关卡规划

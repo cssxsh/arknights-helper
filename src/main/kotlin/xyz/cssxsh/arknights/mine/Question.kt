@@ -6,7 +6,6 @@ import xyz.cssxsh.arknights.bilibili.*
 import xyz.cssxsh.arknights.excel.*
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.time.*
 
 @Serializable
 data class Question(
@@ -44,7 +43,7 @@ enum class QuestionType(val description: String, private val load: (QuestionData
     MUSIC("音乐相关", { randomMusicQuestion(it.video().music) }),
     OTHER("自选相关", { requireNotNull(it.others().values.randomOrNull()) { "题目集为空" } });
 
-    fun build(loader: QuestionDataLoader): Question = load(loader).build(this)
+    fun random(loader: QuestionDataLoader): Question = load(loader).build(this)
 }
 
 private fun Boolean.Companion.random() = listOf(true, false).random()
@@ -58,8 +57,6 @@ private fun OffsetDateTime.randomDays(offset: Int = 1) = plusDays(offset * prefi
 private fun OffsetDateTime.randomMinutes(offset: Int = 30) = plusMinutes(offset * prefix)
 
 private val DefaultChoiceRange = 'A'..'D'
-
-private val DefaultJudgmentOptions = mapOf('Y' to "对", 'N' to "错")
 
 data class QuestionDataLoader(
     val excel: () -> ExcelData,
@@ -93,7 +90,7 @@ data class ChoiceQuestion(
             options = options.mapValues { (_, entry) -> entry.key },
             answer = answer,
             coin = options.size * 100,
-            timeout = (options.size * 10).seconds.toLongMilliseconds(),
+            timeout = options.size * 10_000L,
             type = type
         )
     }
@@ -112,12 +109,12 @@ data class CustomQuestion(
     @SerialName("timeout")
     val timeout: Long
 ) : QuestionBuild() {
-    constructor(problem: String, right: List<String>, error: List<String>, coin: Int, tips: String, duration: Duration): this(
+    constructor(problem: String, right: List<String>, error: List<String>, coin: Int, tips: String, timeout: Long): this(
         problem = problem,
         options = right.associateWith { true } + error.associateWith { false },
         coin = coin,
         tips = tips,
-        timeout = duration.toLongMilliseconds()
+        timeout = timeout
     )
 
     override fun build(type: QuestionType): Question {
@@ -155,7 +152,7 @@ data class DateTimeQuestion(
             options = map.mapValues { (_, datetime) -> datetime.format(formatter) },
             answer = answer,
             coin = 1800,
-            timeout = (3).minutes.toLongMilliseconds(),
+            timeout = 3 * 60_000L,
             type = type
         )
     }
@@ -167,11 +164,11 @@ data class JudgmentQuestion(val generate: (Boolean) -> Pair<String, String>) : Q
         val (problem, tips) = generate(state)
         return Question(
             problem = problem,
-            options = DefaultJudgmentOptions,
+            options = mapOf('Y' to "对", 'N' to "错"),
             answer = setOf(if (state) 'Y' else 'N'),
             coin = 600,
             tips = tips,
-            timeout = (1).minutes.toLongMilliseconds(),
+            timeout = 60_000L,
             type = type
         )
     }
@@ -198,19 +195,19 @@ typealias EnemyQuestion = (enemies: EnemyMap) -> QuestionBuild
 typealias WeeklyQuestion = (zones: WeeklyMap) -> QuestionBuild
 
 val randomPlayerQuestion: ConstInfoQuestion = { const ->
-    val list = buildMap<String, Pair<Int, Int>> {
+    val list = buildMap<String, Pair<Int, Set<Int>>> {
         val speed = const.playerApRegenSpeed
-        put("理智回复速度是每%d分钟1理智", speed to ((1..10).toSet() - speed).random())
+        put("理智回复速度是每%d分钟1理智", speed to ((1..10).toSet() - speed))
         val level = (1..const.maxPlayerLevel).random()
         val ap = const.playerApMap[level - 1]
         val exp = const.playerExpMap[level - 1]
-        put("等级为${level}, 理智回复上限为%d", ap to (const.playerApMap - ap).random())
-        put("等级为${level}, 升级所需经验为%d", exp to (const.playerExpMap - exp).random())
+        put("等级为${level}, 理智回复上限为%d", ap to (const.playerApMap.toSet() - ap))
+        put("等级为${level}, 升级所需经验为%d", exp to (const.playerExpMap.toSet() - exp))
     }
 
     JudgmentQuestion { state ->
         list.entries.random().let { (text, param) ->
-            text.format(if (state) param.first else param.second) to param.first.toString()
+            text.format(if (state) param.first else param.second.random()) to param.first.toString()
         }
     }
 }

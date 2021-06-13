@@ -7,7 +7,6 @@ import xyz.cssxsh.arknights.market.*
 import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.arknights.penguin.*
 import xyz.cssxsh.arknights.weibo.*
-import kotlin.time.*
 
 private fun resolve(name: String) = ArknightsHelperPlugin.dataFolder.resolve(name)
 
@@ -29,11 +28,11 @@ internal val Obtain get() = ExcelData.characters.values
 
 internal val PlayerLevelRange get() = 1..ExcelData.const.maxPlayerLevel
 
-internal val RegenSpeed get() = ExcelData.const.playerApRegenSpeed.minutes
+internal val RegenSpeed get() = ExcelData.const.playerApRegenSpeed * 60 * 1000L
 
 const val PoolUseCoin = 600
 
-val RecruitTime = (1).hours..(9).hours
+val RecruitTime = (1 * 60 * 60 * 1000)..(9 * 60 * 60 * 1000)
 
 /**
  * 卡池规则MAP
@@ -49,6 +48,11 @@ internal val GuardContacts by ArknightsTaskData::contacts
  * 自定义问题MAP
  */
 internal val CustomQuestions by ArknightsMineData::question
+
+/**
+ * 答题统计
+ */
+internal val MineCount by ArknightsMineData::count
 
 /**
  * 轮询速度

@@ -3,13 +3,10 @@ package xyz.cssxsh.mirai.plugin.command
 import net.mamoe.mirai.console.command.CommandSenderOnMessage
 import net.mamoe.mirai.console.command.CompositeCommand
 import net.mamoe.mirai.message.data.buildMessageChain
-import net.mamoe.mirai.message.data.content
 import net.mamoe.mirai.message.data.toPlainText
-import net.mamoe.mirai.message.nextMessage
 import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.mirai.plugin.*
 import java.time.OffsetDateTime
-import kotlin.time.*
 
 object ArknightsQuestionCommand : CompositeCommand(
     owner = ArknightsHelperPlugin,
@@ -24,7 +21,7 @@ object ArknightsQuestionCommand : CompositeCommand(
                 appendLine("问题：${it.problem}")
                 appendLine("选项：${it.options}")
                 appendLine("合成玉：${it.coin}")
-                appendLine("合成玉：${it.timeout.milliseconds}")
+                appendLine("限时：${it.timeout / 1000}s")
             }
         }
     }
@@ -57,9 +54,13 @@ object ArknightsQuestionCommand : CompositeCommand(
         sendMessage("提示:")
         val tips = nextContent()
         sendMessage("时间(单位秒):")
-        val duration = nextContent().toLong().seconds
+        val duration = nextContent().toLong() * 1000
         val question = CustomQuestion(problem, right, error, coin, tips, duration)
         CustomQuestions += ("${fromEvent.sender.nick} ${OffsetDateTime.now().withNano(0)}" to question)
         "问题${question} 已添加".toPlainText()
     }
+
+    @SubCommand("count", "统计")
+    @Description("问题统计")
+    suspend fun CommandSenderOnMessage<*>.count() = sendMessage { tableMineCount().toPlainText() }
 }

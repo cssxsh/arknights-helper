@@ -4,11 +4,11 @@ import net.mamoe.mirai.console.command.CommandSenderOnMessage
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.nextMessage
 import xyz.cssxsh.arknights.excel.*
-import xyz.cssxsh.arknights.intercept
+import xyz.cssxsh.arknights.*
 import xyz.cssxsh.arknights.market.*
 import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.arknights.penguin.*
-import kotlin.time.*
+import java.time.Duration
 
 internal val logger by ArknightsHelperPlugin::logger
 
@@ -83,13 +83,13 @@ internal fun ArknightsFace.toMessage() = buildMessageChain {
     appendLine("Hash: $key")
 }
 
-private fun Duration.text() = toComponents { minutes, seconds, _ -> "${minutes}m${seconds}s" }
+private fun duration(millis: Long) = Duration.ofMillis(millis).run { "${toMinutesPart()}m${toSecondsPart()}s" }
 
 private fun Pair<Matrix, Stage>.toMessage() = buildMessageChain {
-    appendLine("概率: ${first.quantity}/${first.times}=${first.probability.intercept()}")
+    appendLine("概率: ${first.quantity}/${first.times}=${first.probability.percentage()}")
     appendLine("单件期望理智: ${single.intercept()}")
-    appendLine("最短通关用时: ${stage.clear.text()}")
-    appendLine("单件期望用时: ${short.text()}")
+    appendLine("最短通关用时: ${duration(stage.minClearTime)}")
+    appendLine("单件期望用时: ${duration(short)}")
 }
 
 internal fun item(name: String, limit: Int) = buildMessageChain {
@@ -138,10 +138,25 @@ internal fun zone(name: String, limit: Int) = buildMessageChain {
     }
 }
 
-internal fun QuestionType.build() = build(QuestionDataLoader)
+internal fun QuestionType.random() = random(QuestionDataLoader)
+
+internal fun countQuestionType(type: QuestionType, mode: Int) {
+    MineCount.compute(type) { _, s ->
+        (s ?: mutableListOf(0, 0, 0)).apply { this[mode] += 1 }
+    }
+}
+
+internal fun tableMineCount() = buildString {
+    appendLine("# 答题统计")
+    appendLine("| 类型 | 正确 | 错误 | 超时 | 总计 |")
+    appendLine("|:----:|:----:|:----:|:----:|:----:|")
+    MineCount.forEach { type, (f, s, t) ->
+        appendLine("| $type | $f | $s | $t | ${f + s + t} |")
+    }
+}
 
 internal fun Question.toMessage() = buildMessageChain {
-    appendLine("[${type}]<${coin}>：${problem} (${timeout.milliseconds}内作答)")
+    appendLine("[${type}]<${coin}>：${problem} (${timeout / 1000}s内作答)")
     options.forEach { (index, text) ->
         appendLine("${index}.${text}")
     }
