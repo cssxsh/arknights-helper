@@ -25,8 +25,9 @@ class VideoData(override val dir: File): GameDataDownloader {
     val anime get() = dir.readVideoHistory(VideoDataType.ANIME)
     val music get() = dir.readVideoHistory(VideoDataType.MUSIC)
     val game get() = dir.readVideoHistory(VideoDataType.GAME)
+    val entertainment get() = dir.readVideoHistory(VideoDataType.ENTERTAINMENT)
 
-    val all get() = anime + music + game
+    val all get() = anime + music + game + entertainment
 
     override val types get() = VideoDataType.values().asIterable()
 }
@@ -34,10 +35,11 @@ class VideoData(override val dir: File): GameDataDownloader {
 val Video.url get() = Url("https://www.bilibili.com/video/${bvid}")
 val Video.cover get() = Url(pic)
 
-enum class VideoDataType(val id: Int) : GameDataType {
+enum class VideoDataType(private val tid: Int) : GameDataType {
     ANIME(1),
     MUSIC(3),
-    GAME(4);
+    GAME(4),
+    ENTERTAINMENT(5);
 
     override val path = "$name.json"
 
@@ -46,7 +48,7 @@ enum class VideoDataType(val id: Int) : GameDataType {
         append("ps", PAGE_SIZE.toString())
         append("pn", PAGE_NUM.toString())
         append("order", ORDER)
-        append("tid", id.toString())
+        append("tid", tid.toString())
     }
 
     override val url: Url = Url(BILIBILI_API).copy(parameters = parameters)
@@ -66,18 +68,12 @@ private data class Temp(
 
 @Serializable
 private data class VideoHistory(
-//    @SerialName("episodic_button")
-//    val episodicButton: JsonObject? = null,
     @SerialName("list")
     val list: VideoList,
-//    @SerialName("page")
-//    val page: JsonObject
 )
 
 @Serializable
 private data class VideoList(
-//    @SerialName("tlist")
-//    val types: Map<Int, JsonObject>?,
     @SerialName("vlist")
     val videos: List<Video>
 )
@@ -99,16 +95,6 @@ data class Video(
     val created: OffsetDateTime,
     @SerialName("description")
     val description: String,
-//    @SerialName("hide_click")
-//    val hideClick: Boolean,
-//    @SerialName("is_live_playback")
-//    val isLivePlayback: Int,
-//    @SerialName("is_pay")
-//    val isPay: Int,
-//    @SerialName("is_steins_gate")
-//    val isSteinsGate: Int,
-//    @SerialName("is_union_video")
-//    val isUnionVideo: Int,
     @SerialName("length")
     val length: String,
     @SerialName("mid")
@@ -125,6 +111,4 @@ data class Video(
     val title: String,
     @SerialName("typeid")
     val tid: Int,
-//    @SerialName("video_review")
-//    val videoReview: Int
 )
