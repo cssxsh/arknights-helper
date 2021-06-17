@@ -40,7 +40,7 @@ data class AnnouncementMeta(
     @SerialName("extra")
     val extra: AnnouncementExtra,
     @SerialName("focusAnnounceId")
-    val focusId: Int
+    val focusId: Int? = null
 )
 
 @Serializable
