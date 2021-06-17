@@ -1,5 +1,6 @@
 package xyz.cssxsh.arknights.excel
 
+import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -195,6 +196,7 @@ class ExcelData(override val dir: File): GameDataDownloader {
     private val zone by lazy { dir.readZoneTable() }
     val zones by lazy { ZoneMap(zone) }
     val weeks by lazy { WeeklyMap(zone) }
+    val version by lazy { dir.readExcelDataVersion() }
 
     override val types get() = ExcelDataType.values().asIterable()
 }
@@ -209,7 +211,8 @@ enum class ExcelDataType(file: String) : GameDataType {
     SKILL("skill_table.json"),
     STORY("story_review_table.json"),
     TEAM("handbook_team_table.json"),
-    ZONE("zone_table.json");
+    ZONE("zone_table.json"),
+    VERSION("data_version.txt");
 
     override val path = "excel/${file}"
 
@@ -217,6 +220,46 @@ enum class ExcelDataType(file: String) : GameDataType {
 }
 
 private fun path(type: GameDataType): String = "${SERVER.locale}/gamedata/${type.path}"
+
+data class ExcelDataVersion(
+    val stream: String,
+    val change: String,
+    val versionControl: String
+)
+
+internal fun File.readExcelDataVersion(): ExcelDataVersion {
+    return resolve(ExcelDataType.VERSION.path).readText().readExcelDataVersion()
+}
+
+internal suspend fun loadExcelDataVersion(): ExcelDataVersion {
+    return useHttpClient<String> { it.get(jsdelivr(ExcelDataType.VERSION)) }.readExcelDataVersion()
+}
+
+internal fun String.readExcelDataVersion(): ExcelDataVersion {
+    lateinit var stream: String
+    lateinit var change: String
+    lateinit var versionControl: String
+    lines().filter(String::isNotBlank).forEach {
+        val (name, value) = it.split(":")
+        when (name) {
+            "Stream" -> {
+                stream = value
+            }
+            "Change" -> {
+                change = value
+            }
+            "VersionControl" -> {
+                versionControl = value
+            }
+            else -> {}
+        }
+    }
+    return ExcelDataVersion(
+        stream = stream,
+        change = change,
+        versionControl = versionControl
+    )
+}
 
 private val github = { type: ExcelDataType -> Url("https://raw.githubusercontent.com/$GITHUB_REPO/master/${path(type)}") }
 

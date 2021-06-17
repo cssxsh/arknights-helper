@@ -13,7 +13,7 @@ object ArknightsHelperPlugin : KotlinPlugin(
 ) {
 
     override fun onEnable() {
-        downloadExternalData()
+        downloadGameData()
         ArknightsUserData.reload()
         ArknightsPoolData.reload()
         ArknightsMineData.reload()

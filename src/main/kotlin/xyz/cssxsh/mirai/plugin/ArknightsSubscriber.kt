@@ -5,6 +5,7 @@ import io.ktor.http.*
 import kotlinx.coroutines.*
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
+import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.event.events.BotJoinGroupEvent
 import net.mamoe.mirai.event.events.FriendAddEvent
@@ -14,6 +15,7 @@ import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import net.mamoe.mirai.utils.*
 import xyz.cssxsh.arknights.announce.*
 import xyz.cssxsh.arknights.bilibili.*
+import xyz.cssxsh.arknights.excel.loadExcelDataVersion
 import xyz.cssxsh.arknights.useHttpClient
 import xyz.cssxsh.arknights.weibo.*
 import java.time.Duration
@@ -164,17 +166,25 @@ private suspend fun sendRecruitClock(id: Long, site: Int) {
     }
 }
 
-internal fun downloadExternalData(): Unit = runBlocking {
+internal fun downloadGameData(): Unit = runBlocking {
     runCatching {
         ExcelData.download(flush = false)
+        val old = SemVersion.invoke(ExcelData.version.versionControl)
+        val now = SemVersion.invoke(loadExcelDataVersion().versionControl)
+        if (now > old) {
+            ExcelData.download(flush = true)
+            now
+        } else {
+            old
+        }
     }.onSuccess {
-        logger.info { "ExcelData 数据加载完毕" }
+        logger.info { "ExcelData 数据加载完毕, 版本 $it" }
     }.onFailure {
         logger.warning({ "ExcelData 数据加载失败" }, it)
     }
 
     runCatching {
-        PenguinData.download(flush = false)
+        PenguinData.download(flush = true)
     }.onSuccess {
         logger.info { "PenguinData 数据加载完毕" }
     }.onFailure {
