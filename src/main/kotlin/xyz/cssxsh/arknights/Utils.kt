@@ -42,7 +42,7 @@ suspend fun <T : GameDataType> Iterable<T>.load(dir: File, flush: Boolean): List
             dir.resolve(type.path).also { file ->
                 if (flush || file.exists().not()) {
                     file.parentFile.mkdirs()
-                    file.writeText(client.get(type.url))
+                    file.writeBytes(client.get<ByteArray>(type.url).apply { check(isNotEmpty()) })
                 }
             }
         }
