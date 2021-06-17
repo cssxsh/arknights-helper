@@ -20,4 +20,40 @@ internal class StatusKtTest : JsonTest() {
             println(blog.createdAt)
         }
     }
+
+    @Test
+    fun byproduct() = runBlocking {
+        blogs.byproduct.forEach { blog ->
+            println("=====================================>")
+            println(blog.url)
+            println(blog.createdAt)
+        }
+    }
+
+    @Test
+    fun historicus() = runBlocking {
+        blogs.historicus.forEach { blog ->
+            println("=====================================>")
+            println(blog.url)
+            println(blog.createdAt)
+        }
+    }
+
+    @Test
+    fun mounten() = runBlocking {
+        blogs.mounten.forEach { blog ->
+            println("=====================================>")
+            println(blog.url)
+            println(blog.createdAt)
+        }
+    }
+
+    @Test
+    fun picture() = runBlocking {
+        blogs.picture.forEach { blog ->
+            println("=====================================>")
+            println(blog.url)
+            println(blog.createdAt)
+        }
+    }
 }

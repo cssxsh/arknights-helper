@@ -51,4 +51,11 @@ internal class VideoKtTest : JsonTest() {
         println("map:${map}")
     }
 
+    @Test
+    fun entertainment() {
+        video.entertainment.forEach {
+            println(it.title)
+            println(it.created)
+        }
+    }
 }

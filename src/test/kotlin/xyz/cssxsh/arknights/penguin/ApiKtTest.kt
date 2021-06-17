@@ -17,7 +17,7 @@ internal class ApiKtTest : JsonTest() {
     private fun Pair<Matrix, Stage>.getContent() = buildString {
         appendLine("概率: ${first.quantity}/${first.times}=${first.probability}")
         appendLine("单件期望理智: $single")
-        appendLine("最短通关用时: ${stage.clear}")
+        appendLine("最短通关用时: ${stage.minClearTime}")
         appendLine("单件期望用时: $short")
     }
 
@@ -166,8 +166,8 @@ internal class ApiKtTest : JsonTest() {
                 println("${matrix.start}~${matrix.end}")
                 println("概率: ${matrix.quantity}/${matrix.times}=${matrix.probability}")
                 println("单件期望理智: ${(stage.cost * matrix.probability)}")
-                println("最短通关用时: ${stage.clear}")
-                println("单件期望用时: ${(stage.clear / matrix.probability)}")
+                println("最短通关用时: ${stage.minClearTime}")
+                println("单件期望用时: ${(stage.minClearTime / matrix.probability)}")
             }
         }
         (penguin.stages to penguin.matrices).stage("0-1").let { (stage, list) ->

@@ -284,6 +284,9 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
             }.onSuccess {
                 logger.info { "订阅器 VideoData 数据加载完毕" }
             }.onFailure {
+                if ("请求被拦截" in it.message.orEmpty()) {
+                    delay(Slow.toMillis())
+                }
                 logger.warning({ "订阅器 VideoData 数据加载失败" }, it)
             }
             val new = VideoData.all.filterNot { it.bvid in history }
@@ -343,6 +346,10 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
             if (LocalTime.now() > End) {
                 logger.info { "明日方舟 微博 订阅器进入休眠" }
                 delay(Duration.ofDays(1) - (LocalTime.now() - Start))
+            }
+
+            if (LocalTime.now().minute in (55..59) + (0..3)) {
+                delay(Duration.ofSeconds(30))
             }
 
             delay(Duration.ofMinutes(GuardInterval.toLong()))

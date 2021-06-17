@@ -1,6 +1,9 @@
 package xyz.cssxsh.arknights
 
+import io.ktor.client.request.*
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
+import xyz.cssxsh.arknights.announce.*
 import xyz.cssxsh.arknights.excel.*
 
 internal class ExcelKtTest : JsonTest() {
@@ -195,6 +198,18 @@ internal class ExcelKtTest : JsonTest() {
                     println(zone.title)
                 }
             }
+        }
+    }
+
+    @Test
+    fun announce(): Unit = runBlocking {
+        announce.download(flush = false)
+        println(announce.bilibili.focus.web)
+        val url = announce.bilibili.focus.web
+        val html = useHttpClient { it.get<String>(url) }.substringAfter("main")
+        val content = """((?<=>)[^<]+(?=</))|(https://[^<]+\.(jpg|png|gif))""".toRegex()
+        content.findAll(html).forEach { result ->
+            println(result.value.trim())
         }
     }
 }
