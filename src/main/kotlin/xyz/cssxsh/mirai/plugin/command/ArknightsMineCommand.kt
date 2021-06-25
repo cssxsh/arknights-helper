@@ -4,8 +4,6 @@ import kotlinx.coroutines.sync.withLock
 import net.mamoe.mirai.console.command.CommandSender.Companion.toCommandSender
 import net.mamoe.mirai.console.command.CommandSenderOnMessage
 import net.mamoe.mirai.console.command.SimpleCommand
-import net.mamoe.mirai.console.permission.PermissionService.Companion.testPermission
-import net.mamoe.mirai.console.permission.PermitteeId.Companion.permitteeId
 import net.mamoe.mirai.event.EventPriority
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.event.syncFromEventOrNull
@@ -25,9 +23,8 @@ object ArknightsMineCommand : SimpleCommand(
         noinline filter: suspend P.(P) -> Boolean = { true }
     ): P? {
         require(timeoutMillis > 0) { "timeoutMillis must be > 0" }
-        val prev = subject
         return syncFromEventOrNull<P, P>(timeoutMillis, priority) {
-            takeIf { subject == prev && permission.testPermission(sender.permitteeId) && filter(it, it) }
+            takeIf { subject == this@nextAnswerOrNull.subject && filter(it, it) }
         }
     }
 
