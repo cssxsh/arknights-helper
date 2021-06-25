@@ -17,7 +17,7 @@ internal class StatusKtTest : JsonTest() {
         blogs.arknights.forEach { blog ->
             println("=====================================>")
             println(blog.url)
-            println(blog.createdAt)
+            println(blog.created)
         }
     }
 
@@ -26,7 +26,7 @@ internal class StatusKtTest : JsonTest() {
         blogs.byproduct.forEach { blog ->
             println("=====================================>")
             println(blog.url)
-            println(blog.createdAt)
+            println(blog.created)
         }
     }
 
@@ -35,7 +35,7 @@ internal class StatusKtTest : JsonTest() {
         blogs.historicus.forEach { blog ->
             println("=====================================>")
             println(blog.url)
-            println(blog.createdAt)
+            println(blog.created)
         }
     }
 
@@ -44,7 +44,7 @@ internal class StatusKtTest : JsonTest() {
         blogs.mounten.forEach { blog ->
             println("=====================================>")
             println(blog.url)
-            println(blog.createdAt)
+            println(blog.created)
         }
     }
 
@@ -53,7 +53,7 @@ internal class StatusKtTest : JsonTest() {
         blogs.picture.forEach { blog ->
             println("=====================================>")
             println(blog.url)
-            println(blog.createdAt)
+            println(blog.created)
         }
     }
 }

@@ -203,12 +203,10 @@ internal class ExcelKtTest : JsonTest() {
 
     @Test
     fun announce(): Unit = runBlocking {
-        announce.download(flush = false)
-        println(announce.bilibili.focus.web)
-        val url = announce.bilibili.focus.web
-        val html = useHttpClient { it.get<String>(url) }.substringAfter("main")
-        val content = """((?<=>)[^<]+(?=</))|(https://[^<]+\.(jpg|png|gif))""".toRegex()
-        content.findAll(html).forEach { result ->
+        val url = "https://ak-fs.hypergryph.com/announce/Bilibili/announcement/676.html"
+        val html = useHttpClient { it.get<String>(url) }
+        val content = """((?<=>)[^<]+)|(https://.+(jpg|png|gif))""".toRegex()
+        content.findAll(html.substringAfter("<body>").replace("<br/>", "\n")).forEach { result ->
             println(result.value.trim())
         }
     }
