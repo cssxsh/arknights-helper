@@ -11,7 +11,7 @@ val Announcement.date: LocalDate get() = LocalDate.now().withMonth(month).withDa
 
 val Announcement.web: Url get() = Url(webUrl)
 
-val AnnouncementMeta.focus get() = list.first { it.id == focusId }
+val AnnouncementMeta.focus get() = list.firstOrNull { it.id == focusId }
 
 enum class AnnounceType(platform: String) : GameDataType {
     ANDROID("Android"),

@@ -41,7 +41,7 @@ class MicroBlogData(override val dir: File): GameDataDownloader {
     val mounten get() = dir.readMicroBlogHistory(BlogUser.MOUNTEN)
     val picture get() = dir.readMicroBlogPicture(BlogUser.PICTURE)
 
-    val all get() = arknights + byproduct + historicus + mounten + picture
+    val all get() = arknights + byproduct + historicus + mounten
 
     override val types get() = BlogUser.values().asIterable()
 }
@@ -58,17 +58,12 @@ enum class BlogUser(val id: Long) : GameDataType {
 
     override val path = "Blog(${id}).json"
 
-//    private val parameters = Parameters.build {
-//        append("value", "$id")
-//        append("containerid", "107603$id")
-//    }
-
     override val url = Url("$BLOG_API?containerid=107603$id")
 }
 
 private val ImageSizeRegex = """(?<=https://wx\d\.sinaimg\.cn/)([0-9A-z]+)""".toRegex()
 
-private const val OriginalSize = "orj1080"
+private const val OriginalSize = "large"
 
 val MicroBlog.images get() = pictures.map { Url(it.url.replace(ImageSizeRegex, OriginalSize)) }
 
@@ -106,7 +101,7 @@ private data class Card(
 data class MicroBlog(
     @SerialName("created_at")
     @Serializable(WeiboDateTimeSerializer::class)
-    val createdAt: OffsetDateTime = OffsetDateTime.now(),
+    val created: OffsetDateTime = OffsetDateTime.now(),
     @SerialName("id")
     val id: Long,
     @SerialName("isLongText")

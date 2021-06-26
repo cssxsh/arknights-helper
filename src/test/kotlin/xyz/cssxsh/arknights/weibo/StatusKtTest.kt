@@ -17,7 +17,43 @@ internal class StatusKtTest : JsonTest() {
         blogs.arknights.forEach { blog ->
             println("=====================================>")
             println(blog.url)
-            println(blog.createdAt)
+            println(blog.created)
+        }
+    }
+
+    @Test
+    fun byproduct() = runBlocking {
+        blogs.byproduct.forEach { blog ->
+            println("=====================================>")
+            println(blog.url)
+            println(blog.created)
+        }
+    }
+
+    @Test
+    fun historicus() = runBlocking {
+        blogs.historicus.forEach { blog ->
+            println("=====================================>")
+            println(blog.url)
+            println(blog.created)
+        }
+    }
+
+    @Test
+    fun mounten() = runBlocking {
+        blogs.mounten.forEach { blog ->
+            println("=====================================>")
+            println(blog.url)
+            println(blog.created)
+        }
+    }
+
+    @Test
+    fun picture() = runBlocking {
+        blogs.picture.forEach { blog ->
+            println("=====================================>")
+            println(blog.url)
+            println(blog.created)
         }
     }
 }

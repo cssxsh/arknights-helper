@@ -1,5 +1,6 @@
 package xyz.cssxsh.arknights
 
+import xyz.cssxsh.arknights.announce.AnnouncementData
 import xyz.cssxsh.arknights.bilibili.*
 import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.penguin.*
@@ -12,15 +13,11 @@ abstract class JsonTest {
 
     val excel by lazy { ExcelData(dir) }
 
-    val data = File("./test/penguin")
-
     val penguin by lazy { PenguinData(File("./test/penguin")) }
 
-    val bilibili = File("./test/bilibili")
+    val video by lazy { VideoData(File("./test/bilibili")) }
 
-    val video by lazy { VideoData(bilibili) }
+    val blogs by lazy { MicroBlogData(File("./test/weibo")) }
 
-    val weibo = File("./test/weibo")
-
-    val blogs by lazy { MicroBlogData(weibo) }
+    val announce by lazy { AnnouncementData(File("./test/announce")) }
 }
