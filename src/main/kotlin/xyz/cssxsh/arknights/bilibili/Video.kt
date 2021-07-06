@@ -18,10 +18,10 @@ private const val PAGE_NUM = 1
 private const val ORDER = "pubdate"
 
 private fun File.readVideoHistory(type: VideoDataType): List<Video> {
-    return read<Temp>(type).let { requireNotNull(it.data) { it.toString() } }.list.videos
+    return read<Temp>(type).let { requireNotNull(it.data) { "$type error ${it.code} ${it.message}" } }.list.videos
 }
 
-class VideoData(override val dir: File): GameDataDownloader {
+class VideoData(override val dir: File) : GameDataDownloader {
     val anime get() = dir.readVideoHistory(VideoDataType.ANIME)
     val music get() = dir.readVideoHistory(VideoDataType.MUSIC)
     val game get() = dir.readVideoHistory(VideoDataType.GAME)
