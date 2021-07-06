@@ -59,11 +59,11 @@ private data class Temp(
     @SerialName("code")
     val code: Int,
     @SerialName("data")
-    val `data`: VideoHistory?,
+    val `data`: VideoHistory? = null,
     @SerialName("message")
     val message: String,
     @SerialName("ttl")
-    val ttl: Int
+    val ttl: Int = 0
 )
 
 @Serializable
