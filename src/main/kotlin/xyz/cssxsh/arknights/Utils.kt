@@ -2,6 +2,7 @@ package xyz.cssxsh.arknights
 
 import io.ktor.client.request.*
 import io.ktor.http.*
+import kotlinx.coroutines.delay
 import kotlinx.serialization.decodeFromString
 import java.io.File
 import java.time.ZoneId
@@ -36,13 +37,14 @@ interface GameDataDownloader {
 
 internal inline fun <reified T> File.read(type: GameDataType): T = CustomJson.decodeFromString(resolve(type.path).readText())
 
-suspend fun <T : GameDataType> Iterable<T>.load(dir: File, flush: Boolean): List<File> {
+suspend fun <T : GameDataType> Iterable<T>.load(dir: File, flush: Boolean, duration: Long = 30_000): List<File> {
     return useHttpClient { client ->
         map { type ->
             dir.resolve(type.path).also { file ->
                 if (flush || file.exists().not()) {
                     file.parentFile.mkdirs()
                     file.writeBytes(client.get<ByteArray>(type.url).apply { check(isNotEmpty()) })
+                    delay(duration)
                 }
             }
         }
