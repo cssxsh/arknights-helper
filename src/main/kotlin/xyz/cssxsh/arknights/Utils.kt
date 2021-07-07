@@ -27,6 +27,7 @@ typealias Server<T> = Map<ServerType, T>
 interface GameDataType {
     val path: String
     val url: Url
+    val duration: Long get() = 0
 }
 
 interface GameDataDownloader {
@@ -37,14 +38,14 @@ interface GameDataDownloader {
 
 internal inline fun <reified T> File.read(type: GameDataType): T = CustomJson.decodeFromString(resolve(type.path).readText())
 
-suspend fun <T : GameDataType> Iterable<T>.load(dir: File, flush: Boolean, duration: Long = 30_000): List<File> {
+suspend fun <T : GameDataType> Iterable<T>.load(dir: File, flush: Boolean): List<File> {
     return useHttpClient { client ->
         map { type ->
             dir.resolve(type.path).also { file ->
                 if (flush || file.exists().not()) {
                     file.parentFile.mkdirs()
                     file.writeBytes(client.get<ByteArray>(type.url).apply { check(isNotEmpty()) })
-                    delay(duration)
+                    delay(type.duration)
                 }
             }
         }

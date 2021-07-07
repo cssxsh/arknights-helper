@@ -56,6 +56,8 @@ enum class BlogUser(val id: Long) : GameDataType {
         override val url: Url = Url("$BLOG_API?containerid=107803$id")
     };
 
+    override val duration: Long = 30_000L
+
     override val path = "Blog(${id}).json"
 
     override val url = Url("$BLOG_API?containerid=107603$id")

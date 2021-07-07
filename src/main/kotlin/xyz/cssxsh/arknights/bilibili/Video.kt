@@ -41,6 +41,8 @@ enum class VideoDataType(private val tid: Int) : GameDataType {
     GAME(4),
     ENTERTAINMENT(5);
 
+    override val duration: Long = 30_000
+
     override val path = "$name.json"
 
     private val parameters = Parameters.build {
