@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
 pluginManagement {
     repositories {
         mavenLocal()
@@ -12,5 +10,3 @@ pluginManagement {
     }
 }
 rootProject.name = "arknights-helper"
-
-include("tools")
