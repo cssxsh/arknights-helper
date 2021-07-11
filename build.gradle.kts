@@ -10,7 +10,6 @@ version = "1.2.2"
 
 repositories {
     mavenLocal()
-    maven(url = "https://maven.aliyun.com/repository/releases")
     maven(url = "https://maven.aliyun.com/repository/public")
     mavenCentral()
     jcenter()
@@ -37,7 +36,7 @@ kotlin {
 
 dependencies {
     // implementation(ktor("client-serialization", Versions.ktor))
-    // implementation(ktor("client-encoding", Versions.ktor))
+    compileOnly(mirai("core", Versions.mirai))
 
     testImplementation(junit("api", Versions.junit))
     testRuntimeOnly(junit("engine", Versions.junit))
