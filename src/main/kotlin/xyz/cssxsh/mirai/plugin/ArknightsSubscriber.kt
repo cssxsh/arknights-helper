@@ -336,7 +336,9 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
                 logger.warning({ "订阅器 MicroBlogData 数据加载失败" }, it)
             }
 
-            val new = (MicroBlogData.all + MicroBlogData.picture).filterNot { it.id in history }
+            val new = MicroBlogData.all.filterNot { it.id in history } + MicroBlogData.picture.filterNot {
+                it.id > history.maxOrNull() ?: 0
+            }
             if (new.isNotEmpty()) {
                 logger.info { "明日方舟 微博 订阅器 捕捉到结果" }
                 new.sortedBy { it.id }.forEach { blog ->

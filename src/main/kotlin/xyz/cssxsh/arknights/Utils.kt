@@ -2,6 +2,7 @@ package xyz.cssxsh.arknights
 
 import io.ktor.client.request.*
 import io.ktor.http.*
+import kotlinx.coroutines.delay
 import kotlinx.serialization.decodeFromString
 import java.io.File
 import java.time.ZoneId
@@ -26,6 +27,7 @@ typealias Server<T> = Map<ServerType, T>
 interface GameDataType {
     val path: String
     val url: Url
+    val duration: Long get() = 0
 }
 
 interface GameDataDownloader {
@@ -43,6 +45,7 @@ suspend fun <T : GameDataType> Iterable<T>.load(dir: File, flush: Boolean): List
                 if (flush || file.exists().not()) {
                     file.parentFile.mkdirs()
                     file.writeBytes(client.get<ByteArray>(type.url).apply { check(isNotEmpty()) })
+                    delay(type.duration)
                 }
             }
         }

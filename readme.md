@@ -1,10 +1,13 @@
 # [Arknights Helper](https://github.com/cssxsh/arknights-helper)
+
 > 基于 [Mirai Console](https://github.com/mamoe/mirai-console) 的 [明日方舟](https://ak.hypergryph.com/) 助手插件
 
 [![Release](https://img.shields.io/github/v/release/cssxsh/arknights-helper)](https://github.com/cssxsh/arknights-helper/releases)
-[![Release](https://img.shields.io/github/downloads/cssxsh/arknights-helper/total)](https://shields.io/category/downloads)
+[![Downloads](https://img.shields.io/github/downloads/cssxsh/arknights-helper/total)](https://shields.io/category/downloads)
+[![MiraiForum](https://img.shields.io/badge/post-on%20MiraiForum-yellow)](https://mirai.mamoe.net/topic/203)
 
 ## 指令
+
 注意: 使用前请确保可以 [在聊天环境执行指令](https://github.com/project-mirai/chat-command)  
 带括号的`/`前缀是可选的  
 `<...>`中的是指令名，由空格隔开表示或，选择其中任一名称都可执行例如`/抽卡 十连`  
@@ -24,12 +27,14 @@
 抽卡每一抽会消耗`600`合成玉，合成玉可以通过[答题](#助手答题指令)获得，通过[玩家详情](#助手玩家指令)查看
 
 #### ArknightsGachaCommand 卡池规则`rules`参数格式
+
 `rules`参数从第二行起，按行分割  
 每行格式为规则`干员名|星级|other|...:概率`或者注释`#...`  
 星级用连续的`*`表示，例如`*****`表示五星干员，需要单行设置，设置的概率不包括已设置干员名  
 other表示剩余的其他干员  
 概率用小数表示，全部行的概率加起来的概率要为`100%`，即`1.00`  
 例子
+
 ```
 /抽卡 卡池 限时寻访深悼
 浊心斯卡蒂|凯尔希:0.014
@@ -52,11 +57,11 @@ other:0.42
 | `/<question 问题> <count 统计>`         | 答题情况统计                       |
 
 回复选项序号`A~Z`，即算回答问题
-`type`是提问问题类型，默认为全部类型
-多个问题存在时，作答会按先出先答的原则提交答案  
+`type`是提问问题类型，默认为全部类型 多个问题存在时，作答会按先出先答的原则提交答案  
 快速回答(规定时间的1/3内)会有相应奖励  
 群聊模式的其他群员亦可回答题目，但题目只能被回答一次，且其他人作为抢答者有相应奖励和惩罚   
 题目结构如下
+
 ```
 [类型](得分) 问题
 A. 选项
@@ -80,8 +85,7 @@ B. 选项
 | `/<stage 关卡> [name] [limit]?`          | 查看关卡的材料掉落率         |
 | `/<zone 章节 活动 地图> [name] [limit]?` | 查看地图所有关卡的材料掉落率 |
 
-`limit`是显示单元的最大数量
-可以通过配置[材料别名](#材料别名)设置可选的材料索引
+`limit`是显示单元的最大数量 可以通过配置[材料别名](#材料别名)设置可选的材料索引
 
 ### 助手玩家指令
 
@@ -133,10 +137,13 @@ B. 选项
 表情详情指令使用时, 先发送指令，然后发送一个表情，机器人会回复表情的商店链接和原图
 
 ## 配置文件
+
 位于`Mirai-Console`运行目录下的`config/arknights-helper`文件夹下的`config`文件
 
 ### 干员别名
+
 在配置文件中的`roles`配置项
+
 ```
 roles:
   小羊: 艾雅法拉
@@ -144,7 +151,9 @@ roles:
 ```
 
 ### 材料别名
+
 在配置文件中的`items`配置项
+
 ```
 items:
   绿管: 晶体元件
@@ -158,6 +167,7 @@ items:
 1. 从 [Releases](https://github.com/cssxsh/arknights-helper/releases) 下载`jar`并将其放入`plugins`文件夹中
 
 ## TODO
+
 - [ ] 配置问题类型出现的概率
 - [x] 记录答题正确率 21/06/10
 - [x] 明日方舟官方QQ表情，下载、发送更新提醒等 21/05/14
@@ -167,6 +177,7 @@ items:
 - [x] 游戏公告
 
 ## 数据来源
+
 * 游戏数据 [Kengxxiao/ArknightsGameData](https://github.com/Kengxxiao/ArknightsGameData)
 * 掉落数据 [企鹅物流数据统计](https://penguin-stats.io/)
 * 其他数据 相关API

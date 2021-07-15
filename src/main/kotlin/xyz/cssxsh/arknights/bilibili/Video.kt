@@ -18,10 +18,10 @@ private const val PAGE_NUM = 1
 private const val ORDER = "pubdate"
 
 private fun File.readVideoHistory(type: VideoDataType): List<Video> {
-    return read<Temp>(type).let { requireNotNull(it.data) { it.message } }.list.videos
+    return read<Temp>(type).let { requireNotNull(it.data) { "$type error ${it.code} ${it.message}" } }.list.videos
 }
 
-class VideoData(override val dir: File): GameDataDownloader {
+class VideoData(override val dir: File) : GameDataDownloader {
     val anime get() = dir.readVideoHistory(VideoDataType.ANIME)
     val music get() = dir.readVideoHistory(VideoDataType.MUSIC)
     val game get() = dir.readVideoHistory(VideoDataType.GAME)
@@ -41,6 +41,8 @@ enum class VideoDataType(private val tid: Int) : GameDataType {
     GAME(4),
     ENTERTAINMENT(5);
 
+    override val duration: Long = 30_000
+
     override val path = "$name.json"
 
     private val parameters = Parameters.build {
@@ -59,11 +61,11 @@ private data class Temp(
     @SerialName("code")
     val code: Int,
     @SerialName("data")
-    val `data`: VideoHistory?,
+    val `data`: VideoHistory? = null,
     @SerialName("message")
     val message: String,
     @SerialName("ttl")
-    val ttl: Int
+    val ttl: Int = 0
 )
 
 @Serializable

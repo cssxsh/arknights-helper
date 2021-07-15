@@ -4,6 +4,9 @@ import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.features.*
 import io.ktor.utils.io.core.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.supervisorScope
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -38,16 +41,19 @@ private val DEFAULT_IGNORE: (exception: Throwable) -> Boolean = {
 internal suspend fun <T> useHttpClient(
     ignore: (exception: Throwable) -> Boolean = DEFAULT_IGNORE,
     block: suspend (HttpClient) -> T
-): T = client().use {
-    var result: T? = null
-    while (result === null) {
-        result = runCatching {
-            block(it)
-        }.onFailure {
-            if (ignore(it).not()) throw it
-        }.getOrNull()
+): T = supervisorScope {
+    client().use {
+        while (isActive) {
+            runCatching {
+                block(it)
+            }.onFailure {
+                if (ignore(it).not()) throw it
+            }.onSuccess {
+                return@use it
+            }
+        }
+        throw CancellationException()
     }
-    result
 }
 
 internal fun timestamp(value: Long) = OffsetDateTime.ofInstant(Instant.ofEpochSecond(value), SERVER_ZONE)

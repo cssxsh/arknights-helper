@@ -1,16 +1,15 @@
-
 plugins {
-    kotlin("jvm")
-    kotlin("plugin.serialization")
-    id("net.mamoe.mirai-console")
+    kotlin("jvm") version Versions.kotlin
+    kotlin("plugin.serialization") version Versions.kotlin
+
+    id("net.mamoe.mirai-console") version  Versions.mirai
 }
 
 group = "xyz.cssxsh.mirai.plugin"
-version = "1.2.1-dev-6"
+version = "1.2.2"
 
 repositories {
     mavenLocal()
-    maven(url = "https://maven.aliyun.com/repository/releases")
     maven(url = "https://maven.aliyun.com/repository/public")
     mavenCentral()
     jcenter()
@@ -37,8 +36,7 @@ kotlin {
 
 dependencies {
     // implementation(ktor("client-serialization", Versions.ktor))
-    // implementation(ktor("client-encoding", Versions.ktor))
-    implementation(project(":tools"))
+    compileOnly(mirai("core", Versions.mirai))
 
     testImplementation(junit("api", Versions.junit))
     testRuntimeOnly(junit("engine", Versions.junit))

@@ -1,15 +1,19 @@
+@file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
+
 package xyz.cssxsh.arknights.market
 
 import io.ktor.http.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.message.data.MarketFace
+import net.mamoe.mirai.internal.message.*
+import net.mamoe.mirai.internal.network.protocol.data.proto.ImMsgBody
 import okio.ByteString.Companion.decodeHex
 import okio.ByteString.Companion.toByteString
 import xyz.cssxsh.arknights.*
+import xyz.cssxsh.arknights.read
 import java.io.File
 import kotlin.properties.ReadOnlyProperty
-import kotlin.reflect.full.declaredMemberProperties
 
 typealias FaceItemMap = MutableMap<Int, String>
 
@@ -36,7 +40,7 @@ private fun FaceItemMap.types() = mapValues { (id, _) ->
 
 fun File.readMarketFaceMap(items: FaceItemMap): MarketFaceMap = items.types().mapValues { (_, type) -> read(type) }
 
-data class ArknightsFaceData(override val dir: File, val items: FaceItemMap): GameDataDownloader {
+data class ArknightsFaceData(override val dir: File, val items: FaceItemMap) : GameDataDownloader {
     val data by lazy { dir.readMarketFaceMap(items) }
     val faces by lazy { ArknightsFaceMap(data, items) }
 
@@ -270,53 +274,30 @@ interface ArknightsFace {
     }
 }
 
-private val MarketFaceImplKClass by lazy {
-    Class.forName("net.mamoe.mirai.internal.message.MarketFaceImpl").kotlin
-}
-
-private val MarketFaceBodyKClass by lazy {
-    Class.forName("net.mamoe.mirai.internal.network.protocol.data.proto.ImMsgBody").kotlin.nestedClasses.first {
-        it.simpleName == "MarketFace"
-    }
-}
-
 /**
  * 构建 MarketFace 实例
  */
 fun ArknightsFace.impl(): MarketFace {
-    val body = MarketFaceBodyKClass.constructors.first { it.parameters.size == 13 }.run {
-        callBy(parameters.associateWith { parameter ->
-            when (parameter.name) {
-                "faceId" -> md5.decodeHex().toByteArray()
-                "faceInfo" -> 1
-                "faceName" -> "[$content]".toByteArray()
-                "imageHeight" -> 200
-                "imageWidth" -> 200
-                "itemType" -> 6
-                "key" -> key.toByteArray()
-                "mediaType" -> 0
-                "mobileParam" -> byteArrayOf()
-                "param" -> byteArrayOf()
-                "pbReserve" -> byteArrayOf()
-                "subType" -> 3
-                "tabId" -> id
-                else -> throw IllegalArgumentException()
-            }
-        })
-    }
-    return MarketFaceImplKClass.constructors.first { it.parameters.size == 1 }.call(body) as MarketFace
+    return MarketFaceImpl(
+        delegate = ImMsgBody.MarketFace(
+            faceId = md5.decodeHex().toByteArray(),
+            faceInfo = 1,
+            faceName = "[$content]".encodeToByteArray(),
+            imageHeight = 200,
+            imageWidth = 200,
+            itemType = 6,
+            key = key.encodeToByteArray(),
+            mediaType = 0,
+            mobileParam = byteArrayOf(),
+            param = byteArrayOf(),
+            pbReserve = byteArrayOf(),
+            subType = 3,
+            tabId = id
+        )
+    )
 }
 
 val MarketFace.md5 by ReadOnlyProperty { face, _ ->
-    requireNotNull(face::class == MarketFaceImplKClass) { "需要MarketFaceImpl实例作为参数" }
-    val delegate = MarketFaceImplKClass.declaredMemberProperties.first { it.name == "delegate" }.getter.call(face)
-    val md5 = MarketFaceBodyKClass.declaredMemberProperties.first { it.name == "faceId" }.getter.call(delegate) as ByteArray
-    md5.toByteString().hex()
-}
-
-val MarketFace.hash by ReadOnlyProperty { face, _ ->
-    requireNotNull(face::class == MarketFaceImplKClass) { "需要MarketFaceImpl实例作为参数" }
-    val delegate = MarketFaceImplKClass.declaredMemberProperties.first { it.name == "delegate" }.getter.call(face)
-    val hash = MarketFaceBodyKClass.declaredMemberProperties.first { it.name == "key" }.getter.call(delegate) as ByteArray
-    hash.toString()
+    require(face is MarketFaceImpl) { "需要MarketFaceImpl实例作为参数" }
+    face.delegate.faceId.toByteString().hex()
 }
