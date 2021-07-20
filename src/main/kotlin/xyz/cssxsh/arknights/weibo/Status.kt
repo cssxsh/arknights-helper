@@ -23,7 +23,9 @@ private fun File.readMicroBlogHistory(type: BlogUser): List<MicroBlog> {
 }
 
 private fun File.readMicroBlogPicture(type: BlogUser): List<MicroBlog> {
-    return read<Temp<PictureData>>(type).data().blogs.associateBy { it.id }.values.toList()
+    return read<Temp<PictureData>>(type).data().blogs.fold(mutableMapOf<Long, MicroBlog>()) { acc, new ->
+        acc.apply { compute(new.id) { _, old -> old?.copy(pictures = old.pictures + new.pictures) ?: new } }
+    }.values.map { it.copy(user = PictureUser) }
 }
 
 private suspend fun getLongTextContent(id: Long): String {
@@ -47,14 +49,14 @@ class MicroBlogData(override val dir: File): GameDataDownloader {
 }
 
 enum class BlogUser(val id: Long) : GameDataType {
-    ARKNIGHTS(6279793937),
-    BYPRODUCT(6441489862),
-    MOUNTEN(7506039414),
-    HISTORICUS(7499841383),
     PICTURE(6279793937) {
         override val path: String = "BlogPicture(${id}).json"
         override val url: Url = Url("$BLOG_API?containerid=107803$id")
-    };
+    },
+    ARKNIGHTS(6279793937),
+    BYPRODUCT(6441489862),
+    MOUNTEN(7506039414),
+    HISTORICUS(7499841383);
 
     override val duration: Long = 30_000L
 
@@ -63,11 +65,19 @@ enum class BlogUser(val id: Long) : GameDataType {
     override val url = Url("$BLOG_API?containerid=107603$id")
 }
 
-private val ImageSizeRegex = """(?<=https://wx\d\.sinaimg\.cn/)([0-9A-z]+)""".toRegex()
+private val ImageServer = listOf("wx1", "wx2", "wx3", "wx4")
 
-private const val OriginalSize = "large"
+internal val ImageExtensions = mapOf(
+    ContentType.Image.JPEG to "jpg",
+    ContentType.Image.GIF to "gif",
+    ContentType.Image.PNG to "png",
+)
 
-val MicroBlog.images get() = pictures.map { Url(it.url.replace(ImageSizeRegex, OriginalSize)) }
+internal fun extension(pid: String) = ImageExtensions.values.first { it.startsWith(pid[21]) }
+
+internal fun image(pid: String) = Url("https://${ImageServer.random()}.sinaimg.cn/large/${pid}.${extension(pid)}")
+
+val MicroBlog.images get() = pictures.map { image(pid = it) }
 
 val MicroBlog.content get() = raw ?: text.replace("<br />", "\n").remove(SIGN)
 
@@ -108,21 +118,15 @@ data class MicroBlog(
     val id: Long,
     @SerialName("isLongText")
     val isLongText: Boolean = false,
-    @SerialName("pics")
-    val pictures: List<MicroPicture> = emptyList(),
+    @SerialName("pic_ids")
+    val pictures: Set<String> = emptySet(),
     @SerialName("raw_text")
     val raw: String? = null,
     @SerialName("retweeted_status")
     val retweeted: MicroBlog? = null,
     val text: String,
     @SerialName("user")
-    val user: MicroBlogUser? = PictureUser,
-)
-
-@Serializable
-data class MicroPicture(
-    @SerialName("url")
-    val url: String
+    val user: MicroBlogUser? = null,
 )
 
 @Serializable
@@ -162,10 +166,10 @@ data class LongTextContent(
 )
 
 private val PictureUser = MicroBlogUser(
-    "",
-    "",
-    0,
-    "此微博被锁定为热门，机器人无法获取详情，请打开链接自行查看"
+    avatar = "",
+    description = "",
+    id = 0,
+    name = "此微博被锁定为热门，机器人无法获取详情，请打开链接自行查看"
 )
 
 private val PictureData.blogs get() = cards.flatMap { it.group }.flatMap { it.pictures }.map { it.blog }
