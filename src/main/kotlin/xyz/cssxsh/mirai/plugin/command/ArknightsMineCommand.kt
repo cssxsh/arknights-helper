@@ -31,9 +31,10 @@ object ArknightsMineCommand : SimpleCommand(
     @Handler
     suspend fun CommandSenderOnMessage<*>.handler(type: QuestionType = QuestionType.values().random()) {
         val question = type.random()
-        sendMessage(question.toMessage())
 
         val (reply, time) = mutex.withLock {
+            sendMessage(question.toMessage())
+
             val start = System.currentTimeMillis()
             fromEvent.nextAnswerOrNull(question.timeout) { next ->
                 next.message.content.uppercase().any { it in question.options.keys }
