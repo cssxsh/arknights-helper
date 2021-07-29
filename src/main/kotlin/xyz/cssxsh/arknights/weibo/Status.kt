@@ -58,7 +58,7 @@ enum class BlogUser(val id: Long) : GameDataType {
     MOUNTEN(7506039414),
     HISTORICUS(7499841383);
 
-    override val duration: Long = 30_000L
+    override val duration: Long = 5_000L
 
     override val path = "Blog(${id}).json"
 
