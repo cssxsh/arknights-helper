@@ -160,8 +160,8 @@ private fun Pair<Matrix, Stage>.toMessage() = buildMessageChain {
     appendLine("单件期望用时: ${duration(short)}")
 }
 
-internal fun item(name: String, limit: Int) = buildMessageChain {
-    val (item, list) = (PenguinData.items to PenguinData.matrices.now()).item(name)
+internal fun item(name: String, limit: Int, now: Boolean) = buildMessageChain {
+    val (item, list) = (PenguinData.items to PenguinData.matrices.let { if (now) it.now() else it }).item(name)
     appendLine("${item.alias.get()} 统计结果 By 企鹅物流数据统计")
     if (list.isEmpty()) {
         appendLine("列表为空，请尝试更新数据")
@@ -170,7 +170,7 @@ internal fun item(name: String, limit: Int) = buildMessageChain {
     var count = 0
     (list with PenguinData.stages).sortedBy { it.single }.forEach { pair ->
         if (pair.stage.isGacha || count >= limit) return@forEach
-        appendLine("=======> 作战: ${pair.stage.code} (cost=${pair.stage.cost}) ")
+        appendLine("=======> 作战: ${pair.stage.code} (cost=${pair.stage.cost}) ${pair.stage}")
         append(pair.toMessage())
         count++
     }
@@ -183,8 +183,8 @@ internal fun alias() = buildMessageChain {
     }
 }
 
-internal fun stage(code: String, limit: Int) = buildMessageChain {
-    val (stage, list) = (PenguinData.stages to PenguinData.matrices.now()).stage(code)
+internal fun stage(code: String, limit: Int, now: Boolean) = buildMessageChain {
+    val (stage, list) = (PenguinData.stages to PenguinData.matrices.let { if (now) it.now() else it }).stage(code)
     appendLine("[${stage.code}] (cost=${stage.cost}) 统计结果 By 企鹅物流数据统计")
     if (list.isEmpty()) {
         appendLine("列表为空，请尝试更新数据")
@@ -199,10 +199,10 @@ internal fun stage(code: String, limit: Int) = buildMessageChain {
     }
 }
 
-internal fun zone(name: String, limit: Int) = buildMessageChain {
+internal fun zone(name: String, limit: Int, now: Boolean) = buildMessageChain {
     val (_, list) = (PenguinData.zones to PenguinData.stages).name(name)
     list.forEach { stage ->
-        append(stage(stage.code, limit))
+        append(stage(stage.code, limit, now))
     }
 }
 
