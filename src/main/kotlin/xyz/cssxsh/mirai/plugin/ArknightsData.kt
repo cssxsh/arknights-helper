@@ -53,7 +53,7 @@ var CommandSenderOnMessage<*>.pool: String by ArknightsPoolData.subject()
 val CommandSenderOnMessage<*>.rule: String by ReadOnlyProperty { that, _ -> ArknightsPoolData.rules[that.pool] }
 
 /**
- * 抽卡互斥锁
+ * 答题互斥锁
  */
 val CommandSenderOnMessage<*>.mutex: Mutex by SubjectDelegate { Mutex() }
 
