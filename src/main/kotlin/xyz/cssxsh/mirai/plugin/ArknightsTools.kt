@@ -8,7 +8,7 @@ import net.mamoe.mirai.contact.getMember
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.nextMessage
-import net.mamoe.mirai.utils.warning
+import net.mamoe.mirai.utils.*
 import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.*
 import xyz.cssxsh.arknights.market.*
@@ -24,8 +24,6 @@ internal suspend fun <T : CommandSenderOnMessage<*>> T.nextContent(): String {
     return fromEvent.nextMessage { it.message.content.isNotBlank() }.content
 }
 
-val SendLimit = """本群每分钟只能发\d+条消息""".toRegex()
-
 const val SendDelay = 60 * 1000L
 
 suspend fun <T : CommandSenderOnMessage<*>> T.sendMessage(block: suspend T.(Contact) -> Message): Boolean {
@@ -33,17 +31,15 @@ suspend fun <T : CommandSenderOnMessage<*>> T.sendMessage(block: suspend T.(Cont
         block(fromEvent.subject)
     }.onSuccess { message ->
         quoteReply(message)
-    }.onFailure {
-        logger.warning {
-            "发送消息失败, $it"
-        }
+    }.onFailure { throwable ->
+        logger.warning { "发送消息失败, $throwable" }
         when {
-            SendLimit.containsMatchIn(it.message.orEmpty()) -> {
+            "本群每分钟只能发" in throwable.message.orEmpty() -> {
                 kotlinx.coroutines.delay(SendDelay)
-                quoteReply(SendLimit.find(it.message!!)!!.value)
+                sendMessage { throwable.message.orEmpty().toPlainText() }
             }
             else -> {
-                quoteReply("发送消息失败， ${it.message}")
+                quoteReply("发送消息失败， ${throwable.message}")
             }
         }
     }.isSuccess
@@ -164,8 +160,8 @@ private fun Pair<Matrix, Stage>.toMessage() = buildMessageChain {
     appendLine("单件期望用时: ${duration(short)}")
 }
 
-internal fun item(name: String, limit: Int) = buildMessageChain {
-    val (item, list) = (PenguinData.items to PenguinData.matrices.now()).item(name)
+internal fun item(name: String, limit: Int, now: Boolean) = buildMessageChain {
+    val (item, list) = (PenguinData.items to PenguinData.matrices.let { if (now) it.now() else it }).item(name)
     appendLine("${item.alias.get()} 统计结果 By 企鹅物流数据统计")
     if (list.isEmpty()) {
         appendLine("列表为空，请尝试更新数据")
@@ -174,7 +170,7 @@ internal fun item(name: String, limit: Int) = buildMessageChain {
     var count = 0
     (list with PenguinData.stages).sortedBy { it.single }.forEach { pair ->
         if (pair.stage.isGacha || count >= limit) return@forEach
-        appendLine("=======> 作战: ${pair.stage.code} (cost=${pair.stage.cost}) ")
+        appendLine("=======> 作战: ${pair.stage.code} (cost=${pair.stage.cost}) ${pair.stage}")
         append(pair.toMessage())
         count++
     }
@@ -187,8 +183,8 @@ internal fun alias() = buildMessageChain {
     }
 }
 
-internal fun stage(code: String, limit: Int) = buildMessageChain {
-    val (stage, list) = (PenguinData.stages to PenguinData.matrices.now()).stage(code)
+internal fun stage(code: String, limit: Int, now: Boolean) = buildMessageChain {
+    val (stage, list) = (PenguinData.stages to PenguinData.matrices.let { if (now) it.now() else it }).stage(code)
     appendLine("[${stage.code}] (cost=${stage.cost}) 统计结果 By 企鹅物流数据统计")
     if (list.isEmpty()) {
         appendLine("列表为空，请尝试更新数据")
@@ -203,10 +199,10 @@ internal fun stage(code: String, limit: Int) = buildMessageChain {
     }
 }
 
-internal fun zone(name: String, limit: Int) = buildMessageChain {
+internal fun zone(name: String, limit: Int, now: Boolean) = buildMessageChain {
     val (_, list) = (PenguinData.zones to PenguinData.stages).name(name)
     list.forEach { stage ->
-        append(stage(stage.code, limit))
+        append(stage(stage.code, limit, now))
     }
 }
 

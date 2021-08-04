@@ -10,7 +10,7 @@ object ArknightsStageCommand : SimpleCommand(
     description = "明日方舟助手关卡指令"
 ) {
     @Handler
-    suspend fun CommandSenderOnMessage<*>.handler(code: String, limit: Int = 3) = sendMessage {
-        stage(code = code, limit = limit)
+    suspend fun CommandSenderOnMessage<*>.handler(code: String, limit: Int = 3, now: Boolean = true) = sendMessage {
+        stage(code, limit, now)
     }
 }

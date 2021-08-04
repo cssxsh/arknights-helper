@@ -18,7 +18,8 @@ object ArknightsGachaCommand : CompositeCommand(
     suspend fun CommandSenderOnMessage<*>.one(times: Int = 1) = sendMessage {
         if (coin >= times * PoolUseCoin) {
             coin -= times * PoolUseCoin
-            val result: RecruitResult = (1..times).map { gacha(Obtain.pool(rule)) }.toRecruitResult()
+            val data = Obtain.pool(rule)
+            val result = List(times) { gacha(data) }.toRecruitResult()
             "当前卡池[${pool}] 合成玉剩余${coin}\n".toPlainText() + result.toMessage()
         } else {
             "合成玉不足,当前拥有${coin},请尝试答题获得".toPlainText()

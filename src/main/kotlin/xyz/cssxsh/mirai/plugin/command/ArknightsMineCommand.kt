@@ -8,6 +8,7 @@ import net.mamoe.mirai.event.EventPriority
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.event.syncFromEventOrNull
 import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import xyz.cssxsh.arknights.mine.QuestionType
 import xyz.cssxsh.mirai.plugin.*
 
@@ -31,9 +32,10 @@ object ArknightsMineCommand : SimpleCommand(
     @Handler
     suspend fun CommandSenderOnMessage<*>.handler(type: QuestionType = QuestionType.values().random()) {
         val question = type.random()
-        sendMessage(question.toMessage())
 
         val (reply, time) = mutex.withLock {
+            sendMessage(fromEvent.message.quote() + question.toMessage())
+
             val start = System.currentTimeMillis()
             fromEvent.nextAnswerOrNull(question.timeout) { next ->
                 next.message.content.uppercase().any { it in question.options.keys }

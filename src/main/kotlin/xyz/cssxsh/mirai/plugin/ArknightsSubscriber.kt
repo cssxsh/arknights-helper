@@ -15,7 +15,7 @@ import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import net.mamoe.mirai.utils.*
 import xyz.cssxsh.arknights.announce.*
 import xyz.cssxsh.arknights.bilibili.*
-import xyz.cssxsh.arknights.excel.loadExcelDataVersion
+import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.useHttpClient
 import xyz.cssxsh.arknights.weibo.*
 import java.time.Duration
@@ -173,61 +173,70 @@ private suspend fun sendRecruitClock(id: Long, site: Int) {
 }
 
 internal fun downloadGameData(): Unit = runBlocking {
-    runCatching {
-        ExcelData.download(flush = false)
-        val old = SemVersion.invoke(ExcelData.version.versionControl)
-        val now = SemVersion.invoke(loadExcelDataVersion().versionControl)
-        if (now > old) {
-            ExcelData.download(flush = true)
-            now
-        } else {
-            old
+    awaitAll(
+        async {
+            runCatching {
+                ExcelData.download(flush = false)
+                val old = SemVersion(ExcelData.version.versionControl)
+                val now = SemVersion(ExcelDataVersion().versionControl)
+                if (now > old) {
+                    ExcelData.download(flush = true)
+                    now
+                } else {
+                    old
+                }
+            }.onSuccess {
+                logger.info { "ExcelData 数据加载完毕, 版本 $it" }
+            }.onFailure {
+                logger.warning({ "ExcelData 数据加载失败" }, it)
+            }
+        },
+        async {
+            runCatching {
+                PenguinData.download(flush = true)
+            }.onSuccess {
+                logger.info { "PenguinData 数据加载完毕" }
+            }.onFailure {
+                logger.warning({ "PenguinData 数据加载失败" }, it)
+            }
+        },
+        async {
+            runCatching {
+                VideoData.download(flush = false)
+            }.onSuccess {
+                logger.info { "VideoData 数据加载完毕, last: ${VideoData.all.maxByOrNull { it.created }?.bvid}" }
+            }.onFailure {
+                logger.warning({ "VideoData 数据加载失败" }, it)
+            }
+        },
+        async {
+            runCatching {
+                MicroBlogData.download(flush = false)
+            }.onSuccess {
+                logger.info { "MicroBlogData 数据加载完毕, last: ${MicroBlogData.all.maxOfOrNull { it.created }}" }
+            }.onFailure {
+                logger.warning({ "MicroBlogData 数据加载失败" }, it)
+            }
+        },
+        async {
+            runCatching {
+                ArknightsFaceData.download(flush = false)
+            }.onSuccess {
+                logger.info { "ArknightsFaceData 数据加载完毕" }
+            }.onFailure {
+                logger.warning({ "ArknightsFaceData 数据加载失败" }, it)
+            }
+        },
+        async {
+            runCatching {
+                AnnouncementData.download(flush = false)
+            }.onSuccess {
+                logger.info { "AnnouncementData 数据加载完毕" }
+            }.onFailure {
+                logger.warning({ "AnnouncementData 数据加载失败" }, it)
+            }
         }
-    }.onSuccess {
-        logger.info { "ExcelData 数据加载完毕, 版本 $it" }
-    }.onFailure {
-        logger.warning({ "ExcelData 数据加载失败" }, it)
-    }
-
-    runCatching {
-        PenguinData.download(flush = true)
-    }.onSuccess {
-        logger.info { "PenguinData 数据加载完毕" }
-    }.onFailure {
-        logger.warning({ "PenguinData 数据加载失败" }, it)
-    }
-
-    runCatching {
-        VideoData.download(flush = false)
-    }.onSuccess {
-        logger.info { "VideoData 数据加载完毕, last: ${VideoData.all.maxByOrNull { it.created }?.bvid}" }
-    }.onFailure {
-        logger.warning({ "VideoData 数据加载失败" }, it)
-    }
-
-    runCatching {
-        MicroBlogData.download(flush = false)
-    }.onSuccess {
-        logger.info { "MicroBlogData 数据加载完毕, last: ${MicroBlogData.all.maxOfOrNull { it.created }}" }
-    }.onFailure {
-        logger.warning({ "MicroBlogData 数据加载失败" }, it)
-    }
-
-    runCatching {
-        ArknightsFaceData.download(flush = false)
-    }.onSuccess {
-        logger.info { "ArknightsFaceData 数据加载完毕" }
-    }.onFailure {
-        logger.warning({ "ArknightsFaceData 数据加载失败" }, it)
-    }
-
-    runCatching {
-        AnnouncementData.download(flush = false)
-    }.onSuccess {
-        logger.info { "AnnouncementData 数据加载完毕" }
-    }.onFailure {
-        logger.warning({ "AnnouncementData 数据加载失败" }, it)
-    }
+    )
 }
 
 private val Fast = Duration.ofMinutes(3)
@@ -336,8 +345,8 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
                 logger.warning({ "订阅器 MicroBlogData 数据加载失败" }, it)
             }
 
-            val new = MicroBlogData.all.filterNot { it.id in history } + MicroBlogData.picture.filterNot {
-                it.id > history.maxOrNull() ?: 0
+            val new = MicroBlogData.all.filterNot { it.id in history } + MicroBlogData.picture.filter {
+                it.id > (MicroBlogData.arknights.maxOfOrNull(MicroBlog::id) ?: 0L)
             }
             if (new.isNotEmpty()) {
                 logger.info { "明日方舟 微博 订阅器 捕捉到结果" }

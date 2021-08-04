@@ -10,7 +10,7 @@ object ArknightsZoneCommand : SimpleCommand(
     description = "明日方舟助手地图指令"
 ) {
     @Handler
-    suspend fun CommandSenderOnMessage<*>.handler(name: String, limit: Int = 1) = sendMessage {
-        zone(name = name, limit = limit)
+    suspend fun CommandSenderOnMessage<*>.handler(name: String, limit: Int = 1, now: Boolean = true) = sendMessage {
+        zone(name, limit, now)
     }
 }
