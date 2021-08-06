@@ -193,7 +193,7 @@ class ExcelData(override val dir: File): GameDataDownloader {
     val stories by lazy { StoryMap(storyTable) }
     private val enemy by lazy { dir.readEnemyTable() }
     val enemies by lazy { EnemyMap(enemy) }
-    private val zone by lazy { dir.readZoneTable() }
+    internal val zone by lazy { dir.readZoneTable() }
     val zones by lazy { ZoneMap(zone) }
     val weeks by lazy { WeeklyMap(zone) }
     val version by lazy { dir.readExcelDataVersion() }

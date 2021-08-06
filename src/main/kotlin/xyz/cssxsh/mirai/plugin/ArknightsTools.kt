@@ -154,11 +154,13 @@ internal fun ArknightsFace.toMessage() = buildMessageChain {
 private fun duration(millis: Long) = Duration.ofMillis(millis).run { "${toMinutesPart()}m${toSecondsPart()}s" }
 
 private fun Pair<Matrix, Stage>.toMessage() = buildMessageChain {
-    appendLine("概率: ${first.quantity}/${first.times}=${first.probability.percentage()}")
+    appendLine("概率: ${frequency.quantity}/${frequency.times}=${frequency.probability.percentage()}")
     appendLine("单件期望理智: ${single.intercept()}")
     appendLine("最短通关用时: ${duration(stage.minClearTime)}")
     appendLine("单件期望用时: ${duration(short)}")
 }
+
+private val Stage.zone get() = ExcelData.zone.zones[zoneId]
 
 internal fun item(name: String, limit: Int, now: Boolean) = buildMessageChain {
     val (item, list) = (PenguinData.items to PenguinData.matrices.let { if (now) it.now() else it }).item(name)
@@ -170,7 +172,7 @@ internal fun item(name: String, limit: Int, now: Boolean) = buildMessageChain {
     var count = 0
     (list with PenguinData.stages).sortedBy { it.single }.forEach { pair ->
         if (pair.stage.isGacha || count >= limit) return@forEach
-        appendLine("=======> 作战: ${pair.stage.code} (cost=${pair.stage.cost}) ${pair.stage}")
+        appendLine("====> 作战: [${pair.stage.code}] <${pair.stage.zone?.title}> (cost=${pair.stage.cost})")
         append(pair.toMessage())
         count++
     }
@@ -185,7 +187,7 @@ internal fun alias() = buildMessageChain {
 
 internal fun stage(code: String, limit: Int, now: Boolean) = buildMessageChain {
     val (stage, list) = (PenguinData.stages to PenguinData.matrices.let { if (now) it.now() else it }).stage(code)
-    appendLine("[${stage.code}] (cost=${stage.cost}) 统计结果 By 企鹅物流数据统计")
+    appendLine("[${stage.code}] <${stage.zone?.title}> (cost=${stage.cost}) 统计结果 By 企鹅物流数据统计")
     if (list.isEmpty()) {
         appendLine("列表为空，请尝试更新数据")
         return@buildMessageChain
