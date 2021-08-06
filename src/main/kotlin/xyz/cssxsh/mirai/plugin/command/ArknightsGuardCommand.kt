@@ -1,8 +1,7 @@
 package xyz.cssxsh.mirai.plugin.command
 
-import net.mamoe.mirai.console.command.CommandSenderOnMessage
-import net.mamoe.mirai.console.command.CompositeCommand
-import net.mamoe.mirai.message.data.toPlainText
+import net.mamoe.mirai.console.command.*
+import net.mamoe.mirai.message.data.*
 import xyz.cssxsh.mirai.plugin.*
 
 object ArknightsGuardCommand : CompositeCommand(

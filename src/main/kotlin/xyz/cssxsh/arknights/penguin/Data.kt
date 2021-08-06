@@ -1,16 +1,10 @@
 package xyz.cssxsh.arknights.penguin
 
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.descriptors.buildSerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.*
+import kotlinx.serialization.descriptors.*
+import kotlinx.serialization.encoding.*
 import xyz.cssxsh.arknights.*
-import java.time.Instant
-import java.time.OffsetDateTime
+import java.time.*
 
 /**
  * 根据名字查找
@@ -149,18 +143,23 @@ infix fun <V : StageId> Iterable<V>.with(stages: Iterable<Stage>) = map { it to 
 /**
  * XXX
  */
-val Pair<Frequency, Stage>.stage get() = second
+val Pair<*, Stage>.stage get() = second
 
 /**
  * XXX
  */
-val Pair<Frequency, Stage>.single get() = stage.cost / first.probability
+val Pair<Frequency, *>.frequency get() = first
+
+/**
+ * XXX
+ */
+val Pair<Frequency, Stage>.single get() = stage.cost / frequency.probability
 
 
 /**
  * XXX
  */
-val Pair<Frequency, Stage>.short get() = (stage.minClearTime / first.probability).toLong()
+val Pair<Frequency, Stage>.short get() = (stage.minClearTime / frequency.probability).toLong()
 
 /**
  * 根据时间戳过滤

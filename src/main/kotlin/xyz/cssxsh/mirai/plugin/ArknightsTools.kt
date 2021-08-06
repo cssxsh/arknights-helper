@@ -87,9 +87,9 @@ fun findContact(delegate: Long): Contact? {
 /**
  * 检查并转换TAG
  */
-internal fun Collection<String>.tag(tags: Set<String> = ExcelData.gacha.tags()): Set<String> {
+internal fun tag(words: List<String>, tags: Set<String> = ExcelData.gacha.tags()): Set<String> {
     val temp = tags.map { it.substring(0..1) }
-    return map { it.trim() }.filter { it.isNotBlank() }.map { word ->
+    return words.map { it.trim() }.filter { it.isNotBlank() }.map { word ->
         when (word) {
             in tags -> word
             "高资" -> "高级资深干员"
@@ -102,13 +102,13 @@ internal fun Collection<String>.tag(tags: Set<String> = ExcelData.gacha.tags()):
     }.toSet()
 }
 
-internal fun recruit(words: List<String>) = ExcelData.characters.recruit(words.tag(), ExcelData.gacha.recruit())
+internal fun recruit(words: List<String>) = ExcelData.characters.recruit(tag(words), ExcelData.gacha.recruit())
 
-internal fun String.role(roles: Set<String> = ExcelData.gacha.recruit()) = trim().let { name ->
-    when (name) {
-        in roles -> name
-        in RoleAlias -> RoleAlias.getValue(name)
-        else -> throw IllegalArgumentException("未知干员: $name")
+internal fun role(name: String, roles: Set<String> = ExcelData.gacha.recruit()) = name.trim().let {
+    when (it) {
+        in roles -> it
+        in RoleAlias -> RoleAlias.getValue(it)
+        else -> throw IllegalArgumentException("未知干员: ${it}")
     }
 }
 
@@ -154,11 +154,13 @@ internal fun ArknightsFace.toMessage() = buildMessageChain {
 private fun duration(millis: Long) = Duration.ofMillis(millis).run { "${toMinutesPart()}m${toSecondsPart()}s" }
 
 private fun Pair<Matrix, Stage>.toMessage() = buildMessageChain {
-    appendLine("概率: ${first.quantity}/${first.times}=${first.probability.percentage()}")
+    appendLine("概率: ${frequency.quantity}/${frequency.times}=${frequency.probability.percentage()}")
     appendLine("单件期望理智: ${single.intercept()}")
     appendLine("最短通关用时: ${duration(stage.minClearTime)}")
     appendLine("单件期望用时: ${duration(short)}")
 }
+
+private val Stage.zone get() = ExcelData.zone.zones[zoneId]
 
 internal fun item(name: String, limit: Int, now: Boolean) = buildMessageChain {
     val (item, list) = (PenguinData.items to PenguinData.matrices.let { if (now) it.now() else it }).item(name)
@@ -170,7 +172,7 @@ internal fun item(name: String, limit: Int, now: Boolean) = buildMessageChain {
     var count = 0
     (list with PenguinData.stages).sortedBy { it.single }.forEach { pair ->
         if (pair.stage.isGacha || count >= limit) return@forEach
-        appendLine("=======> 作战: ${pair.stage.code} (cost=${pair.stage.cost}) ${pair.stage}")
+        appendLine("====> 作战: [${pair.stage.code}] <${pair.stage.zone?.title}> (cost=${pair.stage.cost})")
         append(pair.toMessage())
         count++
     }
@@ -185,7 +187,7 @@ internal fun alias() = buildMessageChain {
 
 internal fun stage(code: String, limit: Int, now: Boolean) = buildMessageChain {
     val (stage, list) = (PenguinData.stages to PenguinData.matrices.let { if (now) it.now() else it }).stage(code)
-    appendLine("[${stage.code}] (cost=${stage.cost}) 统计结果 By 企鹅物流数据统计")
+    appendLine("[${stage.code}] <${stage.zone?.title}> (cost=${stage.cost}) 统计结果 By 企鹅物流数据统计")
     if (list.isEmpty()) {
         appendLine("列表为空，请尝试更新数据")
         return@buildMessageChain
