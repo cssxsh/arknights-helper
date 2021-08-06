@@ -104,11 +104,11 @@ internal fun tag(words: List<String>, tags: Set<String> = ExcelData.gacha.tags()
 
 internal fun recruit(words: List<String>) = ExcelData.characters.recruit(tag(words), ExcelData.gacha.recruit())
 
-internal fun role(name: String, roles: Set<String> = ExcelData.gacha.recruit()): String {
-    return when (name) {
-        in roles -> name.trim()
-        in RoleAlias -> RoleAlias.getValue(name.trim())
-        else -> throw IllegalArgumentException("未知干员: ${name.trim()}")
+internal fun role(name: String, roles: Set<String> = ExcelData.gacha.recruit()) = name.trim().let {
+    when (it) {
+        in roles -> it
+        in RoleAlias -> RoleAlias.getValue(it)
+        else -> throw IllegalArgumentException("未知干员: ${it}")
     }
 }
 
