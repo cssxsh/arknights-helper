@@ -1,10 +1,9 @@
 package xyz.cssxsh.arknights.user
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
-import java.time.Duration
-import java.time.format.DateTimeFormatter
+import java.time.*
+import java.time.format.*
 
 @Serializable
 data class UserRecruit(

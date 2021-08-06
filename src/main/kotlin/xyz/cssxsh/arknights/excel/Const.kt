@@ -1,8 +1,7 @@
 package xyz.cssxsh.arknights.excel
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
 
 @Serializable
 data class ConstInfo(
