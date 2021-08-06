@@ -62,16 +62,16 @@ object ArknightsDataCommand : CompositeCommand(
                 val time = list[0].split(':', '：', '.', '-').let { (h, m) -> h.toLong() * 60 + m.toLong() }
                 check(time * 60 * 1000 in RecruitTime) { "招募时间不正确" }
 
-                val role = list[1].role()
+                val role = role(name = list[1].trim())
 
-                val words = list[2].split(' ', '\t').tag()
+                val words = tag(words = list[2].split(' ', '\t'))
                 check(words.size == 5) { "词条数量不足5" }
 
-                val selected = list.getOrNull(3).orEmpty().split(' ', '\t').tag()
+                val selected = tag(words = list.getOrNull(3).orEmpty().split(' ', '\t'))
                 check(words.containsAll(selected)) { "选择的词条应在出现的词条中" }
                 check(selected.size in 0..3) { "词条数量应在0..3" }
 
-                val removed = list.getOrNull(4).orEmpty().split(' ', '\t').tag()
+                val removed = tag(words = list.getOrNull(4).orEmpty().split(' ', '\t'))
                 check(selected.containsAll(removed)) { "移除的词条应在选择的词条中" }
 
                 result = result + UserRecruit(words, selected, removed, time, role)

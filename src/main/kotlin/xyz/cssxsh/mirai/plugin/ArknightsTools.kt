@@ -87,9 +87,9 @@ fun findContact(delegate: Long): Contact? {
 /**
  * 检查并转换TAG
  */
-internal fun Collection<String>.tag(tags: Set<String> = ExcelData.gacha.tags()): Set<String> {
+internal fun tag(words: List<String>, tags: Set<String> = ExcelData.gacha.tags()): Set<String> {
     val temp = tags.map { it.substring(0..1) }
-    return map { it.trim() }.filter { it.isNotBlank() }.map { word ->
+    return words.map { it.trim() }.filter { it.isNotBlank() }.map { word ->
         when (word) {
             in tags -> word
             "高资" -> "高级资深干员"
@@ -102,13 +102,13 @@ internal fun Collection<String>.tag(tags: Set<String> = ExcelData.gacha.tags()):
     }.toSet()
 }
 
-internal fun recruit(words: List<String>) = ExcelData.characters.recruit(words.tag(), ExcelData.gacha.recruit())
+internal fun recruit(words: List<String>) = ExcelData.characters.recruit(tag(words), ExcelData.gacha.recruit())
 
-internal fun String.role(roles: Set<String> = ExcelData.gacha.recruit()) = trim().let { name ->
-    when (name) {
-        in roles -> name
-        in RoleAlias -> RoleAlias.getValue(name)
-        else -> throw IllegalArgumentException("未知干员: $name")
+internal fun role(name: String, roles: Set<String> = ExcelData.gacha.recruit()): String {
+    return when (name) {
+        in roles -> name.trim()
+        in RoleAlias -> RoleAlias.getValue(name.trim())
+        else -> throw IllegalArgumentException("未知干员: ${name.trim()}")
     }
 }
 
