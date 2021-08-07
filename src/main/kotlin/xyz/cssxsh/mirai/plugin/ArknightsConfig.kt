@@ -78,3 +78,8 @@ internal val RoleAlias by ArknightsConfig::roles
  * 自定义材料别名
  */
 internal val ItemAlias by ArknightsConfig::items
+
+/**
+ * 自定义材料别名
+ */
+internal val AutoAddGuard by ArknightsConfig::auto
