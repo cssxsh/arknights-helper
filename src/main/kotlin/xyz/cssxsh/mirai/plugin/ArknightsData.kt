@@ -130,6 +130,10 @@ object ArknightsConfig : ReadOnlyPluginConfig("config") {
 
     @ValueDescription("Key 是别名 Value 是材料名")
     val items by value(DefaultItems)
+
+    @ValueName("auto_add_guard")
+    @ValueDescription("开启新好友或新群自动蹲饼")
+    val auto by value<Boolean>(true)
 }
 
 fun <T, K, V> AbstractPluginData.delegate(key: T.() -> K) = object : ReadWriteProperty<T, V> {

@@ -1,24 +1,25 @@
 package xyz.cssxsh.mirai.plugin
 
-import net.mamoe.mirai.Bot
-import net.mamoe.mirai.console.command.CommandSenderOnMessage
-import net.mamoe.mirai.contact.Contact
-import net.mamoe.mirai.contact.Group
-import net.mamoe.mirai.contact.getMember
+import net.mamoe.mirai.*
+import net.mamoe.mirai.console.command.*
+import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
-import net.mamoe.mirai.message.nextMessage
+import net.mamoe.mirai.message.*
 import net.mamoe.mirai.utils.*
 import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.*
 import xyz.cssxsh.arknights.market.*
 import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.arknights.penguin.*
-import java.time.Duration
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
+import java.time.*
+import kotlin.properties.*
+import kotlin.reflect.*
 
-internal val logger by ArknightsHelperPlugin::logger
+internal val logger by lazy {
+    val open = System.getProperty("xyz.cssxsh.mirai.plugin.logger", "${true}").toBoolean()
+    if (open) ArknightsHelperPlugin.logger else SilentLogger
+}
 
 internal suspend fun <T : CommandSenderOnMessage<*>> T.nextContent(): String {
     return fromEvent.nextMessage { it.message.content.isNotBlank() }.content

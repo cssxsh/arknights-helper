@@ -1,6 +1,7 @@
 package xyz.cssxsh.mirai.plugin.command
 
 import net.mamoe.mirai.console.command.*
+import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.message.data.*
 import xyz.cssxsh.mirai.plugin.*
 
@@ -25,15 +26,15 @@ object ArknightsGuardCommand : CompositeCommand(
 
     @SubCommand("open", "打开")
     @Description("开启提醒")
-    suspend fun CommandSenderOnMessage<*>.open() = sendMessage {
-        GuardContacts.add(fromEvent.subject.delegate)
-        "蹲饼已打开".toPlainText()
+    suspend fun CommandSenderOnMessage<*>.open(contact: Contact = fromEvent.subject) = sendMessage {
+        GuardContacts.add(contact.delegate)
+        "$contact 蹲饼已打开".toPlainText()
     }
 
     @SubCommand("close", "关闭")
     @Description("关闭提醒")
-    suspend fun CommandSenderOnMessage<*>.close() = sendMessage {
-        GuardContacts.remove(fromEvent.subject.delegate)
-        "蹲饼已关闭".toPlainText()
+    suspend fun CommandSenderOnMessage<*>.close(contact: Contact = fromEvent.subject) = sendMessage {
+        GuardContacts.remove(contact.delegate)
+        "$contact 蹲饼已关闭".toPlainText()
     }
 }

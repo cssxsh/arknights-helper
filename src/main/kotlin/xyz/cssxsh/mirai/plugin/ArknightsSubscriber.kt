@@ -409,14 +409,18 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
         }
     }
 
-    private fun group() = globalEventChannel().subscribeAlways<BotJoinGroupEvent> {
-        GuardContacts.add(group.delegate)
-        group.sendMessage("机器人加添加群组，已自动开启蹲饼")
+    private fun group() {
+        if (AutoAddGuard) globalEventChannel().subscribeAlways<BotJoinGroupEvent> {
+            GuardContacts.add(group.delegate)
+            group.sendMessage("机器人加添加群组，已自动开启蹲饼")
+        }
     }
 
-    private fun friend() = globalEventChannel().subscribeAlways<FriendAddEvent> {
-        GuardContacts.add(friend.delegate)
-        friend.sendMessage("机器人加添加好友，已自动开启蹲饼")
+    private fun friend() {
+        if (AutoAddGuard) globalEventChannel().subscribeAlways<FriendAddEvent> {
+            GuardContacts.add(friend.delegate)
+            friend.sendMessage("机器人加添加好友，已自动开启蹲饼")
+        }
     }
 
     fun start() {
