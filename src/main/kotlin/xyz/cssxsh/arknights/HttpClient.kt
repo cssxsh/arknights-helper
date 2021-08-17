@@ -19,31 +19,35 @@ internal val CustomJson = Json {
     allowStructuredMapKeys = true
 }
 
-private fun client() = HttpClient(OkHttp) {
-    install(HttpTimeout) {
-        socketTimeoutMillis = 10_000
-        connectTimeoutMillis = 10_000
-        requestTimeoutMillis = 10_000
-    }
-    BrowserUserAgent()
-}
-
-private val DEFAULT_IGNORE: (exception: Throwable) -> Boolean = {
+private val DefaultIgnore: suspend (exception: Throwable) -> Boolean = {
     it is IOException || it is HttpRequestTimeoutException
 }
 
-internal suspend fun <T> useHttpClient(
-    ignore: (exception: Throwable) -> Boolean = DEFAULT_IGNORE,
-    block: suspend (HttpClient) -> T
-): T = supervisorScope {
-    client().use {
+internal object Downloader : Closeable {
+
+    private fun client() = HttpClient(OkHttp) {
+        install(HttpTimeout) {
+            socketTimeoutMillis = 15_000
+            connectTimeoutMillis = 15_000
+            requestTimeoutMillis = 15_000
+        }
+        BrowserUserAgent()
+    }
+
+    override fun close() = clients.forEach { it.close() }
+
+    var ignore: suspend (exception: Throwable) -> Boolean = DefaultIgnore
+
+    private val clients = MutableList(3) { client() }
+
+    internal suspend fun <T> useHttpClient(block: suspend (HttpClient) -> T): T = supervisorScope {
         while (isActive) {
             runCatching {
-                block(it)
+                block(clients.random())
             }.onFailure {
                 if (ignore(it).not()) throw it
             }.onSuccess {
-                return@use it
+                return@supervisorScope it
             }
         }
         throw CancellationException()

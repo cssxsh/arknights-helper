@@ -3,16 +3,18 @@ package xyz.cssxsh.mirai.plugin
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
 import net.mamoe.mirai.console.plugin.jvm.*
+import xyz.cssxsh.arknights.*
 import xyz.cssxsh.mirai.plugin.command.*
 
 object ArknightsHelperPlugin : KotlinPlugin(
-    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "1.2.5") {
+    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "1.2.6") {
         name("arknights-helper")
         author("cssxsh")
     }
 ) {
 
     override fun onEnable() {
+        Downloader.ignore = DownloaderIgnore
         downloadGameData()
         ArknightsUserData.reload()
         ArknightsPoolData.reload()

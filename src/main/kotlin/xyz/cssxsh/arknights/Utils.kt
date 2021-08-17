@@ -39,7 +39,7 @@ interface GameDataDownloader {
 internal inline fun <reified T> File.read(type: GameDataType): T = CustomJson.decodeFromString(resolve(type.path).readText())
 
 suspend fun <T : GameDataType> Iterable<T>.load(dir: File, flush: Boolean): List<File> {
-    return useHttpClient { client ->
+    return Downloader.useHttpClient { client ->
         map { type ->
             dir.resolve(type.path).also { file ->
                 if (flush || file.exists().not()) {

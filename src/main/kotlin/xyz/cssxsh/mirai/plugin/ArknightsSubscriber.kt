@@ -55,7 +55,7 @@ private suspend fun sendVideo(video: Video) = sendToTaskContacts { contact ->
         val image = VideoData.dir.resolve(video.created.date()).resolve(video.cover.filename).apply {
             if (exists().not()) {
                 parentFile.mkdirs()
-                writeBytes(useHttpClient { it.get(video.cover) })
+                writeBytes(Downloader.useHttpClient { it.get(video.cover) })
             }
         }
         append(image.uploadAsImage(contact))
@@ -77,7 +77,7 @@ private suspend fun MicroBlog.toMessage(contact: Contact): Message = buildMessag
             val file = MicroBlogData.dir.resolve(created.date()).resolve(url.filename).apply {
                 if (exists().not()) {
                     parentFile.mkdirs()
-                    writeBytes(useHttpClient { it.get(url) })
+                    writeBytes(Downloader.useHttpClient { it.get(url) })
                 }
             }
             append(file.uploadAsImage(contact))
@@ -108,7 +108,7 @@ private suspend fun Announcement.toMessage(contact: Contact): Message = buildMes
     val html = AnnouncementData.dir.resolve("html/${web.filename}").apply {
         if (exists().not()) {
             parentFile.mkdirs()
-            writeText(useHttpClient { it.get(web) })
+            writeText(Downloader.useHttpClient { it.get(web) })
         }
     }
     ContentRegex.findAll(html.readText().substringAfter("<body>").replace("<br/>", "\n")).forEach { result ->
@@ -117,7 +117,7 @@ private suspend fun Announcement.toMessage(contact: Contact): Message = buildMes
             val image = AnnouncementData.dir.resolve("html/${url.filename}").apply {
                 if (exists().not()) {
                     parentFile.mkdirs()
-                    writeBytes(useHttpClient { it.get(url) })
+                    writeBytes(Downloader.useHttpClient { it.get(url) })
                 }
             }
             append(image.uploadAsImage(contact))

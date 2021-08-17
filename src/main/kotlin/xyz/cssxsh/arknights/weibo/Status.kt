@@ -26,7 +26,7 @@ private fun File.readMicroBlogPicture(type: BlogUser): List<MicroBlog> {
 }
 
 private suspend fun getLongTextContent(id: Long): String {
-    val json = useHttpClient<String> { client ->
+    val json = Downloader.useHttpClient<String> { client ->
         client.get(CONTENT_API) { parameter("id", id) }
     }
     val content = CustomJson.decodeFromString<Temp<LongTextContent>>(json).data().content

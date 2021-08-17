@@ -19,10 +19,11 @@ enum class AnnounceType(platform: String) : GameDataType {
 
     override val path: String = "$platform.json"
 
-    override val url: Url = Url("https://ak-fs.hypergryph.com/announce/$platform/announcement.meta.json")
+    override val url: Url =
+        Url("https://ak-conf.hypergryph.com/config/prod/announce_meta/$platform/announcement.meta.json")
 }
 
-class AnnouncementData(override val dir: File): GameDataDownloader {
+class AnnouncementData(override val dir: File) : GameDataDownloader {
     val android get() = dir.read<AnnouncementMeta>(AnnounceType.ANDROID)
     val bilibili get() = dir.read<AnnouncementMeta>(AnnounceType.BILIBILI)
     val ios get() = dir.read<AnnouncementMeta>(AnnounceType.IOS)
