@@ -231,7 +231,7 @@ internal fun File.readExcelDataVersion(): ExcelDataVersion {
 }
 
 internal suspend fun ExcelDataVersion(): ExcelDataVersion {
-    return useHttpClient<String> { it.get(jsdelivr(ExcelDataType.VERSION)) }.readExcelDataVersion()
+    return Downloader.useHttpClient<String> { it.get(jsdelivr(ExcelDataType.VERSION)) }.readExcelDataVersion()
 }
 
 internal fun String.readExcelDataVersion(): ExcelDataVersion {

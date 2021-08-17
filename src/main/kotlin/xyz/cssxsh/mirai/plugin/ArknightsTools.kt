@@ -1,5 +1,6 @@
 package xyz.cssxsh.mirai.plugin
 
+import io.ktor.client.features.*
 import net.mamoe.mirai.*
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.contact.*
@@ -12,6 +13,7 @@ import xyz.cssxsh.arknights.*
 import xyz.cssxsh.arknights.market.*
 import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.arknights.penguin.*
+import java.io.IOException
 import java.time.*
 import kotlin.properties.*
 import kotlin.reflect.*
@@ -83,6 +85,19 @@ fun findContact(delegate: Long): Contact? {
         }
     }
     return null
+}
+
+internal val DownloaderIgnore: suspend (Throwable) -> Boolean = {
+    when (it) {
+        is IOException,
+        is HttpRequestTimeoutException -> {
+            logger.warning { "Downloader Ignore $it" }
+            true
+        }
+        else -> {
+            false
+        }
+    }
 }
 
 /**
