@@ -48,8 +48,11 @@ private suspend fun sendVideo(video: Video) = sendToTaskContacts { contact ->
     appendLine("鹰角有新视频了！")
     appendLine("链接: ${video.url}")
     appendLine("标题: ${video.title}")
-    appendLine("简介：${video.description}")
-    appendLine("发布时间: ${video.created}")
+    appendLine("时间: ${video.created}")
+    if (video.description.isNotBlank()) {
+        appendLine("简介：")
+        appendLine(video.description)
+    }
 
     runCatching {
         val image = VideoData.dir.resolve(video.created.date()).resolve(video.cover.filename).apply {
