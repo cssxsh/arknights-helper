@@ -78,7 +78,7 @@ val MicroBlog.images get() = pictures.map { image(pid = it) }
 
 val MicroBlog.content get() = raw ?: text.replace("<br />", "\n").remove(SIGN)
 
-val MicroBlog.url get() = Url("https://weibo.com/${user?.id ?: "detail"}/$mid")
+val MicroBlog.url get() = Url("https://weibo.com/${user?.id ?: "detail"}/$bid")
 
 suspend fun MicroBlog.content(): String = if (isLongText) getLongTextContent(id = id) else content
 
@@ -113,8 +113,8 @@ data class MicroBlog(
     val created: OffsetDateTime = OffsetDateTime.now(),
     @SerialName("id")
     val id: Long,
-    @SerialName("mid")
-    val mid: String,
+    @SerialName("bid")
+    val bid: String,
     @SerialName("isLongText")
     val isLongText: Boolean = false,
     @SerialName("pic_ids")
