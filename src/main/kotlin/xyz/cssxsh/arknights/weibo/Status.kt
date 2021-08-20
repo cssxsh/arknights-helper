@@ -20,9 +20,20 @@ private fun File.readMicroBlogHistory(type: BlogUser): List<MicroBlog> {
 }
 
 private fun File.readMicroBlogPicture(type: BlogUser): List<MicroBlog> {
-    return read<Temp<PictureData>>(type).data().blogs.fold(mutableMapOf<Long, MicroBlog>()) { acc, new ->
-        acc.apply { compute(new.id) { _, old -> old?.copy(pictures = old.pictures + new.pictures) ?: new } }
-    }.values.map { it.copy(user = PictureUser) }
+    val map = mutableMapOf<Long, MicroBlog>()
+    val epoch = 515483463L
+    // XXX
+    fun timestamp(id: Long): Long = (id shr 22) + epoch
+
+    read<Temp<PictureData>>(type).data().blogs.forEach { new ->
+        map.compute(new.id) { _, old ->
+            old?.copy(pictures = old.pictures + new.pictures) ?: new
+        }
+    }
+
+    return map.values.map {
+        it.copy(created = OffsetDateTime.ofInstant(Instant.ofEpochSecond(timestamp(it.id)), it.created.offset))
+    }
 }
 
 private suspend fun getLongTextContent(id: Long): String {
@@ -33,7 +44,7 @@ private suspend fun getLongTextContent(id: Long): String {
     return content.replace("<br />", "\n").remove(SIGN)
 }
 
-class MicroBlogData(override val dir: File): GameDataDownloader {
+class MicroBlogData(override val dir: File) : GameDataDownloader {
     val arknights get() = dir.readMicroBlogHistory(BlogUser.ARKNIGHTS)
     val byproduct get() = dir.readMicroBlogHistory(BlogUser.BYPRODUCT)
     val historicus get() = dir.readMicroBlogHistory(BlogUser.HISTORICUS)
@@ -78,7 +89,7 @@ val MicroBlog.images get() = pictures.map { image(pid = it) }
 
 val MicroBlog.content get() = raw ?: text.replace("<br />", "\n").remove(SIGN)
 
-val MicroBlog.url get() = Url("https://weibo.com/${user?.id ?: "detail"}/$bid")
+val MicroBlog.url get() = Url("https://weibo.com/${user?.id ?: "detail"}/${bid.ifBlank { id }}")
 
 suspend fun MicroBlog.content(): String = if (isLongText) getLongTextContent(id = id) else content
 
@@ -114,7 +125,7 @@ data class MicroBlog(
     @SerialName("id")
     val id: Long,
     @SerialName("bid")
-    val bid: String,
+    val bid: String = "",
     @SerialName("isLongText")
     val isLongText: Boolean = false,
     @SerialName("pic_ids")
@@ -163,13 +174,6 @@ data class LongTextContent(
     val content: String,
     @SerialName("ok")
     val ok: Int,
-)
-
-private val PictureUser = MicroBlogUser(
-    avatar = "",
-    description = "",
-    id = 0,
-    name = "此微博被锁定为热门，机器人无法获取详情，请打开链接自行查看"
 )
 
 private val PictureData.blogs get() = cards.flatMap { it.group }.flatMap { it.pictures }.map { it.blog }
