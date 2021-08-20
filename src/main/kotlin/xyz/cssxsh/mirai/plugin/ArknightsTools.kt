@@ -124,7 +124,7 @@ internal fun role(name: String, roles: Set<String> = ExcelData.gacha.recruit()) 
     when (it) {
         in roles -> it
         in RoleAlias -> RoleAlias.getValue(it)
-        else -> throw IllegalArgumentException("未知干员: ${it}")
+        else -> throw IllegalArgumentException("未知干员: $it")
     }
 }
 

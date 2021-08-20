@@ -48,8 +48,11 @@ private suspend fun sendVideo(video: Video) = sendToTaskContacts { contact ->
     appendLine("鹰角有新视频了！")
     appendLine("链接: ${video.url}")
     appendLine("标题: ${video.title}")
-    appendLine("简介：${video.description}")
-    appendLine("发布时间: ${video.created}")
+    appendLine("时间: ${video.created}")
+    if (video.description.isNotBlank()) {
+        appendLine("简介：")
+        appendLine(video.description)
+    }
 
     runCatching {
         val image = VideoData.dir.resolve(video.created.date()).resolve(video.cover.filename).apply {
@@ -88,7 +91,7 @@ private suspend fun MicroBlog.toMessage(contact: Contact): Message = buildMessag
 }
 
 private suspend fun sendMicroBlog(blog: MicroBlog) = sendToTaskContacts { contact ->
-    appendLine("鹰角有新微博！@${blog.user?.name}")
+    appendLine("鹰角有新微博！@${blog.user?.name ?: "此微博被锁定为热门，机器人无法获取详情，请打开链接自行查看"}")
     appendLine("时间: ${blog.created}")
     appendLine("链接: ${blog.url}")
 
@@ -253,6 +256,7 @@ private suspend fun waitContacts() = supervisorScope {
     }
 }
 
+@OptIn(ConsoleExperimentalApi::class)
 internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.childScope("ArknightsSubscriber") {
 
     private fun clock() = launch {
@@ -341,8 +345,9 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
                 logger.warning({ "订阅器 MicroBlogData 数据加载失败" }, it)
             }
 
-            val new = MicroBlogData.all.filterNot { it.id in history } + MicroBlogData.picture.filter {
-                it.id > (MicroBlogData.arknights.maxOfOrNull(MicroBlog::id) ?: 0L)
+            val new = with(MicroBlogData) {
+                val max = arknights.maxOfOrNull { it.id } ?: Long.MAX_VALUE
+                all.filterNot { it.id in history } + picture.filterNot { it.id <= max && it.id in history }
             }
             if (new.isNotEmpty()) {
                 logger.info { "明日方舟 微博 订阅器 捕捉到结果" }
@@ -391,7 +396,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
             if (new.isNotEmpty()) {
                 logger.info { "明日方舟 公告 订阅器 捕捉到结果" }
                 new.sortedBy { it.id }.forEach { announcement ->
-                    if (announcement.id in history) return@forEach
+                    if (announcement.id in history || announcement.date != LocalDate.now()) return@forEach
                     runCatching {
                         sendAnnouncement(announcement)
                     }.onSuccess {

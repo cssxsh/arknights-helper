@@ -193,6 +193,7 @@ typealias EnemyQuestion = (enemies: EnemyMap) -> QuestionBuild
 
 typealias WeeklyQuestion = (zones: WeeklyMap) -> QuestionBuild
 
+@OptIn(ExperimentalStdlibApi::class)
 val randomPlayerQuestion: ConstInfoQuestion = { const ->
     val list = buildMap<String, Pair<Int, Set<Int>>> {
         val speed = const.playerApRegenSpeed
