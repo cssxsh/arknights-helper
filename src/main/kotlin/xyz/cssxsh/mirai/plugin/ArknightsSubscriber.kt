@@ -256,6 +256,7 @@ private suspend fun waitContacts() = supervisorScope {
     }
 }
 
+@OptIn(ConsoleExperimentalApi::class)
 internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.childScope("ArknightsSubscriber") {
 
     private fun clock() = launch {

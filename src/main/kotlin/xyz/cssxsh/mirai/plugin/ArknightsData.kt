@@ -4,6 +4,7 @@ import kotlinx.coroutines.sync.*
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.data.*
 import net.mamoe.mirai.console.data.PluginDataExtensions.withDefault
+import net.mamoe.mirai.console.util.*
 import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.market.*
 import xyz.cssxsh.arknights.mine.*
@@ -136,6 +137,7 @@ object ArknightsConfig : ReadOnlyPluginConfig("config") {
     val auto by value<Boolean>(true)
 }
 
+@OptIn(ConsoleExperimentalApi::class)
 fun <T, K, V> AbstractPluginData.delegate(key: T.() -> K) = object : ReadWriteProperty<T, V> {
     override fun getValue(thisRef: T, property: KProperty<*>): V {
         return findBackingFieldValue<MutableMap<K, V>>(property.name)!!.value.getValue(thisRef.key())

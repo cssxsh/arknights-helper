@@ -29,6 +29,7 @@ object ArknightsFaceCommand: CompositeCommand(
         ArknightsFaceData.faces.toMessage()
     }
 
+    @OptIn(MiraiExperimentalApi::class)
     @SubCommand("detail", "详情")
     @Description("表情详情")
     suspend fun CommandSenderOnMessage<*>.detail() = sendMessage {
