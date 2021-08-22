@@ -13,7 +13,8 @@ import xyz.cssxsh.arknights.*
 import xyz.cssxsh.arknights.market.*
 import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.arknights.penguin.*
-import java.io.IOException
+import java.io.*
+import java.net.*
 import java.time.*
 import kotlin.properties.*
 import kotlin.reflect.*
@@ -89,6 +90,9 @@ fun findContact(delegate: Long): Contact? {
 
 internal val DownloaderIgnore: suspend (Throwable) -> Boolean = {
     when (it) {
+        is UnknownHostException -> {
+            false
+        }
         is IOException,
         is HttpRequestTimeoutException -> {
             logger.warning { "Downloader Ignore $it" }
