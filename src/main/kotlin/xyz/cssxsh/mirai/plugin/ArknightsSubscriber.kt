@@ -348,11 +348,11 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
             val new = with(MicroBlogData) {
                 val max = arknights.maxOfOrNull { it.id } ?: Long.MAX_VALUE
                 all.filterNot { it.id in history } + picture.filterNot { it.id <= max && it.id in history }
-            }
+            }.filter { blog -> blog.created.toLocalDate() == LocalDate.now() }
             if (new.isNotEmpty()) {
                 logger.info { "明日方舟 微博 订阅器 捕捉到结果" }
                 new.sortedBy { it.id }.forEach { blog ->
-                    if (blog.id in history || blog.created.toLocalDate() != LocalDate.now()) return@forEach
+                    if (blog.id in history) return@forEach
                     runCatching {
                         sendMicroBlog(blog)
                     }.onSuccess {
