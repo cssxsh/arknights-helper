@@ -1,5 +1,6 @@
 package xyz.cssxsh.arknights.weibo
 
+import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.serialization.*
@@ -36,9 +37,16 @@ private fun File.readMicroBlogPicture(type: BlogUser): List<MicroBlog> {
     }
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 private suspend fun getLongTextContent(id: Long): String {
-    val json = Downloader.useHttpClient<String> { client ->
-        client.get(CONTENT_API) { parameter("id", id) }
+    val json = Downloader.useHttpClient { client ->
+        lateinit var builder: HttpRequestBuilder
+        client.get<String>(CONTENT_API) {
+            parameter("id", id)
+            builder = this
+        }.also {
+            if ("请求超时</p>" in it) throw HttpRequestTimeoutException(builder)
+        }
     }
     val content = CustomJson.decodeFromString<Temp<LongTextContent>>(json).data().content
     return content.replace("<br />", "\n").remove(SIGN)
