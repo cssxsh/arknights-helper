@@ -41,7 +41,9 @@ private fun File.readMicroBlogPicture(type: BlogUser): List<MicroBlog> {
 private suspend fun getLongTextContent(id: Long): String {
     val json = Downloader.useHttpClient { client ->
         lateinit var builder: HttpRequestBuilder
-        client.get<String>(CONTENT_API) {
+        client.config {
+            followRedirects = false
+        }.get<String>(CONTENT_API) {
             parameter("id", id)
             builder = this
         }.also {
