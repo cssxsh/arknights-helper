@@ -8,6 +8,7 @@ import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 import xyz.cssxsh.arknights.*
 import java.io.File
+import java.lang.IllegalStateException
 import java.time.*
 import java.time.format.*
 import java.util.*
@@ -41,13 +42,12 @@ private fun File.readMicroBlogPicture(type: BlogUser): List<MicroBlog> {
 private suspend fun getLongTextContent(id: Long): String {
     val json = Downloader.useHttpClient { client ->
         lateinit var builder: HttpRequestBuilder
-        client.config {
-            followRedirects = false
-        }.get<String>(CONTENT_API) {
+        client.get<String>(CONTENT_API) {
             parameter("id", id)
             builder = this
         }.also {
             if ("请求超时</p>" in it) throw HttpRequestTimeoutException(builder)
+            if ("登录注册更精彩</p>" in it) throw IllegalStateException("登陆锁定")
         }
     }
     val content = CustomJson.decodeFromString<Temp<LongTextContent>>(json).data().content
