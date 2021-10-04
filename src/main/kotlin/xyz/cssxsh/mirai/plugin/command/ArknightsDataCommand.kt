@@ -41,7 +41,7 @@ object ArknightsDataCommand : CompositeCommand(
     @SubCommand("reload", "重载")
     @Description("重载Config数据")
     suspend fun CommandSenderOnMessage<*>.reload() = sendMessage {
-        ArknightsHelperPlugin.run { ArknightsConfig.reload() }
+        with(ArknightsHelperPlugin) { ArknightsConfig.reload() }
         "数据已重载".toPlainText()
     }
 

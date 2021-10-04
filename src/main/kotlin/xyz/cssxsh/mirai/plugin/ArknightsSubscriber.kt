@@ -174,66 +174,33 @@ private suspend fun sendRecruitClock(id: Long, site: Int) {
 internal fun downloadGameData(): Unit = runBlocking {
     awaitAll(
         async {
-            runCatching {
-                ExcelData.download(flush = false)
-                val old = SemVersion(ExcelData.version.versionControl)
-                val now = SemVersion(ExcelDataVersion().versionControl)
-                if (now > old) {
-                    ExcelData.download(flush = true)
-                    now
-                } else {
-                    old
-                }
-            }.onSuccess {
-                logger.info { "ExcelData 数据加载完毕, 版本 $it" }
-            }.onFailure {
-                logger.warning({ "ExcelData 数据加载失败" }, it)
-            }
+            ExcelData.download(flush = false)
+            val old = SemVersion(ExcelData.version.versionControl)
+            val now = SemVersion(ExcelDataVersion().versionControl)
+            if (now > old)  ExcelData.download(flush = true)
+            logger.info { "ExcelData 数据加载完毕, 版本 $now" }
         },
         async {
-            runCatching {
-                PenguinData.download(flush = true)
-            }.onSuccess {
-                logger.info { "PenguinData 数据加载完毕" }
-            }.onFailure {
-                logger.warning({ "PenguinData 数据加载失败" }, it)
-            }
+            PenguinData.download(flush = true)
+            logger.info { "PenguinData 数据加载完毕" }
         },
         async {
-            runCatching {
-                VideoData.download(flush = false)
-            }.onSuccess {
-                logger.info { "VideoData 数据加载完毕, last: ${VideoData.all.maxByOrNull { it.created }?.bvid}" }
-            }.onFailure {
-                logger.warning({ "VideoData 数据加载失败" }, it)
-            }
+            VideoData.download(flush = false)
+            val id = VideoData.all.maxByOrNull { it.created }?.bvid
+            logger.info { "VideoData 数据加载完毕, last: $id" }
         },
         async {
-            runCatching {
-                MicroBlogData.download(flush = false)
-            }.onSuccess {
-                logger.info { "MicroBlogData 数据加载完毕, last: ${MicroBlogData.all.maxOfOrNull { it.created }}" }
-            }.onFailure {
-                logger.warning({ "MicroBlogData 数据加载失败" }, it)
-            }
+            MicroBlogData.download(flush = false)
+            val last = MicroBlogData.all.maxOfOrNull { it.created }
+            logger.info { "MicroBlogData 数据加载完毕, last: $last" }
         },
         async {
-            runCatching {
-                ArknightsFaceData.download(flush = false)
-            }.onSuccess {
-                logger.info { "ArknightsFaceData 数据加载完毕" }
-            }.onFailure {
-                logger.warning({ "ArknightsFaceData 数据加载失败" }, it)
-            }
+            ArknightsFaceData.download(flush = false)
+            logger.info { "ArknightsFaceData 数据加载完毕" }
         },
         async {
-            runCatching {
-                AnnouncementData.download(flush = false)
-            }.onSuccess {
-                logger.info { "AnnouncementData 数据加载完毕" }
-            }.onFailure {
-                logger.warning({ "AnnouncementData 数据加载失败" }, it)
-            }
+            AnnouncementData.download(flush = false)
+            logger.info { "AnnouncementData 数据加载完毕" }
         }
     )
 }
