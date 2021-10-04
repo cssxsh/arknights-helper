@@ -13,7 +13,16 @@ object ArknightsGuardCommand : CompositeCommand(
     @SubCommand("detail", "详情")
     @Description("查看蹲饼详情")
     suspend fun CommandSenderOnMessage<*>.detail() = sendMessage {
-        "当前蹲饼状态${fromEvent.subject.delegate in GuardContacts}, 蹲饼间隔${GuardInterval}m".toPlainText()
+        buildMessageChain {
+            val list = GuardContacts.groupBy { it > 0 }
+            for (friend in list[true].orEmpty()) {
+                appendLine("friend: $friend")
+            }
+            for (group in list[false].orEmpty()) {
+                appendLine("group ${-group}")
+            }
+            appendLine("蹲饼间隔${GuardInterval}m")
+        }
     }
 
     @SubCommand("speed", "速度")
