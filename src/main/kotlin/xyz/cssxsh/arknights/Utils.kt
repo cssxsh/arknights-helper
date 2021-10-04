@@ -28,6 +28,7 @@ interface GameDataType {
     val path: String
     val url: Url
     val duration: Long get() = 0
+    val readable: (ByteArray) -> Boolean get() = { it.isNotEmpty() }
 }
 
 interface GameDataDownloader {
@@ -36,6 +37,7 @@ interface GameDataDownloader {
     suspend fun download(flush: Boolean) = types.load(dir, flush)
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 internal inline fun <reified T> File.read(type: GameDataType): T = CustomJson.decodeFromString(resolve(type.path).readText())
 
 suspend fun <T : GameDataType> Iterable<T>.load(dir: File, flush: Boolean): List<File> {
@@ -44,7 +46,9 @@ suspend fun <T : GameDataType> Iterable<T>.load(dir: File, flush: Boolean): List
             dir.resolve(type.path).also { file ->
                 if (flush || file.exists().not()) {
                     file.parentFile.mkdirs()
-                    file.writeBytes(client.get<ByteArray>(type.url).apply { check(isNotEmpty()) })
+                    file.writeBytes(client.get<ByteArray>(type.url).also { bytes ->
+                        check(type.readable(bytes)) { "$type 下载内容不可读" }
+                    })
                     delay(type.duration)
                 }
             }

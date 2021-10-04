@@ -1,6 +1,7 @@
 package xyz.cssxsh.arknights.bilibili
 
 import io.ktor.http.*
+import io.ktor.util.*
 import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
 import java.io.File
@@ -44,6 +45,12 @@ enum class VideoDataType(private val tid: Int) : GameDataType {
 
     override val path = "$name.json"
 
+    @OptIn(ExperimentalSerializationApi::class)
+    override val readable: (ByteArray) -> Boolean = { bytes ->
+        CustomJson.decodeFromString<Temp>(bytes.toString()).data != null
+    }
+
+    @OptIn(InternalAPI::class)
     private val parameters = Parameters.build {
         append("mid", BILIBILI_ID.toString())
         append("ps", PAGE_SIZE.toString())
