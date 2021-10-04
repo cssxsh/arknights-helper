@@ -18,7 +18,7 @@ private const val PAGE_NUM = 1
 private const val ORDER = "pubdate"
 
 private fun File.readVideoHistory(type: VideoDataType): List<Video> {
-    return read<Temp>(type).let { requireNotNull(it.data) { "$type error ${it.code} ${it.message}" } }.list.videos
+    return with(read<Temp>(type)) { requireNotNull(data) { "$type error $code $message" } }.list.videos
 }
 
 class VideoData(override val dir: File) : GameDataDownloader {
@@ -47,7 +47,7 @@ enum class VideoDataType(private val tid: Int) : GameDataType {
 
     @OptIn(ExperimentalSerializationApi::class)
     override val readable: (ByteArray) -> Boolean = { bytes ->
-        CustomJson.decodeFromString<Temp>(bytes.toString()).data != null
+        CustomJson.decodeFromString<Temp>(bytes.decodeToString()).data != null
     }
 
     @OptIn(InternalAPI::class)
