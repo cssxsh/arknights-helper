@@ -202,8 +202,9 @@ internal fun downloadGameData(): Unit = runBlocking {
         async {
             runCatching {
                 VideoData.download(flush = false)
-            }.onSuccess {
-                logger.info { "VideoData 数据加载完毕, last: ${VideoData.all.maxByOrNull { it.created }?.bvid}" }
+                VideoData.all.maxByOrNull { it.created }?.bvid
+            }.onSuccess { id ->
+                logger.info { "VideoData 数据加载完毕, last: $id" }
             }.onFailure {
                 logger.warning({ "VideoData 数据加载失败" }, it)
             }
@@ -211,8 +212,9 @@ internal fun downloadGameData(): Unit = runBlocking {
         async {
             runCatching {
                 MicroBlogData.download(flush = false)
-            }.onSuccess {
-                logger.info { "MicroBlogData 数据加载完毕, last: ${MicroBlogData.all.maxOfOrNull { it.created }}" }
+                MicroBlogData.all.maxOfOrNull { it.created }
+            }.onSuccess { last ->
+                logger.info { "MicroBlogData 数据加载完毕, last: $last" }
             }.onFailure {
                 logger.warning({ "MicroBlogData 数据加载失败" }, it)
             }
