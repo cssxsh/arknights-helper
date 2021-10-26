@@ -10,13 +10,17 @@ import xyz.cssxsh.arknights.weibo.*
 
 private fun resolve(name: String) = ArknightsHelperPlugin.dataFolder.resolve(name)
 
+private val VideoTypes get() = ArknightsTaskData.video
+
+private val MicroBlogTypes get() = ArknightsTaskData.blog
+
 internal val ExcelData by lazy { ExcelData(resolve("ArknightsGameData")) }
 
 internal val PenguinData by lazy { PenguinData(resolve("PenguinStats")) }
 
-internal val VideoData by lazy { VideoData(resolve("BilibiliData")) }
+internal val VideoData by lazy { VideoData(resolve("BilibiliData"), VideoTypes) }
 
-internal val MicroBlogData by lazy { MicroBlogData(resolve("WeiboData")) }
+internal val MicroBlogData by lazy { MicroBlogData(resolve("WeiboData"), MicroBlogTypes) }
 
 internal val ArknightsFaceData by lazy { ArknightsFaceData(resolve("ArknightsFaceData"), FaceItems) }
 

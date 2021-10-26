@@ -5,10 +5,13 @@ import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.data.*
 import net.mamoe.mirai.console.data.PluginDataExtensions.withDefault
 import net.mamoe.mirai.console.util.*
+import xyz.cssxsh.arknights.bilibili.*
 import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.market.*
 import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.arknights.user.*
+import xyz.cssxsh.arknights.weibo.*
+import xyz.cssxsh.mirai.plugin.ArknightsConfig.provideDelegate
 import kotlin.properties.*
 import kotlin.reflect.*
 
@@ -110,7 +113,15 @@ object ArknightsTaskData : AutoSavePluginConfig("task") {
     val contacts by value<MutableSet<Long>>()
 
     @ValueDescription("蹲饼轮询间隔，单位分钟，默认5分钟")
-    var interval by value<Int>(5)
+    var interval by value(5)
+
+    @ValueName("video")
+    @ValueDescription("开启订阅的b站视频类型 ANIME, MUSIC, GAME, ENTERTAINMENT")
+    val video by value(VideoDataType.values().asList())
+
+    @ValueName("blog")
+    @ValueDescription("开启订阅的微博号 ARKNIGHTS, BYPRODUCT, MOUNTEN, HISTORICUS")
+    val blog by value(BlogUser.values().asList())
 }
 
 object ArknightsConfig : ReadOnlyPluginConfig("config") {
@@ -134,7 +145,7 @@ object ArknightsConfig : ReadOnlyPluginConfig("config") {
 
     @ValueName("auto_add_guard")
     @ValueDescription("开启新好友或新群自动蹲饼")
-    val auto by value<Boolean>(true)
+    val auto by value(true)
 }
 
 @OptIn(ConsoleExperimentalApi::class)

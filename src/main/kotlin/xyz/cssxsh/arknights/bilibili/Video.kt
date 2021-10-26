@@ -21,20 +21,20 @@ private fun File.readVideoHistory(type: VideoDataType): List<Video> {
     return with(read<Temp>(type)) { requireNotNull(data) { "$type error $code $message" } }.list.videos
 }
 
-class VideoData(override val dir: File) : GameDataDownloader {
+class VideoData(override val dir: File, override val types: List<VideoDataType> = VideoDataType.values().asList()) :
+    GameDataDownloader {
     val anime get() = dir.readVideoHistory(VideoDataType.ANIME)
     val music get() = dir.readVideoHistory(VideoDataType.MUSIC)
     val game get() = dir.readVideoHistory(VideoDataType.GAME)
     val entertainment get() = dir.readVideoHistory(VideoDataType.ENTERTAINMENT)
 
-    val all get() = anime + music + game + entertainment
-
-    override val types get() = VideoDataType.values().asIterable()
+    val all get() = types.flatMap { dir.readVideoHistory(it) }
 }
 
 val Video.url get() = Url("https://www.bilibili.com/video/${bvid}")
 val Video.cover get() = Url(pic)
 
+@Serializable
 enum class VideoDataType(private val tid: Int) : GameDataType {
     ANIME(1),
     MUSIC(3),
