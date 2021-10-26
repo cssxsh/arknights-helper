@@ -230,15 +230,15 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
         waitContacts()
         logger.info { "明日方舟 定时器 订阅器开始运行" }
         while (isActive) {
-            ArknightsUserData.reason.forEach { (id, timestamp) ->
+            for ((id, timestamp) in ArknightsUserData.reason) {
                 if (abs(timestamp - System.currentTimeMillis()) < RegenSpeed) {
                     launch {
                         sendReasonClock(id)
                     }
                 }
             }
-            ArknightsUserData.recruit.forEach { (id, sites) ->
-                sites.forEach { (site, timestamp) ->
+            for ((id, sites) in ArknightsUserData.recruit) {
+                for ((site, timestamp) in sites) {
                     if (abs(timestamp - System.currentTimeMillis()) < RegenSpeed) {
                         launch {
                             sendRecruitClock(id, site)

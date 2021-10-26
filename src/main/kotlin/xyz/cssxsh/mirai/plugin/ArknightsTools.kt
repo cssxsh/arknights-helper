@@ -145,7 +145,7 @@ internal fun role(name: String, roles: Set<String> = ExcelData.gacha.recruit()) 
 
 @JvmName("buildRecruitMessage")
 internal fun RecruitResult.toMessage() = buildMessageChain {
-    this@toMessage.forEach { (rarity, character) ->
+    for ((rarity, character) in this@toMessage) {
         val sum = character.groupBy { it.name }.mapValues { it.value.size }.entries.sortedBy { it.value }.map {
             "${it.key}${if (it.value == 1) "" else "*${it.value}"}"
         }
@@ -155,7 +155,7 @@ internal fun RecruitResult.toMessage() = buildMessageChain {
 
 @JvmName("buildRecruitMapMessage")
 internal fun RecruitMap.toMessage() = buildMessageChain {
-    this@toMessage.forEach { (tags, result) ->
+    for ((tags, result) in this@toMessage) {
         append("====> $tags ")
         if ((result.keys - 0).all { it >= 3 }) {
             appendLine("${(result.keys - 0).minOrNull()!! + 1}星保底")
@@ -169,7 +169,7 @@ internal fun RecruitMap.toMessage() = buildMessageChain {
 @JvmName("buildMarketFaceMapMessage")
 internal fun ArknightsFaceMap.toMessage() = buildMessageChain {
     appendLine("共${this@toMessage.size}个表情")
-    this@toMessage.forEach { (name, list) ->
+    for ((name, list) in this@toMessage) {
         appendLine("$name ${list.first().detail}")
     }
 }
@@ -260,7 +260,7 @@ internal fun tableMineCount() = buildString {
 
 internal fun Question.toMessage() = buildMessageChain {
     appendLine("[${type}]<${coin}>：${problem} (${timeout / 1000}s内作答)")
-    options.forEach { (index, text) ->
+    for ((index, text) in options) {
         appendLine("${index}.${text}")
     }
 }
