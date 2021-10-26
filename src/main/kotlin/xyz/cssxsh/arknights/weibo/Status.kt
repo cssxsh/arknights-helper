@@ -27,7 +27,7 @@ private fun File.readMicroBlogPicture(type: BlogUser): List<MicroBlog> {
     // XXX
     fun timestamp(id: Long): Long = (id shr 22) + epoch
 
-    read<Temp<PictureData>>(type).data().blogs.forEach { new ->
+    for (new in read<Temp<PictureData>>(type).data().blogs) {
         map.compute(new.id) { _, old ->
             old?.copy(pictures = old.pictures + new.pictures) ?: new
         }

@@ -201,8 +201,9 @@ internal fun item(name: String, limit: Int, now: Boolean) = buildMessageChain {
         return@buildMessageChain
     }
     var count = 0
-    (list with PenguinData.stages).sortedBy { it.single }.forEach { pair ->
-        if (pair.stage.isGacha || count >= limit) return@forEach
+    for (pair in (list with PenguinData.stages).sortedBy { it.single }) {
+        if (count >= limit) break
+        if (pair.stage.isGacha) continue
         appendLine("====> 作战: [${pair.stage.code}] <${pair.stage.zone?.title}> (cost=${pair.stage.cost})")
         append(pair.toMessage())
         count++
@@ -211,7 +212,7 @@ internal fun item(name: String, limit: Int, now: Boolean) = buildMessageChain {
 
 internal fun alias() = buildMessageChain {
     appendLine("企鹅物流材料别名")
-    PenguinData.items.forEach { item ->
+    for (item in PenguinData.items) {
         appendLine("名称: ${item.i18n.get()}，别名: ${item.alias.get()}")
     }
 }
@@ -224,8 +225,9 @@ internal fun stage(code: String, limit: Int, now: Boolean) = buildMessageChain {
         return@buildMessageChain
     }
     var count = 0
-    (list with PenguinData.items).sortedByDescending { it.rarity }.forEach { (matrix, item) ->
-        if (item.type != ItemType.MATERIAL || count >= limit) return@forEach
+    for ((matrix, item) in (list with PenguinData.items).sortedByDescending { it.rarity }) {
+        if (count >= limit) break
+        if (item.type != ItemType.MATERIAL) continue
         appendLine("=======> 掉落: ${item.name} (rarity=${item.rarity}) ")
         append((matrix to stage).toMessage())
         count++
@@ -234,7 +236,7 @@ internal fun stage(code: String, limit: Int, now: Boolean) = buildMessageChain {
 
 internal fun zone(name: String, limit: Int, now: Boolean) = buildMessageChain {
     val (_, list) = (PenguinData.zones to PenguinData.stages).name(name)
-    list.forEach { stage ->
+    for (stage in list) {
         append(stage(stage.code, limit, now))
     }
 }

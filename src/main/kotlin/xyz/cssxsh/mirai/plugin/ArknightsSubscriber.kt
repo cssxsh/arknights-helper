@@ -35,7 +35,7 @@ private fun contacts(): List<Contact> {
 }
 
 private suspend fun sendToTaskContacts(block: suspend MessageChainBuilder.(Contact) -> Unit) {
-    contacts().forEach { contact ->
+    for (contact in contacts()) {
         runCatching {
             contact.sendMessage(buildMessageChain { block(contact) })
         }.onFailure {
@@ -75,7 +75,7 @@ private suspend fun MicroBlog.toMessage(contact: Contact): Message = buildMessag
         appendLine(content)
     }
 
-    images.forEach { url ->
+    for (url in images) {
         runCatching {
             val file = MicroBlogData.dir.resolve(created.date()).resolve(url.filename).apply {
                 if (exists().not()) {
@@ -177,7 +177,7 @@ internal fun downloadGameData(): Unit = runBlocking {
             ExcelData.download(flush = false)
             val old = SemVersion(ExcelData.version.versionControl)
             val now = SemVersion(ExcelDataVersion().versionControl)
-            if (now > old)  ExcelData.download(flush = true)
+            if (now > old) ExcelData.download(flush = true)
             logger.info { "ExcelData 数据加载完毕, 版本 $now" }
         },
         async {
@@ -274,7 +274,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
             val new = VideoData.all.filterNot { it.bvid in history }
             if (new.isNotEmpty()) {
                 logger.info { "明日方舟 哔哩哔哩  订阅器 捕捉到结果" }
-                new.sortedBy { it.created }.forEach { video ->
+                for (video in new.sortedBy { it.created }) {
                     runCatching {
                         sendVideo(video)
                     }.onSuccess {
@@ -318,8 +318,8 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
             }.filter { blog -> blog.created.toLocalDate() == LocalDate.now() }
             if (new.isNotEmpty()) {
                 logger.info { "明日方舟 微博 订阅器 捕捉到结果" }
-                new.sortedBy { it.id }.forEach { blog ->
-                    if (blog.id in history) return@forEach
+                for (blog in new.sortedBy { it.id }) {
+                    if (blog.id in history) continue
                     runCatching {
                         sendMicroBlog(blog)
                     }.onSuccess {
@@ -362,8 +362,8 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
             val new = AnnouncementData.all.filterNot { it.id in history }
             if (new.isNotEmpty()) {
                 logger.info { "明日方舟 公告 订阅器 捕捉到结果" }
-                new.sortedBy { it.id }.forEach { announcement ->
-                    if (announcement.id in history || announcement.date != LocalDate.now()) return@forEach
+                for (announcement in new.sortedBy { it.id }) {
+                    if (announcement.id in history || announcement.date != LocalDate.now()) continue
                     runCatching {
                         sendAnnouncement(announcement)
                     }.onSuccess {
