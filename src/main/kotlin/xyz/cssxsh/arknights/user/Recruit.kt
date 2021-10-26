@@ -55,15 +55,13 @@ private fun List<String>.most() = associateWith { tag -> count { tag == it } }.m
  */
 fun Collection<UserRecruit>.tag(): String = buildString {
     val that = this@tag
-    runCatching {
-        val words = that.flatMap { it.words }
-        val tags = words.toSet().associateWith { tag -> words.count { tag == it } / that.size.toDouble() }
-        appendLine("# TAG出现的概率(样本量${that.size})")
-        appendLine("| TAG | 概率 |")
-        appendLine("|:---:|:---:|")
-        for ((tag, probability) in tags.entries.sortedByDescending { it.value }) {
-            appendLine("| $tag | ${probability.percentage()} |")
-        }
+    val words = that.flatMap { it.words }
+    val tags = words.toSet().associateWith { tag -> words.count { tag == it } / that.size.toDouble() }
+    appendLine("# TAG出现的概率(样本量${that.size})")
+    appendLine("| TAG | 概率 |")
+    appendLine("|:---:|:---:|")
+    for ((tag, probability) in tags.entries.sortedByDescending { it.value }) {
+        appendLine("| $tag | ${probability.percentage()} |")
     }
 }
 

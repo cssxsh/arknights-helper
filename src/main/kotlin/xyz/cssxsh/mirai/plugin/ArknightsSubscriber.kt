@@ -27,19 +27,19 @@ private fun OffsetDateTime.date() = toLocalDate().toString()
 private suspend fun delay(duration: Duration) = delay(duration.toMillis())
 
 private fun contacts(): List<Contact> {
-    return runCatching {
+    return try {
         Bot.instances.flatMap { bot -> (bot.friends + bot.groups).filter { it.delegate in GuardContacts } }
-    }.getOrElse {
+    } catch (e: Throwable) {
         emptyList()
     }
 }
 
 private suspend fun sendToTaskContacts(block: suspend MessageChainBuilder.(Contact) -> Unit) {
     for (contact in contacts()) {
-        runCatching {
+        try {
             contact.sendMessage(buildMessageChain { block(contact) })
-        }.onFailure {
-            logger.warning({ "向${contact}发送消息失败" }, it)
+        } catch (e: Throwable) {
+            logger.warning({ "向${contact}发送消息失败" }, e)
         }
     }
 }
@@ -54,7 +54,7 @@ private suspend fun sendVideo(video: Video) = sendToTaskContacts { contact ->
         appendLine(video.description)
     }
 
-    runCatching {
+    try {
         val image = VideoData.dir.resolve(video.created.date()).resolve(video.cover.filename).apply {
             if (exists().not()) {
                 parentFile.mkdirs()
@@ -62,21 +62,21 @@ private suspend fun sendVideo(video: Video) = sendToTaskContacts { contact ->
             }
         }
         append(image.uploadAsImage(contact))
-    }.onFailure {
-        appendLine("添加图片[${video.url}]失败, ${it.message}")
+    } catch (e: Throwable) {
+        appendLine("添加图片[${video.url}]失败, ${e.message}")
     }
 }
 
 private suspend fun MicroBlog.toMessage(contact: Contact): Message = buildMessageChain {
-    runCatching {
+    try {
         appendLine(content())
-    }.onFailure {
-        logger.warning({ "加载[${url}]长微博失败" }, it)
+    } catch (e: Throwable) {
+        logger.warning({ "加载[${url}]长微博失败" }, e)
         appendLine(content)
     }
 
     for (url in images) {
-        runCatching {
+        try {
             val file = MicroBlogData.dir.resolve(created.date()).resolve(url.filename).apply {
                 if (exists().not()) {
                     parentFile.mkdirs()
@@ -84,8 +84,8 @@ private suspend fun MicroBlog.toMessage(contact: Contact): Message = buildMessag
                 }
             }
             append(file.uploadAsImage(contact))
-        }.onFailure {
-            appendLine("添加图片[${url}]失败, ${it.message}")
+        } catch (e: Throwable) {
+            appendLine("添加图片[${url}]失败, ${e.message}")
         }
     }
 }
@@ -114,7 +114,8 @@ private suspend fun Announcement.toMessage(contact: Contact): Message = buildMes
             writeText(Downloader.useHttpClient { it.get(web) })
         }
     }
-    ContentRegex.findAll(html.readText().substringAfter("<body>").replace("<br/>", "\n")).forEach { result ->
+    val body = html.readText().substringAfter("<body>").replace("<br/>", "\n")
+    for (result in ContentRegex.findAll(body)) {
         if (result.value.startsWith("http")) {
             val url = Url(result.value)
             val image = AnnouncementData.dir.resolve("html/${url.filename}").apply {
@@ -140,7 +141,7 @@ private suspend fun sendAnnouncement(info: Announcement) = sendToTaskContacts { 
 }
 
 private suspend fun sendReasonClock(id: Long) {
-    runCatching {
+    try {
         val user = requireNotNull(findContact(id)) { "未找到用户" }
         val massage = " 理智警告 ".toPlainText()
         if (user is Member) {
@@ -148,8 +149,8 @@ private suspend fun sendReasonClock(id: Long) {
         } else {
             user.sendMessage(massage)
         }
-    }.onFailure {
-        logger.warning({ "定时器播报失败" }, it)
+    } catch (e: Throwable) {
+        logger.warning({ "定时器播报失败" }, e)
     }
 }
 
@@ -163,9 +164,7 @@ private suspend fun sendRecruitClock(id: Long, site: Int) {
             user.sendMessage(massage)
         }
     }.onSuccess {
-        ArknightsUserData.recruit[id] = ArknightsUserData.recruit[id].toMutableMap().apply {
-            put(site, 0)
-        }
+        ArknightsUserData.recruit[id] = ArknightsUserData.recruit[id] + (site to 0)
     }.onFailure {
         logger.warning({ "定时器播报失败" }, it)
     }

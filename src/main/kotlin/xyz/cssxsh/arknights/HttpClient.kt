@@ -42,12 +42,10 @@ internal object Downloader : Closeable {
 
     internal suspend fun <T> useHttpClient(block: suspend (HttpClient) -> T): T = supervisorScope {
         while (isActive) {
-            runCatching {
-                block(clients.random())
-            }.onFailure {
-                if (ignore(it).not()) throw it
-            }.onSuccess {
-                return@supervisorScope it
+            try {
+                return@supervisorScope block(clients.random())
+            } catch (e: Throwable) {
+                if (ignore(e).not()) throw e
             }
         }
         throw CancellationException()
