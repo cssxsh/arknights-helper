@@ -18,7 +18,11 @@ const val BLOG_API = "https://m.weibo.cn/api/container/getIndex"
 const val CONTENT_API = "https://m.weibo.cn/statuses/extend"
 
 private fun File.readMicroBlogHistory(type: BlogUser): List<MicroBlog> {
-    return read<Temp<WeiboData>>(type).data().cards.map { it.blog }
+    return if (type == BlogUser.PICTURE) {
+        emptyList()
+    } else {
+        read<Temp<WeiboData>>(type).data().cards.map { it.blog }
+    }
 }
 
 private fun File.readMicroBlogPicture(type: BlogUser): List<MicroBlog> {
@@ -192,13 +196,13 @@ private val PictureData.blogs get() = cards.flatMap { it.group }.flatMap { it.pi
 @Serializable
 private data class PictureData(
     @SerialName("cards")
-    val cards: List<PictureCard>
+    val cards: List<PictureCard> = emptyList()
 )
 
 @Serializable
 private data class PictureCard(
     @SerialName("card_group")
-    val group: List<PictureCardGroup>,
+    val group: List<PictureCardGroup> = emptyList()
 )
 
 @Serializable
