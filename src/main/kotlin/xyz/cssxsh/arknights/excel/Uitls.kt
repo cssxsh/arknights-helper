@@ -175,7 +175,7 @@ internal fun WeeklyMap(table: ZoneTable): WeeklyMap {
     }
 }
 
-class ExcelData(override val dir: File): GameDataDownloader {
+class ExcelData(override val dir: File) : GameDataDownloader {
     private val building by lazy { dir.readBuilding() }
     private val character by lazy { dir.readCharacterTable() }
     val const by lazy { dir.readConstInfo() }
@@ -238,8 +238,7 @@ internal fun String.readExcelDataVersion(): ExcelDataVersion {
     lateinit var stream: String
     lateinit var change: String
     lateinit var versionControl: String
-    lines().filter(String::isNotBlank).forEach {
-        val (name, value) = it.split(":")
+    for ((name, value) in lines().filter(String::isNotBlank).map { it.split(":") }) {
         when (name) {
             "Stream" -> {
                 stream = value
@@ -250,7 +249,7 @@ internal fun String.readExcelDataVersion(): ExcelDataVersion {
             "VersionControl" -> {
                 versionControl = value
             }
-            else -> {}
+            else -> Unit
         }
     }
     return ExcelDataVersion(

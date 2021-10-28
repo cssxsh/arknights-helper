@@ -34,7 +34,7 @@ fun Collection<UserRecruit>.table(page: Int): String = buildString {
     appendLine("# 公招记录第${page}页")
     appendLine("| 干员 | 招募时间 | 词条 | 记录时间 |")
     appendLine("|:---:|:---:|:---:|:---:|")
-    records.forEach { recruit ->
+    for (recruit in records) {
         val timestamp = timestamp(recruit.timestamp / 1_000).format(formatter)
         val time = Duration.ofMinutes(recruit.time).run { "%d:%02d".format(toHours(), toMinutesPart()) }
         val words = recruit.words.joinToString(" ") { word ->
@@ -55,15 +55,13 @@ private fun List<String>.most() = associateWith { tag -> count { tag == it } }.m
  */
 fun Collection<UserRecruit>.tag(): String = buildString {
     val that = this@tag
-    runCatching {
-        val words = that.flatMap { it.words }
-        val tags = words.toSet().associateWith { tag -> words.count { tag == it } / that.size.toDouble() }
-        appendLine("# TAG出现的概率(样本量${that.size})")
-        appendLine("| TAG | 概率 |")
-        appendLine("|:---:|:---:|")
-        tags.entries.sortedByDescending { it.value }.forEach { (tag, probability) ->
-            appendLine("| $tag | ${probability.percentage()} |")
-        }
+    val words = that.flatMap { it.words }
+    val tags = words.toSet().associateWith { tag -> words.count { tag == it } / that.size.toDouble() }
+    appendLine("# TAG出现的概率(样本量${that.size})")
+    appendLine("| TAG | 概率 |")
+    appendLine("|:---:|:---:|")
+    for ((tag, probability) in tags.entries.sortedByDescending { it.value }) {
+        appendLine("| $tag | ${probability.percentage()} |")
     }
 }
 
@@ -76,7 +74,7 @@ fun Collection<UserRecruit>.role(exclude: Collection<String> = emptySet()): Stri
     appendLine("# 最匹配的TAG(样本量${that.size})")
     appendLine("| 干员 | 选中 | 出现 |")
     appendLine("|:---:|:---:|:---:|")
-    roles.forEach { (role, records) ->
+    for ((role, records) in roles) {
         val select = records.flatMap { it.selected }.most()
         val word = records.flatMap { it.words }.most()
         appendLine("| $role(${records.size}) | ${select?.key}(${select?.value}) | ${word?.key}(${word?.value}) |")

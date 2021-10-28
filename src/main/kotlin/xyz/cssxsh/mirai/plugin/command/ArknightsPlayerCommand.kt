@@ -23,7 +23,7 @@ object ArknightsPlayerCommand : CompositeCommand(
             } else {
                 appendLine("当前未设置理智提醒")
             }
-            recruit.forEach { (site, timestamp) ->
+            for ((site, timestamp) in recruit) {
                 if (timestamp > System.currentTimeMillis()) {
                     val time = OffsetDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault())
                     appendLine("公招位置[${site}]设置, 预计提醒时间：${time}")

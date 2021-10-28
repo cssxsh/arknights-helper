@@ -27,19 +27,19 @@ private fun OffsetDateTime.date() = toLocalDate().toString()
 private suspend fun delay(duration: Duration) = delay(duration.toMillis())
 
 private fun contacts(): List<Contact> {
-    return runCatching {
+    return try {
         Bot.instances.flatMap { bot -> (bot.friends + bot.groups).filter { it.delegate in GuardContacts } }
-    }.getOrElse {
+    } catch (e: Throwable) {
         emptyList()
     }
 }
 
 private suspend fun sendToTaskContacts(block: suspend MessageChainBuilder.(Contact) -> Unit) {
-    contacts().forEach { contact ->
-        runCatching {
+    for (contact in contacts()) {
+        try {
             contact.sendMessage(buildMessageChain { block(contact) })
-        }.onFailure {
-            logger.warning({ "向${contact}发送消息失败" }, it)
+        } catch (e: Throwable) {
+            logger.warning({ "向${contact}发送消息失败" }, e)
         }
     }
 }
@@ -54,7 +54,7 @@ private suspend fun sendVideo(video: Video) = sendToTaskContacts { contact ->
         appendLine(video.description)
     }
 
-    runCatching {
+    try {
         val image = VideoData.dir.resolve(video.created.date()).resolve(video.cover.filename).apply {
             if (exists().not()) {
                 parentFile.mkdirs()
@@ -62,21 +62,21 @@ private suspend fun sendVideo(video: Video) = sendToTaskContacts { contact ->
             }
         }
         append(image.uploadAsImage(contact))
-    }.onFailure {
-        appendLine("添加图片[${video.url}]失败, ${it.message}")
+    } catch (e: Throwable) {
+        appendLine("添加图片[${video.url}]失败, ${e.message}")
     }
 }
 
 private suspend fun MicroBlog.toMessage(contact: Contact): Message = buildMessageChain {
-    runCatching {
+    try {
         appendLine(content())
-    }.onFailure {
-        logger.warning({ "加载[${url}]长微博失败" }, it)
+    } catch (e: Throwable) {
+        logger.warning({ "加载[${url}]长微博失败" }, e)
         appendLine(content)
     }
 
-    images.forEach { url ->
-        runCatching {
+    for (url in images) {
+        try {
             val file = MicroBlogData.dir.resolve(created.date()).resolve(url.filename).apply {
                 if (exists().not()) {
                     parentFile.mkdirs()
@@ -84,8 +84,8 @@ private suspend fun MicroBlog.toMessage(contact: Contact): Message = buildMessag
                 }
             }
             append(file.uploadAsImage(contact))
-        }.onFailure {
-            appendLine("添加图片[${url}]失败, ${it.message}")
+        } catch (e: Throwable) {
+            appendLine("添加图片[${url}]失败, ${e.message}")
         }
     }
 }
@@ -114,7 +114,8 @@ private suspend fun Announcement.toMessage(contact: Contact): Message = buildMes
             writeText(Downloader.useHttpClient { it.get(web) })
         }
     }
-    ContentRegex.findAll(html.readText().substringAfter("<body>").replace("<br/>", "\n")).forEach { result ->
+    val body = html.readText().substringAfter("<body>").replace("<br/>", "\n")
+    for (result in ContentRegex.findAll(body)) {
         if (result.value.startsWith("http")) {
             val url = Url(result.value)
             val image = AnnouncementData.dir.resolve("html/${url.filename}").apply {
@@ -140,7 +141,7 @@ private suspend fun sendAnnouncement(info: Announcement) = sendToTaskContacts { 
 }
 
 private suspend fun sendReasonClock(id: Long) {
-    runCatching {
+    try {
         val user = requireNotNull(findContact(id)) { "未找到用户" }
         val massage = " 理智警告 ".toPlainText()
         if (user is Member) {
@@ -148,8 +149,8 @@ private suspend fun sendReasonClock(id: Long) {
         } else {
             user.sendMessage(massage)
         }
-    }.onFailure {
-        logger.warning({ "定时器播报失败" }, it)
+    } catch (e: Throwable) {
+        logger.warning({ "定时器播报失败" }, e)
     }
 }
 
@@ -163,9 +164,7 @@ private suspend fun sendRecruitClock(id: Long, site: Int) {
             user.sendMessage(massage)
         }
     }.onSuccess {
-        ArknightsUserData.recruit[id] = ArknightsUserData.recruit[id].toMutableMap().apply {
-            put(site, 0)
-        }
+        ArknightsUserData.recruit[id] = ArknightsUserData.recruit[id] + (site to 0)
     }.onFailure {
         logger.warning({ "定时器播报失败" }, it)
     }
@@ -177,7 +176,7 @@ internal fun downloadGameData(): Unit = runBlocking {
             ExcelData.download(flush = false)
             val old = SemVersion(ExcelData.version.versionControl)
             val now = SemVersion(ExcelDataVersion().versionControl)
-            if (now > old)  ExcelData.download(flush = true)
+            if (now > old) ExcelData.download(flush = true)
             logger.info { "ExcelData 数据加载完毕, 版本 $now" }
         },
         async {
@@ -216,6 +215,8 @@ private val End = LocalTime.of(22, 0, 0)
 private operator fun LocalTime.minus(other: LocalTime): Duration =
     Duration.ofSeconds((toSecondOfDay() - other.toSecondOfDay()).toLong())
 
+private fun OffsetDateTime.isToday(): Boolean = (toLocalDate() == LocalDate.now())
+
 private suspend fun waitContacts() = supervisorScope {
     while (isActive && contacts().isEmpty()) {
         logger.verbose { "蹲饼联系人没有实例，进入${Fast}等待" }
@@ -230,15 +231,15 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
         waitContacts()
         logger.info { "明日方舟 定时器 订阅器开始运行" }
         while (isActive) {
-            ArknightsUserData.reason.forEach { (id, timestamp) ->
+            for ((id, timestamp) in ArknightsUserData.reason) {
                 if (abs(timestamp - System.currentTimeMillis()) < RegenSpeed) {
                     launch {
                         sendReasonClock(id)
                     }
                 }
             }
-            ArknightsUserData.recruit.forEach { (id, sites) ->
-                sites.forEach { (site, timestamp) ->
+            for ((id, sites) in ArknightsUserData.recruit) {
+                for ((site, timestamp) in sites) {
                     if (abs(timestamp - System.currentTimeMillis()) < RegenSpeed) {
                         launch {
                             sendRecruitClock(id, site)
@@ -251,7 +252,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
     }
 
     private fun bilibili() = launch {
-        val history = VideoData.all.map { it.bvid }.toMutableSet()
+        val history = VideoData.all.mapTo(mutableSetOf()) { it.bvid }
         var updated = false
         val list = VideoData.all.map { it.created.toLocalTime() }.sorted()
         val start = list.minOrNull() ?: Start
@@ -271,10 +272,10 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
                 }
                 logger.warning({ "订阅器 VideoData 数据加载失败" }, it)
             }
-            val new = VideoData.all.filterNot { it.bvid in history }
+            val new = VideoData.all.filterNot { it.bvid in history }.sortedBy { it.created }
             if (new.isNotEmpty()) {
                 logger.info { "明日方舟 哔哩哔哩  订阅器 捕捉到结果" }
-                new.sortedBy { it.created }.forEach { video ->
+                for (video in new) {
                     runCatching {
                         sendVideo(video)
                     }.onSuccess {
@@ -298,8 +299,8 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
     }
 
     private fun weibo() = launch {
-        val history = MicroBlogData.all.map { it.id }.toMutableSet()
-        if (LocalTime.now() < Start) delay((Start - LocalTime.now()))
+        val history = MicroBlogData.all.mapTo(mutableSetOf())  { it.id }
+        if (LocalTime.now() < Start) delay(Start - LocalTime.now())
         waitContacts()
         logger.info { "明日方舟 微博 订阅器开始运行" }
         while (isActive) {
@@ -315,11 +316,11 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
             val new = with(MicroBlogData) {
                 val max = arknights.maxOfOrNull { it.id } ?: Long.MAX_VALUE
                 all.filterNot { it.id in history } + picture.filterNot { it.id <= max && it.id in history }
-            }.filter { blog -> blog.created.toLocalDate() == LocalDate.now() }
+            }.filter { blog -> blog.created.isToday() }
             if (new.isNotEmpty()) {
                 logger.info { "明日方舟 微博 订阅器 捕捉到结果" }
-                new.sortedBy { it.id }.forEach { blog ->
-                    if (blog.id in history) return@forEach
+                for (blog in new.sortedBy { it.id }) {
+                    if (blog.id in history) continue
                     runCatching {
                         sendMicroBlog(blog)
                     }.onSuccess {
@@ -345,8 +346,8 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
     }
 
     private fun announce() = launch {
-        val history = AnnouncementData.all.map { it.id }.toMutableSet()
-        if (LocalTime.now() < Start) delay((Start - LocalTime.now()))
+        val history = AnnouncementData.all.mapTo(mutableSetOf()) { it.id }
+        if (LocalTime.now() < Start) delay(Start - LocalTime.now())
         waitContacts()
         logger.info { "明日方舟 公告 订阅器开始运行" }
         while (isActive) {
@@ -359,11 +360,11 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
                 logger.warning({ "订阅器 AnnouncementData 数据加载失败" }, it)
             }
 
-            val new = AnnouncementData.all.filterNot { it.id in history }
+            val new = AnnouncementData.all.filterNot { it.id in history }.sortedBy { it.id }
             if (new.isNotEmpty()) {
                 logger.info { "明日方舟 公告 订阅器 捕捉到结果" }
-                new.sortedBy { it.id }.forEach { announcement ->
-                    if (announcement.id in history || announcement.date != LocalDate.now()) return@forEach
+                for (announcement in new) {
+                    if (announcement.id in history || announcement.date != LocalDate.now()) continue
                     runCatching {
                         sendAnnouncement(announcement)
                     }.onSuccess {

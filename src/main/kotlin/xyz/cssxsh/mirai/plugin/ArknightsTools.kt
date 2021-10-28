@@ -74,14 +74,25 @@ val Contact.delegate get() = if (this is Group) id * -1 else id
  * 查找Contact
  */
 fun findContact(delegate: Long): Contact? {
-    Bot.instances.forEach { bot ->
+    for (bot in Bot.instances) {
         if (delegate < 0) {
-            bot.getGroup(delegate * -1)?.let { return@findContact it }
+            for (group in bot.groups) {
+                if (group.id == delegate * -1) return group
+            }
         } else {
-            bot.getFriend(delegate)?.let { return@findContact it }
-            bot.getStranger(delegate)?.let { return@findContact it }
-            bot.groups.forEach { group ->
-                group.getMember(delegate)?.let { return@findContact it }
+            for (friend in bot.friends) {
+                if (friend.id == delegate) return friend
+            }
+            for (stranger in bot.strangers) {
+                if (stranger.id == delegate) return stranger
+            }
+            for (friend in bot.friends) {
+                if (friend.id == delegate) return friend
+            }
+            for (group in bot.groups) {
+                for (member in group.members) {
+                    if (member.id == delegate) return member
+                }
             }
         }
     }
@@ -134,7 +145,7 @@ internal fun role(name: String, roles: Set<String> = ExcelData.gacha.recruit()) 
 
 @JvmName("buildRecruitMessage")
 internal fun RecruitResult.toMessage() = buildMessageChain {
-    this@toMessage.forEach { (rarity, character) ->
+    for ((rarity, character) in this@toMessage) {
         val sum = character.groupBy { it.name }.mapValues { it.value.size }.entries.sortedBy { it.value }.map {
             "${it.key}${if (it.value == 1) "" else "*${it.value}"}"
         }
@@ -144,7 +155,7 @@ internal fun RecruitResult.toMessage() = buildMessageChain {
 
 @JvmName("buildRecruitMapMessage")
 internal fun RecruitMap.toMessage() = buildMessageChain {
-    this@toMessage.forEach { (tags, result) ->
+    for ((tags, result) in this@toMessage) {
         append("====> $tags ")
         if ((result.keys - 0).all { it >= 3 }) {
             appendLine("${(result.keys - 0).minOrNull()!! + 1}星保底")
@@ -158,7 +169,7 @@ internal fun RecruitMap.toMessage() = buildMessageChain {
 @JvmName("buildMarketFaceMapMessage")
 internal fun ArknightsFaceMap.toMessage() = buildMessageChain {
     appendLine("共${this@toMessage.size}个表情")
-    this@toMessage.forEach { (name, list) ->
+    for ((name, list) in this@toMessage) {
         appendLine("$name ${list.first().detail}")
     }
 }
@@ -190,8 +201,9 @@ internal fun item(name: String, limit: Int, now: Boolean) = buildMessageChain {
         return@buildMessageChain
     }
     var count = 0
-    (list with PenguinData.stages).sortedBy { it.single }.forEach { pair ->
-        if (pair.stage.isGacha || count >= limit) return@forEach
+    for (pair in (list with PenguinData.stages).sortedBy { it.single }) {
+        if (count >= limit) break
+        if (pair.stage.isGacha) continue
         appendLine("====> 作战: [${pair.stage.code}] <${pair.stage.zone?.title}> (cost=${pair.stage.cost})")
         append(pair.toMessage())
         count++
@@ -200,7 +212,7 @@ internal fun item(name: String, limit: Int, now: Boolean) = buildMessageChain {
 
 internal fun alias() = buildMessageChain {
     appendLine("企鹅物流材料别名")
-    PenguinData.items.forEach { item ->
+    for (item in PenguinData.items) {
         appendLine("名称: ${item.i18n.get()}，别名: ${item.alias.get()}")
     }
 }
@@ -213,8 +225,9 @@ internal fun stage(code: String, limit: Int, now: Boolean) = buildMessageChain {
         return@buildMessageChain
     }
     var count = 0
-    (list with PenguinData.items).sortedByDescending { it.rarity }.forEach { (matrix, item) ->
-        if (item.type != ItemType.MATERIAL || count >= limit) return@forEach
+    for ((matrix, item) in (list with PenguinData.items).sortedByDescending { it.rarity }) {
+        if (count >= limit) break
+        if (item.type != ItemType.MATERIAL) continue
         appendLine("=======> 掉落: ${item.name} (rarity=${item.rarity}) ")
         append((matrix to stage).toMessage())
         count++
@@ -223,7 +236,7 @@ internal fun stage(code: String, limit: Int, now: Boolean) = buildMessageChain {
 
 internal fun zone(name: String, limit: Int, now: Boolean) = buildMessageChain {
     val (_, list) = (PenguinData.zones to PenguinData.stages).name(name)
-    list.forEach { stage ->
+    for (stage in list) {
         append(stage(stage.code, limit, now))
     }
 }
@@ -247,7 +260,7 @@ internal fun tableMineCount() = buildString {
 
 internal fun Question.toMessage() = buildMessageChain {
     appendLine("[${type}]<${coin}>：${problem} (${timeout / 1000}s内作答)")
-    options.forEach { (index, text) ->
+    for ((index, text) in options) {
         appendLine("${index}.${text}")
     }
 }
