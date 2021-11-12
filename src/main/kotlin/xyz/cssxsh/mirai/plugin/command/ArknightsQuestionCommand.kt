@@ -10,7 +10,8 @@ object ArknightsQuestionCommand : CompositeCommand(
     owner = ArknightsHelperPlugin,
     "question", "问题",
     description = "明日方舟助手自定义问题指令"
-) {
+), ArknightsHelperCommand {
+
     @SubCommand("detail", "详情")
     @Description("查看问题详情")
     suspend fun CommandSenderOnMessage<*>.detail(name: String) = sendMessage {

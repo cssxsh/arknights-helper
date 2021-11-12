@@ -11,7 +11,7 @@ object ArknightsFaceCommand: CompositeCommand(
     owner = ArknightsHelperPlugin,
     "arkface", "方舟表情",
     description = "明日方舟助手表情指令"
-) {
+), ArknightsHelperCommand {
 
     @SubCommand("random", "随机")
     @Description("表情随机")

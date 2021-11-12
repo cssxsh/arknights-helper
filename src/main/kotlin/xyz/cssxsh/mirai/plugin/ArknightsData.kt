@@ -11,7 +11,6 @@ import xyz.cssxsh.arknights.market.*
 import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.arknights.user.*
 import xyz.cssxsh.arknights.weibo.*
-import xyz.cssxsh.mirai.plugin.ArknightsConfig.provideDelegate
 import kotlin.properties.*
 import kotlin.reflect.*
 
@@ -60,7 +59,29 @@ val CommandSenderOnMessage<*>.rule: String by ReadOnlyProperty { that, _ -> Arkn
  */
 val CommandSenderOnMessage<*>.mutex: Mutex by SubjectDelegate { Mutex() }
 
-object ArknightsUserData : AutoSavePluginData("user") {
+sealed interface ArknightsHelperData : PluginData {
+
+    companion object : Collection<ArknightsHelperData> {
+        private val list by lazy {
+            ArknightsHelperData::class.sealedSubclasses.mapNotNull { kClass -> kClass.objectInstance }
+        }
+
+        override val size: Int get() = list.size
+
+        override fun contains(element: ArknightsHelperData): Boolean = list.contains(element)
+
+        override fun containsAll(elements: Collection<ArknightsHelperData>): Boolean = list.containsAll(elements)
+
+        override fun isEmpty(): Boolean = list.isEmpty()
+
+        override fun iterator(): Iterator<ArknightsHelperData> = list.iterator()
+
+        @OptIn(ConsoleExperimentalApi::class)
+        operator fun get(name: String): ArknightsHelperData = list.first { it.saveName.equals(name, true) }
+    }
+}
+
+object ArknightsUserData : AutoSavePluginData("user"), ArknightsHelperData {
     @ValueDescription("Key 是QQ号，Value是合成玉数值")
     val coin by value<MutableMap<Long, Int>>().withDefault { 3_000 }
 
@@ -77,7 +98,7 @@ object ArknightsUserData : AutoSavePluginData("user") {
     val result by value<MutableMap<Long, List<UserRecruit>>>().withDefault { emptyList() }
 }
 
-object ArknightsPoolData : AutoSavePluginConfig("pool") {
+object ArknightsPoolData : AutoSavePluginConfig("pool"), ArknightsHelperData {
     @ValueDescription("Key 是QQ号/QQ群号，Value是规则名")
     val pool by value<MutableMap<Long, String>>().withDefault { GachaPoolRule.NORMAL.name }
 
@@ -87,7 +108,7 @@ object ArknightsPoolData : AutoSavePluginConfig("pool") {
     val rules by value<MutableMap<String, String>>().withDefault { default.getValue(it) }
 }
 
-object ArknightsMineData : AutoSavePluginData("mine") {
+object ArknightsMineData : AutoSavePluginData("mine"), ArknightsHelperData {
     private val default = CustomQuestion(
         problem = "以下那个干员被称为老女人",
         options = mapOf(
@@ -108,7 +129,7 @@ object ArknightsMineData : AutoSavePluginData("mine") {
     val count by value(mutableMapOf<QuestionType, MutableList<Int>>())
 }
 
-object ArknightsTaskData : AutoSavePluginConfig("task") {
+object ArknightsTaskData : AutoSavePluginConfig("task"), ArknightsHelperData {
     @ValueDescription("开启了提醒的QQ号/QQ群号(正负性区别，QQ群是负数)")
     val contacts by value<MutableSet<Long>>()
 
@@ -124,7 +145,7 @@ object ArknightsTaskData : AutoSavePluginConfig("task") {
     val blog by value(BlogUser.values().asList())
 }
 
-object ArknightsConfig : ReadOnlyPluginConfig("config") {
+object ArknightsConfig : ReadOnlyPluginConfig("config"), ArknightsHelperData {
     @ValueDescription("Key 是表情ID, Value 是表情Hash")
     val faces by value(DefaultFaceItems)
 

@@ -9,7 +9,7 @@ object ArknightsGachaCommand : CompositeCommand(
     owner = ArknightsHelperPlugin,
     "gacha", "抽卡",
     description = "明日方舟助手抽卡指令"
-) {
+), ArknightsHelperCommand {
 
     @SubCommand("one", "单抽")
     @Description("单抽times次")

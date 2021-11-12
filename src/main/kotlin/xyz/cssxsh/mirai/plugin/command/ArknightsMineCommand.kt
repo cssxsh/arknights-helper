@@ -14,7 +14,7 @@ object ArknightsMineCommand : SimpleCommand(
     owner = ArknightsHelperPlugin,
     "mine", "挖矿", "答题",
     description = "明日方舟助手挖矿指令"
-) {
+), ArknightsHelperCommand {
 
     private suspend inline fun <reified P : MessageEvent> P.nextAnswerOrNull(
         timeoutMillis: Long,

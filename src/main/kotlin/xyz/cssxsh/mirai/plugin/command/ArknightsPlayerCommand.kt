@@ -10,7 +10,8 @@ object ArknightsPlayerCommand : CompositeCommand(
     owner = ArknightsHelperPlugin,
     "player", "玩家",
     description = "明日方舟助手玩家指令"
-) {
+), ArknightsHelperCommand {
+
     @SubCommand("detail", "详情")
     @Description("查看玩家详情")
     suspend fun CommandSenderOnMessage<*>.detail() = sendMessage {

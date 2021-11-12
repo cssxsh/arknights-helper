@@ -10,7 +10,7 @@ object ArknightsDataCommand : CompositeCommand(
     owner = ArknightsHelperPlugin,
     "data", "数据",
     description = "明日方舟助手数据指令"
-) {
+), ArknightsHelperCommand {
 
     @SubCommand("arknights", "方舟")
     @Description("方舟数据下载")

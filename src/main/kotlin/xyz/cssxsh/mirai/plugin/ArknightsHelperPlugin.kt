@@ -2,6 +2,7 @@ package xyz.cssxsh.mirai.plugin
 
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
+import net.mamoe.mirai.console.data.*
 import net.mamoe.mirai.console.plugin.jvm.*
 import xyz.cssxsh.arknights.*
 import xyz.cssxsh.mirai.plugin.command.*
@@ -16,38 +17,23 @@ object ArknightsHelperPlugin : KotlinPlugin(
     override fun onEnable() {
         Downloader.ignore = DownloaderIgnore
         downloadGameData()
-        ArknightsUserData.reload()
-        ArknightsPoolData.reload()
-        ArknightsMineData.reload()
-        ArknightsTaskData.reload()
-        ArknightsConfig.reload()
-        ArknightsRecruitCommand.register()
-        ArknightsGachaCommand.register()
-        ArknightsPlayerCommand.register()
-        ArknightsDataCommand.register()
-        ArknightsItemCommand.register()
-        ArknightsStageCommand.register()
-        ArknightsZoneCommand.register()
-        ArknightsMineCommand.register()
-        ArknightsQuestionCommand.register()
-        ArknightsGuardCommand.register()
-        ArknightsFaceCommand.register()
+        // Data and config
+        for (data in ArknightsHelperData) {
+            (data as? PluginConfig)?.reload() ?: data.reload()
+        }
+        // Command
+        for (command in ArknightsHelperCommand) {
+            command.register()
+        }
 
         ArknightsSubscriber.start()
     }
 
     override fun onDisable() {
-        ArknightsRecruitCommand.unregister()
-        ArknightsGachaCommand.unregister()
-        ArknightsPlayerCommand.unregister()
-        ArknightsDataCommand.unregister()
-        ArknightsItemCommand.unregister()
-        ArknightsStageCommand.unregister()
-        ArknightsZoneCommand.unregister()
-        ArknightsMineCommand.unregister()
-        ArknightsQuestionCommand.unregister()
-        ArknightsGuardCommand.unregister()
-        ArknightsFaceCommand.unregister()
+        // Command
+        for (command in ArknightsHelperCommand) {
+            command.unregister()
+        }
 
         ArknightsSubscriber.stop()
     }

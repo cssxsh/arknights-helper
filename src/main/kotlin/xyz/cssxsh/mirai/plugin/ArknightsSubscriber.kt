@@ -186,12 +186,12 @@ internal fun downloadGameData(): Unit = runBlocking {
         async {
             VideoData.download(flush = false)
             val id = VideoData.all.maxByOrNull { it.created }?.bvid
-            logger.info { "VideoData 数据加载完毕, last: $id" }
+            logger.info { "VideoData ${VideoData.types} 数据加载完毕, last: $id" }
         },
         async {
             MicroBlogData.download(flush = false)
             val last = MicroBlogData.all.maxOfOrNull { it.created }
-            logger.info { "MicroBlogData 数据加载完毕, last: $last" }
+            logger.info { "MicroBlogData ${MicroBlogData.types} 数据加载完毕, last: $last" }
         },
         async {
             ArknightsFaceData.download(flush = false)
