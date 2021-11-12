@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "xyz.cssxsh"
-version = "1.3.2"
+version = "1.3.3"
 
 mavenCentralPublish {
     useCentralS01()
@@ -36,8 +36,7 @@ dependencies {
     // implementation(ktor("client-serialization", Versions.ktor))
     compileOnly(mirai("core", Versions.mirai))
 
-    testImplementation(junit("api", Versions.junit))
-    testRuntimeOnly(junit("engine", Versions.junit))
+    testImplementation(kotlin("test", Versions.kotlin))
 }
 
 tasks {
