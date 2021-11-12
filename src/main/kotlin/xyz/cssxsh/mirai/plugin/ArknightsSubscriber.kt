@@ -155,7 +155,7 @@ private suspend fun sendReasonClock(id: Long) {
 }
 
 private suspend fun sendRecruitClock(id: Long, site: Int) {
-    runCatching {
+    try {
         val user = requireNotNull(findContact(id)) { "未找到用户" }
         val massage = " 公招位置${site}警告 ".toPlainText()
         if (user is Member) {
@@ -163,10 +163,10 @@ private suspend fun sendRecruitClock(id: Long, site: Int) {
         } else {
             user.sendMessage(massage)
         }
-    }.onSuccess {
+    } catch (e: Throwable) {
+        logger.warning({ "定时器播报失败" }, e)
+    } finally {
         ArknightsUserData.recruit[id] = ArknightsUserData.recruit[id] + (site to 0)
-    }.onFailure {
-        logger.warning({ "定时器播报失败" }, it)
     }
 }
 
