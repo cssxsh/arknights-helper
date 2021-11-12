@@ -16,11 +16,11 @@ object ArknightsHelperPlugin : KotlinPlugin(
 
     override fun onEnable() {
         Downloader.ignore = DownloaderIgnore
-        downloadGameData()
         // Data and config
         for (data in ArknightsHelperData) {
             (data as? PluginConfig)?.reload() ?: data.reload()
         }
+        downloadGameData()
         // Command
         for (command in ArknightsHelperCommand) {
             command.register()

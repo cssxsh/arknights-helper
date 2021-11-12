@@ -11,6 +11,7 @@ import xyz.cssxsh.arknights.market.*
 import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.arknights.user.*
 import xyz.cssxsh.arknights.weibo.*
+import xyz.cssxsh.mirai.plugin.ArknightsTaskData.provideDelegate
 import kotlin.properties.*
 import kotlin.reflect.*
 
@@ -135,6 +136,22 @@ object ArknightsTaskData : AutoSavePluginConfig("task"), ArknightsHelperData {
 
     @ValueDescription("蹲饼轮询间隔，单位分钟，默认5分钟")
     var interval by value(5)
+}
+
+object ArknightsConfig : ReadOnlyPluginConfig("config"), ArknightsHelperData {
+
+    @ValueDescription("Key 是别名 Value 是干员名")
+    val roles by value(mutableMapOf(
+        "羊" to "艾雅法拉",
+        "鳄鱼" to "艾丝黛尔"
+    ))
+
+    @ValueDescription("Key 是别名 Value 是材料名")
+    val items by value(mutableMapOf("绿管" to "晶体元件"))
+
+    @ValueName("auto_add_guard")
+    @ValueDescription("开启新好友或新群自动蹲饼")
+    val auto by value(true)
 
     @ValueName("video")
     @ValueDescription("开启订阅的b站视频类型 ANIME, MUSIC, GAME, ENTERTAINMENT")
@@ -143,30 +160,9 @@ object ArknightsTaskData : AutoSavePluginConfig("task"), ArknightsHelperData {
     @ValueName("blog")
     @ValueDescription("开启订阅的微博号 ARKNIGHTS, BYPRODUCT, MOUNTEN, HISTORICUS")
     val blog by value(BlogUser.values().asList())
-}
 
-object ArknightsConfig : ReadOnlyPluginConfig("config"), ArknightsHelperData {
     @ValueDescription("Key 是表情ID, Value 是表情Hash")
     val faces by value(DefaultFaceItems)
-
-    private val DefaultRoles = mutableMapOf(
-        "羊" to "艾雅法拉",
-        "鳄鱼" to "艾丝黛尔"
-    )
-
-    @ValueDescription("Key 是别名 Value 是干员名")
-    val roles by value(DefaultRoles)
-
-    private val DefaultItems = mutableMapOf(
-        "绿管" to "晶体元件"
-    )
-
-    @ValueDescription("Key 是别名 Value 是材料名")
-    val items by value(DefaultItems)
-
-    @ValueName("auto_add_guard")
-    @ValueDescription("开启新好友或新群自动蹲饼")
-    val auto by value(true)
 }
 
 @OptIn(ConsoleExperimentalApi::class)

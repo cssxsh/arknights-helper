@@ -167,6 +167,14 @@ items:
 
 自动开启蹲饼功能 在机器人添加新好友和新群时自动开启蹲饼功能
 
+### video
+
+开启订阅的b站视频类型 ANIME, MUSIC, GAME, ENTERTAINMENT
+
+### blog
+
+开启订阅的微博号 ARKNIGHTS, BYPRODUCT, MOUNTEN, HISTORICUS
+
 ## 安装
 
 ### MCL 指令安装

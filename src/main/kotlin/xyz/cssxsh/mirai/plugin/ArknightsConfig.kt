@@ -10,9 +10,9 @@ import xyz.cssxsh.arknights.weibo.*
 
 private fun resolve(name: String) = ArknightsHelperPlugin.dataFolder.resolve(name)
 
-private val VideoTypes get() = ArknightsTaskData.video
+private val VideoTypes get() = ArknightsConfig.video
 
-private val MicroBlogTypes get() = ArknightsTaskData.blog
+private val MicroBlogTypes get() = ArknightsConfig.blog
 
 internal val ExcelData by lazy { ExcelData(resolve("ArknightsGameData")) }
 
