@@ -11,9 +11,7 @@ private const val BILIBILI_API = "https://api.bilibili.com/x/space/arc/search"
 
 private const val BILIBILI_ID = 161775300L
 
-private const val PAGE_SIZE = 100
-
-private const val PAGE_NUM = 1
+private const val PAGE_SIZE = 50
 
 private const val ORDER = "pubdate"
 
@@ -35,15 +33,16 @@ val Video.url get() = Url("https://www.bilibili.com/video/${bvid}")
 val Video.cover get() = Url(pic)
 
 @Serializable
-enum class VideoDataType(private val tid: Int) : GameDataType {
+enum class VideoDataType(private val tid: Int, private val pn: Int = 1) : GameDataType {
     ANIME(1),
     MUSIC(3),
     GAME(4),
+    GAME_2(4, 2),
     ENTERTAINMENT(5);
 
     override val duration: Long = 10_000
 
-    override val path = "$name.json"
+    override val path = "${name}_${pn}.json"
 
     @OptIn(ExperimentalSerializationApi::class)
     override val readable: (ByteArray) -> Boolean = { bytes ->
@@ -54,7 +53,7 @@ enum class VideoDataType(private val tid: Int) : GameDataType {
     private val parameters = Parameters.build {
         append("mid", BILIBILI_ID.toString())
         append("ps", PAGE_SIZE.toString())
-        append("pn", PAGE_NUM.toString())
+        append("pn", pn.toString())
         append("order", ORDER)
         append("tid", tid.toString())
     }
