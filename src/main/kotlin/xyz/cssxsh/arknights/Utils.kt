@@ -48,7 +48,7 @@ suspend fun <T : GameDataType> Iterable<T>.load(dir: File, flush: Boolean): List
                 if (flush || file.exists().not()) {
                     file.parentFile.mkdirs()
                     file.writeBytes(client.get<ByteArray>(type.url).also { bytes ->
-                        check(type.readable(bytes)) { "$type 下载内容不可读" }
+                        check(type.readable(bytes)) { "$type 下载内容不可读 ${bytes.decodeToString()}" }
                     })
                     delay(type.duration)
                 }
