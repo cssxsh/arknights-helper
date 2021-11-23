@@ -7,7 +7,7 @@ import net.mamoe.mirai.utils.*
 import xyz.cssxsh.arknights.market.*
 import xyz.cssxsh.mirai.plugin.*
 
-object ArknightsFaceCommand: CompositeCommand(
+object ArknightsFaceCommand : CompositeCommand(
     owner = ArknightsHelperPlugin,
     "arkface", "方舟表情",
     description = "明日方舟助手表情指令"

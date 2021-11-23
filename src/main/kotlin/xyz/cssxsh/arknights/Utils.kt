@@ -38,7 +38,8 @@ interface GameDataDownloader {
 }
 
 @OptIn(ExperimentalSerializationApi::class)
-internal inline fun <reified T> File.read(type: GameDataType): T = CustomJson.decodeFromString(resolve(type.path).readText())
+internal inline fun <reified T> File.read(type: GameDataType): T =
+    CustomJson.decodeFromString(resolve(type.path).readText())
 
 suspend fun <T : GameDataType> Iterable<T>.load(dir: File, flush: Boolean): List<File> {
     return Downloader.useHttpClient { client ->

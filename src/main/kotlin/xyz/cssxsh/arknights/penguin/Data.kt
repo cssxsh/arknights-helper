@@ -132,7 +132,8 @@ fun <V : StageId> Iterable<V>.stage(stage: Stage) = filter { it.stageId == stage
  * @see stage
  * @see code
  */
-fun <V : StageId> Pair<Iterable<Stage>, Iterable<V>>.stage(code: String) = first.name(code).let { it to second.stage(it) }
+fun <V : StageId> Pair<Iterable<Stage>, Iterable<V>>.stage(code: String) =
+    first.name(code).let { it to second.stage(it) }
 
 /**
  * XXX
@@ -253,7 +254,7 @@ data class Existence(
     @SerialName("closeTime")
     @Serializable(OffsetDataTimeSerializer::class)
     override val end: OffsetDateTime = OffsetDateTime.MAX
-): TimePeriod
+) : TimePeriod
 
 @Serializable
 data class Item(

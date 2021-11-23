@@ -8,7 +8,7 @@ private val TagRegex = """(?<=【|\[)(.+)(?:]|】)(.+)""".toRegex()
 fun Handbook.infos(): Map<String, String> {
     return stories.values.flatten().flatMap { text ->
         TagRegex.findAll(text).map { result ->
-            result.destructured.let { (key, value) -> key to value.trim()  }
+            result.destructured.let { (key, value) -> key to value.trim() }
         }
     }.toMap()
 }

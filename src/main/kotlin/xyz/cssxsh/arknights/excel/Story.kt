@@ -1,7 +1,6 @@
 package xyz.cssxsh.arknights.excel
 
 import kotlinx.serialization.*
-import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
 import java.time.*
 
@@ -107,7 +106,7 @@ data class StoryInfo(
     val storyTxt: String,
     @SerialName("unLockType")
     val unLockType: UnLockType
-): StoryId
+) : StoryId
 
 enum class CostItemType {
     NONE,

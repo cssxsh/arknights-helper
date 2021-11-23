@@ -41,7 +41,7 @@ data class Enemy(
     val resistance: String,
     @SerialName("sortId")
     val sortId: Int
-): Id, Name, TagInfo
+) : Id, Name, TagInfo
 
 enum class EnemyLevel(val text: String) {
     NORMAL("普通"),

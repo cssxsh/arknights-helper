@@ -28,6 +28,7 @@ private fun File.readMicroBlogHistory(type: BlogUser): List<MicroBlog> {
 private fun File.readMicroBlogPicture(type: BlogUser): List<MicroBlog> {
     val map = mutableMapOf<Long, MicroBlog>()
     val epoch = 515483463L
+
     // XXX
     fun timestamp(id: Long): Long = (id shr 22) + epoch
 

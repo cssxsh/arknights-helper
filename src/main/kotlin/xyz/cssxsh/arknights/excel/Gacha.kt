@@ -60,7 +60,7 @@ private const val CAPACITY = 1000
  * 检查概率和
  */
 private fun one(prob: Collection<Double>) {
-    check(prob.sumOf { (it * CAPACITY).toInt() } in (CAPACITY - 3 .. CAPACITY + 3)) { "${prob}概率和不满足100%" }
+    check(prob.sumOf { (it * CAPACITY).toInt() } in (CAPACITY - 3..CAPACITY + 3)) { "${prob}概率和不满足100%" }
 }
 
 /**
@@ -203,7 +203,7 @@ data class GachaPool(
     private val CDSecColor: String?,
     @SerialName("LMTGSID")
     private val LMTGSID: String?
-): Id, Name, Period
+) : Id, Name, Period
 
 enum class GachaPoolRule(vararg lines: String) {
     /**

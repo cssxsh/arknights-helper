@@ -34,7 +34,7 @@ data class Mainline(
     override val zoneId: String,
     @SerialName("zoneIndex")
     val index: Int
-): ZoneId
+) : ZoneId
 
 @Serializable
 data class Weekly(
@@ -58,7 +58,7 @@ data class ValidInfo(
     @SerialName("startTs")
     @Serializable(TimestampSerializer::class)
     override val start: OffsetDateTime
-): Period
+) : Period
 
 @Serializable
 data class Zone(
@@ -84,7 +84,7 @@ data class Zone(
     val nameTitleEx: String?,
     @SerialName("zoneNameTitleUnCurrent")
     val nameTitleUnCurrent: String?
-): Id
+) : Id
 
 enum class ZoneType(val text: String) {
     MAINLINE("主线"),

@@ -299,7 +299,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
     }
 
     private fun weibo() = launch {
-        val history = MicroBlogData.all.mapTo(mutableSetOf())  { it.id }
+        val history = MicroBlogData.all.mapTo(mutableSetOf()) { it.id }
         if (LocalTime.now() < Start) delay(Start - LocalTime.now())
         waitContacts()
         logger.info { "明日方舟 微博 订阅器开始运行" }

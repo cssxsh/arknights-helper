@@ -108,7 +108,14 @@ data class CustomQuestion(
     @SerialName("timeout")
     val timeout: Long
 ) : QuestionBuild() {
-    constructor(problem: String, right: List<String>, error: List<String>, coin: Int, tips: String, timeout: Long): this(
+    constructor(
+        problem: String,
+        right: List<String>,
+        error: List<String>,
+        coin: Int,
+        tips: String,
+        timeout: Long
+    ) : this(
         problem = problem,
         options = right.associateWith { true } + error.associateWith { false },
         coin = coin,
@@ -230,7 +237,7 @@ val randomTalentQuestion: CharacterQuestion = { characters ->
 
 val randomPositionQuestion: CharacterQuestion = { characters ->
     ChoiceQuestion(meaning = "角色" to "放置位", range = DefaultChoiceRange) {
-        characters.map { (name, character) -> name to  character.position.text }
+        characters.map { (name, character) -> name to character.position.text }
     }
 }
 
@@ -312,7 +319,7 @@ val randomEnemyInfoQuestion: EnemyQuestion = { enemies ->
         "法术抗性" to { resistance },
         "耐久" to { endure }
     ).random()
-    ChoiceQuestion(meaning = "敌方" to attribute , range = DefaultChoiceRange) {
+    ChoiceQuestion(meaning = "敌方" to attribute, range = DefaultChoiceRange) {
         enemies.flatMap { (_, enemies) ->
             enemies.map { enemy ->
                 enemy.designation to enemy.value()

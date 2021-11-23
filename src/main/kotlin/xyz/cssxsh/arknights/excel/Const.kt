@@ -12,7 +12,7 @@ data class ConstInfo(
     @SerialName("apBuyThreshold")
     private val apBuyThreshold: Int,
     @SerialName("assistBeUsedSocialPt")
-    private val assistBeUsedSocialPt: Map<Int,Int>,
+    private val assistBeUsedSocialPt: Map<Int, Int>,
     @SerialName("attackMax")
     private val attackMax: Double,
     @SerialName("baseMaxFriendNum")

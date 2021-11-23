@@ -259,6 +259,7 @@ internal fun String.readExcelDataVersion(): ExcelDataVersion {
     )
 }
 
-private val github = { type: ExcelDataType -> Url("https://raw.githubusercontent.com/$GITHUB_REPO/master/${path(type)}") }
+private val github =
+    { type: ExcelDataType -> Url("https://raw.githubusercontent.com/$GITHUB_REPO/master/${path(type)}") }
 
 private val jsdelivr = { type: ExcelDataType -> Url("https://cdn.jsdelivr.net/gh/$GITHUB_REPO@master/${path(type)}") }

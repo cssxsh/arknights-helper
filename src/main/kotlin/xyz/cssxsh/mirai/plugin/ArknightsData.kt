@@ -11,7 +11,6 @@ import xyz.cssxsh.arknights.market.*
 import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.arknights.user.*
 import xyz.cssxsh.arknights.weibo.*
-import xyz.cssxsh.mirai.plugin.ArknightsTaskData.provideDelegate
 import kotlin.properties.*
 import kotlin.reflect.*
 
@@ -141,10 +140,12 @@ object ArknightsTaskData : AutoSavePluginConfig("task"), ArknightsHelperData {
 object ArknightsConfig : ReadOnlyPluginConfig("config"), ArknightsHelperData {
 
     @ValueDescription("Key 是别名 Value 是干员名")
-    val roles by value(mutableMapOf(
-        "羊" to "艾雅法拉",
-        "鳄鱼" to "艾丝黛尔"
-    ))
+    val roles by value(
+        mutableMapOf(
+            "羊" to "艾雅法拉",
+            "鳄鱼" to "艾丝黛尔"
+        )
+    )
 
     @ValueDescription("Key 是别名 Value 是材料名")
     val items by value(mutableMapOf("绿管" to "晶体元件"))
