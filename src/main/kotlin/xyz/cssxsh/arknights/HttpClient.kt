@@ -29,7 +29,7 @@ internal object Downloader : Closeable {
         install(HttpTimeout) {
             socketTimeoutMillis = 15_000
             connectTimeoutMillis = 15_000
-            requestTimeoutMillis = 15_000
+            requestTimeoutMillis = null
         }
         BrowserUserAgent()
     }
