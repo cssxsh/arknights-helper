@@ -16,6 +16,7 @@ import xyz.cssxsh.arknights.penguin.*
 import java.io.*
 import java.net.*
 import java.time.*
+import javax.net.ssl.*
 import kotlin.properties.*
 import kotlin.reflect.*
 
@@ -101,7 +102,7 @@ fun findContact(delegate: Long): Contact? {
 
 internal val DownloaderIgnore: suspend (Throwable) -> Boolean = {
     when (it) {
-        is UnknownHostException -> {
+        is UnknownHostException, is SSLHandshakeException -> {
             false
         }
         is IOException,
