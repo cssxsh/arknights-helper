@@ -4,6 +4,7 @@ import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
 import net.mamoe.mirai.console.data.*
 import net.mamoe.mirai.console.plugin.jvm.*
+import net.mamoe.mirai.utils.*
 import xyz.cssxsh.arknights.*
 import xyz.cssxsh.mirai.plugin.command.*
 
@@ -20,7 +21,11 @@ object ArknightsHelperPlugin : KotlinPlugin(
         for (data in ArknightsHelperData) {
             (data as? PluginConfig)?.reload() ?: data.reload()
         }
-        downloadGameData()
+        try {
+            downloadGameData()
+        } catch (cause: Throwable) {
+            logger.warning({ "数据下载失败" }, cause)
+        }
         // Command
         for (command in ArknightsHelperCommand) {
             command.register()
