@@ -42,16 +42,16 @@ internal inline fun <reified T> File.read(type: GameDataType): T =
     CustomJson.decodeFromString(resolve(type.path).readText())
 
 suspend fun <T : GameDataType> Iterable<T>.load(dir: File, flush: Boolean): List<File> {
-    return Downloader.useHttpClient { client ->
-        map { type ->
-            dir.resolve(type.path).also { file ->
-                if (flush || file.exists().not()) {
-                    file.parentFile.mkdirs()
-                    file.writeBytes(client.get<ByteArray>(type.url).also { bytes ->
-                        check(type.readable(bytes)) { "$type 下载内容不可读 ${bytes.decodeToString()}" }
-                    })
-                    delay(type.duration)
+    return map { type ->
+        dir.resolve(type.path).also { file ->
+            if (flush || file.exists().not()) {
+                file.parentFile.mkdirs()
+                Downloader.useHttpClient { client ->
+                    val bytes = client.get<ByteArray>(type.url)
+                    check(type.readable(bytes)) { "$type 下载内容不可读 ${bytes.decodeToString()}" }
+                    file.writeBytes(bytes)
                 }
+                delay(type.duration)
             }
         }
     }
