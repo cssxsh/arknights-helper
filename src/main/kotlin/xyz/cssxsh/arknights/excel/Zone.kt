@@ -93,5 +93,6 @@ enum class ZoneType(val text: String) {
     CAMPAIGN("战役"),
     ACTIVITY("活动"),
     BRANCHLINE("支线"),
-    SIDESTORY("趣闻")
+    SIDESTORY("趣闻"),
+    ROGUELIKE("肉鸽")
 }
