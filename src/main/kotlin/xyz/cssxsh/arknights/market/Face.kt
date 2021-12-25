@@ -1,5 +1,3 @@
-@file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
-
 package xyz.cssxsh.arknights.market
 
 import io.ktor.http.*
@@ -275,6 +273,7 @@ interface ArknightsFace {
 /**
  * 构建 MarketFace 实例
  */
+@Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 fun ArknightsFace.impl(): MarketFace {
     return MarketFaceImpl(
         delegate = ImMsgBody.MarketFace(
@@ -295,6 +294,7 @@ fun ArknightsFace.impl(): MarketFace {
     )
 }
 
+@Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 val MarketFace.md5 by ReadOnlyProperty { face, _ ->
     require(face is MarketFaceImpl) { "需要MarketFaceImpl实例作为参数" }
     face.delegate.faceId.toByteString().hex()

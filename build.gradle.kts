@@ -3,11 +3,11 @@ plugins {
     kotlin("plugin.serialization") version Versions.kotlin
 
     id("net.mamoe.mirai-console") version  Versions.mirai
-    id("net.mamoe.maven-central-publish") version "0.7.0"
+    id("net.mamoe.maven-central-publish") version "0.7.1"
 }
 
 group = "xyz.cssxsh"
-version = "1.3.6"
+version = "1.3.7"
 
 mavenCentralPublish {
     useCentralS01()
