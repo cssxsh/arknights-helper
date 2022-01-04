@@ -1,7 +1,6 @@
 package xyz.cssxsh.arknights.excel
 
 import kotlinx.serialization.*
-import kotlinx.serialization.json.*
 import xyz.cssxsh.arknights.*
 import java.time.*
 
@@ -133,30 +132,30 @@ data class GachaTable(
     val tagMaxValid: Int,
     @SerialName("gachaPoolClient")
     val pools: List<GachaPool>,
-    @SerialName("newbeeGachaPoolClient")
-    val newbeeGachaPoolClient: List<JsonObject>,
-    @SerialName("recruitPool")
-    private val recruitPool: JsonObject,
-    @SerialName("specialRecruitPool")
-    private val specialRecruitPool: List<JsonObject>,
-    @SerialName("potentialMaterialConverter")
-    private val potentialMaterialConverter: JsonObject,
-    @SerialName("potentialMats")
-    private val potentialMats: JsonObject,
-    @SerialName("recruitRarityTable")
-    private val recruitRarityTable: JsonObject,
-    @SerialName("specialTagRarityTable")
-    private val specialTagRarityTable: Map<Int, List<Int>>,
+//    @SerialName("newbeeGachaPoolClient")
+//    val newbeeGachaPoolClient: List<JsonObject>,
+//    @SerialName("recruitPool")
+//    private val recruitPool: JsonObject,
+//    @SerialName("specialRecruitPool")
+//    private val specialRecruitPool: List<JsonObject>,
+//    @SerialName("potentialMaterialConverter")
+//    private val potentialMaterialConverter: JsonObject,
+//    @SerialName("potentialMats")
+//    private val potentialMats: JsonObject,
+//    @SerialName("recruitRarityTable")
+//    private val recruitRarityTable: JsonObject,
+//    @SerialName("specialTagRarityTable")
+//    private val specialTagRarityTable: Map<Int, List<Int>>,
     @SerialName("recruitDetail")
     val recruitDetail: String,
-    @SerialName("carousel")
-    private val carousel: List<JsonObject>,
-    @SerialName("freeGacha")
-    private val freeGacha: List<JsonObject>,
-    @SerialName("limitTenGachaItem")
-    private val limitTenGachaItem: List<JsonObject>,
-    @SerialName("linkageTenGachaItem")
-    private val linkageTenGachaItem: List<JsonObject>,
+//    @SerialName("carousel")
+//    private val carousel: List<JsonObject>,
+//    @SerialName("freeGacha")
+//    private val freeGacha: List<JsonObject>,
+//    @SerialName("limitTenGachaItem")
+//    private val limitTenGachaItem: List<JsonObject>,
+//    @SerialName("linkageTenGachaItem")
+//    private val linkageTenGachaItem: List<JsonObject>,
 )
 
 @Serializable
@@ -189,20 +188,20 @@ data class GachaPool(
     val rule: GachaPoolRule,
     @SerialName("gachaPoolSummary")
     val summary: String,
-    @SerialName("linkageRuleId")
-    private val linkageRule: String? = null,
-    @SerialName("linkageParam")
-    private val linkageParam: JsonObject? = null,
-    @SerialName("guarantee5Avail")
-    private val guarantee5Avail: Int,
-    @SerialName("guarantee5Count")
-    private val guarantee5Count: Int,
-    @SerialName("CDPrimColor")
-    private val CDPrimColor: String?,
-    @SerialName("CDSecColor")
-    private val CDSecColor: String?,
-    @SerialName("LMTGSID")
-    private val LMTGSID: String?
+//    @SerialName("linkageRuleId")
+//    private val linkageRule: String? = null,
+//    @SerialName("linkageParam")
+//    private val linkageParam: JsonObject? = null,
+//    @SerialName("guarantee5Avail")
+//    private val guarantee5Avail: Int,
+//    @SerialName("guarantee5Count")
+//    private val guarantee5Count: Int,
+//    @SerialName("CDPrimColor")
+//    private val CDPrimColor: String?,
+//    @SerialName("CDSecColor")
+//    private val CDSecColor: String?,
+//    @SerialName("LMTGSID")
+//    private val lmtgsid: String?
 ) : Id, Name, Period
 
 enum class GachaPoolRule(vararg lines: String) {
@@ -214,12 +213,17 @@ enum class GachaPoolRule(vararg lines: String) {
     /**
      * 限定
      */
-    LIMITED(""),
+    LIMITED,
 
     /**
      * 联动
      */
-    LINKAGE("");
+    LINKAGE,
+
+    /**
+     *
+     */
+    ATTAIN;
 
     val rule = "#${name};" + lines.joinToString(";")
 }
