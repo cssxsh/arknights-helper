@@ -173,7 +173,7 @@ items:
 
 ### blog
 
-开启订阅的微博号 `BYPRODUCT`, `MOUNTEN`, `HISTORICUS`
+开启订阅的微博号 `BYPRODUCT`(朝陇山), `MOUNTEN`(一拾山), `HISTORICUS`(泰拉记事社)
 
 ## 安装
 
