@@ -252,7 +252,10 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
     }
 
     private fun bilibili() = launch {
-        val history = VideoData.all.mapTo(mutableSetOf()) { it.bvid }
+        if (VideoData.types.isEmpty()) {
+            logger.info { "明日方舟 哔哩哔哩 订阅器 跳过" }
+        }
+        val history = VideoData.all.mapTo(HashSet()) { it.aid }
         var updated = false
         val list = VideoData.all.map { it.created.toLocalTime() }.sorted()
         val start = list.minOrNull() ?: Start
@@ -265,21 +268,21 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
             runCatching {
                 VideoData.download(flush = true)
             }.onSuccess {
-                logger.info { "订阅器 VideoData 数据加载完毕" }
+                logger.info { "订阅器 VideoData (${VideoData.types}) 数据加载完毕" }
             }.onFailure {
                 if ("请求被拦截" in it.message.orEmpty()) {
                     delay(Slow.toMillis())
                 }
-                logger.warning({ "订阅器 VideoData 数据加载失败" }, it)
+                logger.warning({ "订阅器 VideoData (${VideoData.types}) 数据加载失败" }, it)
             }
-            val new = VideoData.all.filterNot { it.bvid in history }.sortedBy { it.created }
+            val new = VideoData.all.filterNot { it.aid in history }.sortedBy { it.created }
             if (new.isNotEmpty()) {
-                logger.info { "明日方舟 哔哩哔哩  订阅器 捕捉到结果" }
+                logger.info { "明日方舟 哔哩哔哩 订阅器 捕捉到结果" }
                 for (video in new) {
                     runCatching {
                         sendVideo(video)
                     }.onSuccess {
-                        history.add(video.bvid)
+                        history.add(video.aid)
                     }
                 }
                 updated = true
@@ -299,7 +302,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
     }
 
     private fun weibo() = launch {
-        val history = MicroBlogData.all.mapTo(mutableSetOf()) { it.id }
+        val history = MicroBlogData.all.mapTo(HashSet()) { it.id }
         if (LocalTime.now() < Start) delay(Start - LocalTime.now())
         waitContacts()
         logger.info { "明日方舟 微博 订阅器开始运行" }
@@ -308,15 +311,16 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
             runCatching {
                 MicroBlogData.download(flush = true)
             }.onSuccess {
-                logger.info { "订阅器 MicroBlogData 数据加载完毕" }
+                logger.info { "订阅器 MicroBlogData (${MicroBlogData.types}) 数据加载完毕" }
             }.onFailure {
-                logger.warning({ "订阅器 MicroBlogData 数据加载失败" }, it)
+                logger.warning({ "订阅器 MicroBlogData (${MicroBlogData.types}) 数据加载失败" }, it)
             }
 
             val new = with(MicroBlogData) {
                 val max = arknights.maxOfOrNull { it.id } ?: Long.MAX_VALUE
                 all.filterNot { it.id in history } + picture.filterNot { it.id <= max && it.id in history }
             }.filter { blog -> blog.created.isToday() }
+
             if (new.isNotEmpty()) {
                 logger.info { "明日方舟 微博 订阅器 捕捉到结果" }
                 for (blog in new.sortedBy { it.id }) {

@@ -12,7 +12,7 @@ private fun resolve(name: String) = ArknightsHelperPlugin.dataFolder.resolve(nam
 
 private val VideoTypes get() = ArknightsConfig.video
 
-private val MicroBlogTypes get() = ArknightsConfig.blog
+private val MicroBlogTypes get() = ArknightsConfig.blog + BlogUser.ARKNIGHTS + BlogUser.PICTURE
 
 internal val ExcelData by lazy { ExcelData(resolve("ArknightsGameData")) }
 

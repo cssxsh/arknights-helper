@@ -169,11 +169,11 @@ items:
 
 ### video
 
-开启订阅的b站视频类型 ANIME, MUSIC, GAME, ENTERTAINMENT
+开启订阅的b站视频类型 `ANIME`, `MUSIC`, `GAME`, `ENTERTAINMENT`
 
 ### blog
 
-开启订阅的微博号 ARKNIGHTS, BYPRODUCT, MOUNTEN, HISTORICUS
+开启订阅的微博号 `BYPRODUCT`, `MOUNTEN`, `HISTORICUS`
 
 ## 安装
 

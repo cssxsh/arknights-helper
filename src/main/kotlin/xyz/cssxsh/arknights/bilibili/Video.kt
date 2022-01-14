@@ -16,10 +16,11 @@ private const val PAGE_SIZE = 50
 private const val ORDER = "pubdate"
 
 private fun File.readVideoHistory(type: VideoDataType): List<Video> {
+    if (exists().not()) return emptyList()
     return with(read<Temp>(type)) { requireNotNull(data) { "$type error $code $message" } }.list.videos
 }
 
-class VideoData(override val dir: File, override val types: List<VideoDataType> = VideoDataType.values().asList()) :
+class VideoData(override val dir: File, override val types: Set<VideoDataType> = VideoDataType.values().toSet()) :
     GameDataDownloader {
     val anime get() = dir.readVideoHistory(VideoDataType.ANIME)
     val music get() = dir.readVideoHistory(VideoDataType.MUSIC)

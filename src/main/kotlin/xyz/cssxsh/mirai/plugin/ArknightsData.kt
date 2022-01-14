@@ -156,11 +156,11 @@ object ArknightsConfig : ReadOnlyPluginConfig("config"), ArknightsHelperData {
 
     @ValueName("video")
     @ValueDescription("开启订阅的b站视频类型 ANIME, MUSIC, GAME, ENTERTAINMENT")
-    val video by value(VideoDataType.values().asList())
+    val video by value(VideoDataType.values().toSet())
 
     @ValueName("blog")
-    @ValueDescription("开启订阅的微博号 ARKNIGHTS, BYPRODUCT, MOUNTEN, HISTORICUS")
-    val blog by value(BlogUser.values().asList())
+    @ValueDescription("开启订阅的微博号 BYPRODUCT, MOUNTEN, HISTORICUS")
+    val blog by value(BlogUser.values().toSet())
 
     @ValueDescription("Key 是表情ID, Value 是表情Hash")
     val faces by value(DefaultFaceItems)

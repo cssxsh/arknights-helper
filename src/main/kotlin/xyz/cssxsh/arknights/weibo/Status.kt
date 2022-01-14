@@ -18,8 +18,9 @@ const val BLOG_API = "https://m.weibo.cn/api/container/getIndex"
 const val CONTENT_API = "https://m.weibo.cn/statuses/extend"
 
 private fun File.readMicroBlogHistory(type: BlogUser): List<MicroBlog> {
+    if (exists().not()) return emptyList()
     return if (type == BlogUser.PICTURE) {
-        emptyList()
+        readMicroBlogPicture(type)
     } else {
         read<Temp<WeiboData>>(type).data().cards.map { it.blog }
     }
@@ -59,15 +60,15 @@ private suspend fun getLongTextContent(id: Long): String {
     return content.replace("<br />", "\n").remove(SIGN)
 }
 
-class MicroBlogData(override val dir: File, override val types: List<BlogUser> = BlogUser.values().asList()) :
+class MicroBlogData(override val dir: File, override val types: Set<BlogUser> = BlogUser.values().toSet()) :
     GameDataDownloader {
     val arknights get() = dir.readMicroBlogHistory(BlogUser.ARKNIGHTS)
     val byproduct get() = dir.readMicroBlogHistory(BlogUser.BYPRODUCT)
     val historicus get() = dir.readMicroBlogHistory(BlogUser.HISTORICUS)
     val mounten get() = dir.readMicroBlogHistory(BlogUser.MOUNTEN)
-    val picture get() = dir.readMicroBlogPicture(BlogUser.PICTURE)
+    val picture get() = dir.readMicroBlogHistory(BlogUser.PICTURE)
 
-    val all get() = types.flatMap { dir.readMicroBlogHistory(it) }
+    val all get() = (types - BlogUser.PICTURE).flatMap { dir.readMicroBlogHistory(it) }
 }
 
 @Serializable
