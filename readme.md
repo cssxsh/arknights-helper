@@ -6,13 +6,22 @@
 [![Downloads](https://img.shields.io/github/downloads/cssxsh/arknights-helper/total)](https://shields.io/category/downloads)
 [![MiraiForum](https://img.shields.io/badge/post-on%20MiraiForum-yellow)](https://mirai.mamoe.net/topic/203)
 
+**使用前应该查阅的相关文档或项目**
+
+* [User Manual](https://github.com/mamoe/mirai/blob/dev/docs/UserManual.md)
+* [Permission Command](https://github.com/mamoe/mirai/blob/dev/mirai-console/docs/BuiltInCommands.md#permissioncommand)
+* [Chat Command](https://github.com/project-mirai/chat-command)
+
 ## 指令
 
 注意: 使用前请确保可以 [在聊天环境执行指令](https://github.com/project-mirai/chat-command)  
 带括号的`/`前缀是可选的  
 `<...>`中的是指令名，由空格隔开表示或，选择其中任一名称都可执行例如`/抽卡 十连`  
 `[...]`表示参数，当`[...]`后面带`?`时表示参数可选  
-`{...}`表示连续的多个参数
+`{...}`表示连续的多个参数  
+
+本插件指令权限ID 格式为 `xyz.cssxsh.mirai.plugin.arknights-helper:command.*`, `*` 是指令的第一指令名  
+例如 `/抽卡 十连` 的权限ID为 `xyz.cssxsh.mirai.plugin.arknights-helper:command.gacha`
 
 ### 助手抽卡指令
 
