@@ -169,7 +169,7 @@ private suspend fun sendRecruitClock(id: Long, site: Int) {
     }
 }
 
-internal fun CoroutineScope.downloadGameData(): Unit = runBlocking(coroutineContext) {
+internal suspend fun downloadGameData(): Unit = supervisorScope {
     awaitAll(
         async {
             ExcelData.download(flush = false)

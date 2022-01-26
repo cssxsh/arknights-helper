@@ -1,5 +1,6 @@
 package xyz.cssxsh.mirai.plugin
 
+import kotlinx.coroutines.*
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
 import net.mamoe.mirai.console.data.*
@@ -26,12 +27,6 @@ object ArknightsHelperPlugin : KotlinPlugin(
         } catch (cause: Throwable) {
             logger.warning({ "数据下载失败" }, cause)
         }
-        // Command
-        for (command in ArknightsHelperCommand) {
-            command.register()
-        }
-
-        ArknightsSubscriber.start()
     }
 
     override fun onDisable() {
