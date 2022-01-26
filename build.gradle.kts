@@ -1,8 +1,8 @@
 plugins {
-    kotlin("jvm") version Versions.kotlin
-    kotlin("plugin.serialization") version Versions.kotlin
+    kotlin("jvm") version "1.6.0"
+    kotlin("plugin.serialization") version "1.6.0"
 
-    id("net.mamoe.mirai-console") version  Versions.mirai
+    id("net.mamoe.mirai-console") version "2.10.0-RC2"
     id("net.mamoe.maven-central-publish") version "0.7.1"
 }
 
@@ -20,23 +20,24 @@ mavenCentralPublish {
 
 repositories {
     mavenLocal()
-    maven(url = "https://maven.aliyun.com/repository/public")
+    maven(url = "https://maven.aliyun.com/repository/central")
     mavenCentral()
     maven(url = "https://maven.aliyun.com/repository/gradle-plugin")
     gradlePluginPortal()
 }
 
-kotlin {
-    sourceSets {
-        //
+mirai {
+    jvmTarget = JavaVersion.VERSION_11
+    configureShadow {
+        exclude("module-info.class")
     }
 }
 
 dependencies {
-    // implementation(ktor("client-serialization", Versions.ktor))
-    compileOnly(mirai("core", Versions.mirai))
+    compileOnly("net.mamoe:mirai-core:${mirai.coreVersion}")
+    compileOnly("net.mamoe:mirai-core-utils:${mirai.coreVersion}")
 
-    testImplementation(kotlin("test", Versions.kotlin))
+    testImplementation(kotlin("test", kotlin.coreLibrariesVersion))
 }
 
 tasks {

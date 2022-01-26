@@ -1,7 +1,6 @@
 package xyz.cssxsh.arknights.bilibili
 
 import io.ktor.http.*
-import io.ktor.util.*
 import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
 import java.io.File
@@ -50,7 +49,6 @@ enum class VideoDataType(private val tid: Int, private val pn: Int = 1) : GameDa
         CustomJson.decodeFromString<Temp>(bytes.decodeToString()).data != null
     }
 
-    @OptIn(InternalAPI::class)
     private val parameters = Parameters.build {
         append("mid", BILIBILI_ID.toString())
         append("ps", PAGE_SIZE.toString())

@@ -4,7 +4,6 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.*
 import net.mamoe.mirai.*
-import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
 import net.mamoe.mirai.console.util.*
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.event.events.*
@@ -224,7 +223,6 @@ private suspend fun waitContacts() = supervisorScope {
     }
 }
 
-@OptIn(ConsoleExperimentalApi::class)
 internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.childScope("ArknightsSubscriber") {
 
     private fun clock() = launch {
