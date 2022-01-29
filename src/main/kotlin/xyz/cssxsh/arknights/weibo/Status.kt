@@ -22,7 +22,7 @@ private fun File.readMicroBlogHistory(type: BlogUser): List<MicroBlog> {
     return if (type == BlogUser.PICTURE) {
         readMicroBlogPicture(type)
     } else {
-        read<Temp<WeiboData>>(type).data().cards.map { it.blog }
+        read<Temp<WeiboData>>(type).data().cards.mapNotNull { it.blog }
     }
 }
 
@@ -130,7 +130,7 @@ private data class WeiboData(
 @Serializable
 private data class Card(
     @SerialName("mblog")
-    val blog: MicroBlog,
+    val blog: MicroBlog? = null,
 )
 
 @Serializable
