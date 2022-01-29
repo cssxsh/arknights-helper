@@ -10,7 +10,7 @@ import xyz.cssxsh.arknights.*
 import xyz.cssxsh.mirai.plugin.command.*
 
 object ArknightsHelperPlugin : KotlinPlugin(
-    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "1.3.9") {
+    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "1.3.10") {
         name("arknights-helper")
         author("cssxsh")
     }
@@ -22,10 +22,19 @@ object ArknightsHelperPlugin : KotlinPlugin(
         for (data in ArknightsHelperData) {
             (data as? PluginConfig)?.reload() ?: data.reload()
         }
-        try {
-            downloadGameData()
-        } catch (cause: Throwable) {
-            logger.warning({ "数据下载失败" }, cause)
+        launch {
+            try {
+                downloadGameData()
+            } catch (cause: Throwable) {
+                logger.warning({ "数据下载失败, 功能可能会不正常" }, cause)
+            }
+        }.invokeOnCompletion {
+            // Command
+            for (command in ArknightsHelperCommand) {
+                command.register()
+            }
+
+            ArknightsSubscriber.start()
         }
     }
 
