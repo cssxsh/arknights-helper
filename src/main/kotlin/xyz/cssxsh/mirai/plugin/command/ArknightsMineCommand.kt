@@ -1,6 +1,7 @@
 package xyz.cssxsh.mirai.plugin.command
 
 import kotlinx.coroutines.sync.*
+import kotlinx.coroutines.*
 import net.mamoe.mirai.console.command.CommandSender.Companion.toCommandSender
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.event.*
@@ -19,11 +20,12 @@ object ArknightsMineCommand : SimpleCommand(
     private suspend inline fun <reified P : MessageEvent> P.nextAnswerOrNull(
         timeoutMillis: Long,
         priority: EventPriority = EventPriority.MONITOR,
-        noinline filter: suspend P.(P) -> Boolean = { true }
+        noinline filter: suspend (P) -> Boolean = { true }
     ): P? {
-        require(timeoutMillis > 0) { "timeoutMillis must be > 0" }
-        return syncFromEventOrNull<P, P>(timeoutMillis, priority) {
-            takeIf { subject == this@nextAnswerOrNull.subject && filter(it, it) }
+        return withTimeoutOrNull(timeoutMillis) {
+            bot.eventChannel.nextEvent(priority) {
+                subject == this@nextAnswerOrNull.subject && filter(it)
+            }
         }
     }
 
