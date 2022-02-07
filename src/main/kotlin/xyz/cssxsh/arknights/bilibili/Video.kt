@@ -36,8 +36,10 @@ val Video.cover get() = Url(pic)
 enum class VideoDataType(private val tid: Int, private val pn: Int = 1) : GameDataType {
     ANIME(1),
     MUSIC(3),
+    MUSIC_2(3, 2),
     GAME(4),
     GAME_2(4, 2),
+    GAME_3(4, 3),
     ENTERTAINMENT(5);
 
     override val duration: Long = 10_000
