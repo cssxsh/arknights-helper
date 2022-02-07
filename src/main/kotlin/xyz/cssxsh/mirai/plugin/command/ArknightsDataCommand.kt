@@ -93,4 +93,18 @@ object ArknightsDataCommand : CompositeCommand(
         val exclude = ExcelData.characters.values.rarities(1, 2).map { it.name }
         RecruitResult.values.flatten().role(exclude).toPlainText()
     }
+
+    @SubCommand("clear", "清理")
+    @Description("清理缓存")
+    suspend fun CommandSenderOnMessage<*>.clear() = sendMessage {
+        val list = listOf(MicroBlogData, VideoData, AnnouncementData)
+        for (downloader in list) {
+            for (file in downloader.dir.listFiles().orEmpty()) {
+                if (file.isDirectory) {
+                    file.deleteRecursively()
+                }
+            }
+        }
+        "MicroBlogData, VideoData, AnnouncementData 数据已清理".toPlainText()
+    }
 }
