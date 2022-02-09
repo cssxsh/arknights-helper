@@ -55,9 +55,8 @@ internal object Downloader : Closeable {
 internal fun timestamp(value: Long) = OffsetDateTime.ofInstant(Instant.ofEpochSecond(value), SERVER_ZONE)
 
 object TimestampSerializer : KSerializer<OffsetDateTime> {
-    @OptIn(InternalSerializationApi::class, ExperimentalSerializationApi::class)
     override val descriptor: SerialDescriptor =
-        buildSerialDescriptor(OffsetDateTime::class.qualifiedName!!, PrimitiveKind.LONG)
+        PrimitiveSerialDescriptor(OffsetDateTime::class.qualifiedName!!, PrimitiveKind.LONG)
 
     override fun deserialize(decoder: Decoder): OffsetDateTime {
         return timestamp(decoder.decodeLong())

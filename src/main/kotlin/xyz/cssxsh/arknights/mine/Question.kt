@@ -200,9 +200,8 @@ typealias EnemyQuestion = (enemies: EnemyMap) -> QuestionBuild
 
 typealias WeeklyQuestion = (zones: WeeklyMap) -> QuestionBuild
 
-@OptIn(ExperimentalStdlibApi::class)
 val randomPlayerQuestion: ConstInfoQuestion = { const ->
-    val list = buildMap<String, Pair<Int, Set<Int>>> {
+    val map: Map<String, Pair<Int, Set<Int>>> = buildMap {
         val speed = const.playerApRegenSpeed
         put("理智回复速度是每%d分钟1理智", speed to ((1..10).toSet() - speed))
         val level = (1..const.maxPlayerLevel).random()
@@ -213,9 +212,8 @@ val randomPlayerQuestion: ConstInfoQuestion = { const ->
     }
 
     JudgmentQuestion { state ->
-        list.entries.random().let { (text, param) ->
-            text.format(if (state) param.first else param.second.random()) to param.first.toString()
-        }
+        val (text, param) = map.entries.random()
+        text.format(if (state) param.first else param.second.random()) to param.first.toString()
     }
 }
 

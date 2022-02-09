@@ -177,9 +177,8 @@ fun <V : TimePeriod> Iterable<V>.now() = time(OffsetDateTime.now())
 typealias I18n<T> = Map<String, T>
 
 object OffsetDataTimeSerializer : KSerializer<OffsetDateTime> {
-    @OptIn(InternalSerializationApi::class, ExperimentalSerializationApi::class)
-    override val descriptor: SerialDescriptor
-        get() = buildSerialDescriptor(OffsetDateTime::class.qualifiedName!!, PrimitiveKind.LONG)
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor(OffsetDateTime::class.qualifiedName!!, PrimitiveKind.LONG)
 
     override fun deserialize(decoder: Decoder): OffsetDateTime {
         return OffsetDateTime.ofInstant(Instant.ofEpochMilli(decoder.decodeLong()), SERVER_ZONE)
