@@ -2,11 +2,7 @@ package xyz.cssxsh.arknights.penguin
 
 import io.ktor.http.*
 import xyz.cssxsh.arknights.*
-import java.io.File
-
-private const val PENGUIN_STATS_CN = "penguin-stats.cn"
-
-private const val PENGUIN_STATS_IO = "penguin-stats.io"
+import java.io.*
 
 enum class PenguinDataType : GameDataType {
     // BASE
@@ -18,15 +14,15 @@ enum class PenguinDataType : GameDataType {
 
     // STATS
     RESULT_MATRIX {
-        override val path get() = "_private/result/matrix/${SERVER}/global.json"
+        override val path get() = "_private/result/matrix/${SERVER}/global"
     },
     RESULT_PATTERN {
-        override val path get() = "_private/result/pattern/${SERVER}/global.json"
+        override val path get() = "_private/result/pattern/${SERVER}/global"
     };
 
-    override val path get() = "${name.lowercase()}.json"
+    override val path get() = name.lowercase()
 
-    override val url: Url get() = Url("https://${PENGUIN_STATS_CN}/PenguinStats/api/v2/${path}")
+    override val url: Url get() = Url("https://penguin-stats.cn/PenguinStats/api/v2/${path}")
 }
 
 private fun File.readItems(): List<Item> = read(PenguinDataType.ITEMS)
