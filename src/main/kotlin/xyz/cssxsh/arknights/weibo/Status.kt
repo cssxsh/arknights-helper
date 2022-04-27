@@ -54,6 +54,7 @@ private suspend fun getLongTextContent(id: Long): String {
         }.also {
             if ("请求超时</p>" in it) throw HttpRequestTimeoutException(builder)
             if ("登录注册更精彩</p>" in it) throw IllegalStateException("登陆锁定")
+            if ("打开微博客户端，查看全文</p>" in it) throw IllegalStateException("微博客户端锁定")
         }
     }
     val content = CustomJson.decodeFromString<Temp<LongTextContent>>(json).data().content
