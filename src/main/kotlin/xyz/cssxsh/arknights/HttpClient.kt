@@ -17,6 +17,7 @@ internal val CustomJson = Json {
     ignoreUnknownKeys = true
     isLenient = true
     allowStructuredMapKeys = true
+    coerceInputValues = true
 }
 
 private val DefaultIgnore: suspend (exception: Throwable) -> Boolean = {
