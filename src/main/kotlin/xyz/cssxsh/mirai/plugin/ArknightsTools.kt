@@ -154,12 +154,12 @@ internal fun RecruitResult.toMessage() = buildMessageChain {
 @JvmName("buildRecruitMapMessage")
 internal fun RecruitMap.toMessage() = buildMessageChain {
     for ((tags, result) in this@toMessage) {
-        append("====> $tags ")
-        if ((result.keys - 0).all { it >= 3 }) {
-            appendLine("${(result.keys - 0).minOrNull()!! + 1}星保底")
-        } else {
-            appendLine("")
+        val info = when {
+            result.keys.all { it >= 3 } -> "${result.keys.minOrNull()!! + 1}星保底"
+            result.keys.all { it == 0 } -> "小车保底"
+            else -> ""
         }
+        appendLine("====> $tags $info")
         append(result.toMessage())
     }
 }
