@@ -37,7 +37,7 @@ suspend fun <T : CommandSenderOnMessage<*>> T.sendMessage(block: suspend T.(Cont
     }.onSuccess { message ->
         quoteReply(message)
     }.onFailure { throwable ->
-        logger.warning { "发送消息失败, $throwable" }
+        logger.warning({ "发送消息失败" }, throwable)
         when {
             "本群每分钟只能发" in throwable.message.orEmpty() -> {
                 kotlinx.coroutines.delay(SendDelay)
