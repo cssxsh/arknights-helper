@@ -1,4 +1,4 @@
-package xyz.cssxsh.mirai.plugin.command
+package xyz.cssxsh.mirai.arknights.command
 
 import net.mamoe.mirai.console.command.*
 

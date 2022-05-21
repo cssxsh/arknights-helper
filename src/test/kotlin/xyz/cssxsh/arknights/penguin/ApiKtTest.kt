@@ -4,7 +4,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import xyz.cssxsh.arknights.*
-import xyz.cssxsh.mirai.plugin.*
+import xyz.cssxsh.mirai.arknights.*
 
 internal class ApiKtTest : JsonTest() {
 

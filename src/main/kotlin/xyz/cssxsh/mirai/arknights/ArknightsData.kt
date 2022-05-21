@@ -1,4 +1,4 @@
-package xyz.cssxsh.mirai.plugin
+package xyz.cssxsh.mirai.arknights
 
 import kotlinx.coroutines.sync.*
 import net.mamoe.mirai.console.command.*

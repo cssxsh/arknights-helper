@@ -1,4 +1,4 @@
-package xyz.cssxsh.mirai.plugin
+package xyz.cssxsh.mirai.arknights
 
 import io.ktor.client.features.*
 import net.mamoe.mirai.*

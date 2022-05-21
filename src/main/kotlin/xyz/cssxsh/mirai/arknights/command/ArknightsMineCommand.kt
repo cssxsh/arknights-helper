@@ -1,4 +1,4 @@
-package xyz.cssxsh.mirai.plugin.command
+package xyz.cssxsh.mirai.arknights.command
 
 import kotlinx.coroutines.sync.*
 import kotlinx.coroutines.*
@@ -9,7 +9,7 @@ import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import xyz.cssxsh.arknights.mine.*
-import xyz.cssxsh.mirai.plugin.*
+import xyz.cssxsh.mirai.arknights.*
 
 object ArknightsMineCommand : SimpleCommand(
     owner = ArknightsHelperPlugin,

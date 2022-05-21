@@ -1,4 +1,4 @@
-package xyz.cssxsh.mirai.plugin
+package xyz.cssxsh.mirai.arknights
 
 import kotlinx.coroutines.*
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
@@ -7,7 +7,7 @@ import net.mamoe.mirai.console.data.*
 import net.mamoe.mirai.console.plugin.jvm.*
 import net.mamoe.mirai.utils.*
 import xyz.cssxsh.arknights.*
-import xyz.cssxsh.mirai.plugin.command.*
+import xyz.cssxsh.mirai.arknights.command.*
 
 object ArknightsHelperPlugin : KotlinPlugin(
     JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "1.3.14") {

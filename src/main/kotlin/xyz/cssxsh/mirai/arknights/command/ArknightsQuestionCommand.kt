@@ -1,9 +1,9 @@
-package xyz.cssxsh.mirai.plugin.command
+package xyz.cssxsh.mirai.arknights.command
 
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.message.data.*
 import xyz.cssxsh.arknights.mine.*
-import xyz.cssxsh.mirai.plugin.*
+import xyz.cssxsh.mirai.arknights.*
 import java.time.*
 
 object ArknightsQuestionCommand : CompositeCommand(

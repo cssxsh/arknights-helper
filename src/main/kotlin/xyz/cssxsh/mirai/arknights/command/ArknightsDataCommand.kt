@@ -1,10 +1,10 @@
-package xyz.cssxsh.mirai.plugin.command
+package xyz.cssxsh.mirai.arknights.command
 
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.message.data.*
 import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.user.*
-import xyz.cssxsh.mirai.plugin.*
+import xyz.cssxsh.mirai.arknights.*
 
 object ArknightsDataCommand : CompositeCommand(
     owner = ArknightsHelperPlugin,
