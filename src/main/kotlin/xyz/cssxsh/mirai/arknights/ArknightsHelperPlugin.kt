@@ -22,6 +22,7 @@ object ArknightsHelperPlugin : KotlinPlugin(
         for (data in ArknightsHelperData) {
             (data as? PluginConfig)?.reload() ?: data.reload()
         }
+        System.setProperty("xyz.cssxsh.arknights.source", ArknightsConfig.source)
         launch {
             try {
                 downloadGameData()

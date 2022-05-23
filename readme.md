@@ -185,6 +185,12 @@ items:
 
 开启订阅的微博号 `BYPRODUCT`(朝陇山), `MOUNTEN`(一拾山), `HISTORICUS`(泰拉记事社)
 
+### source
+
+游戏资源，可选值：
+* `https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/`
+* `https://cdn.jsdelivr.net/gh/Kengxxiao/ArknightsGameData@master/`
+
 ## 安装
 
 ### MCL 指令安装

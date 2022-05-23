@@ -5,6 +5,7 @@ import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.data.*
 import net.mamoe.mirai.console.data.PluginDataExtensions.withDefault
 import net.mamoe.mirai.console.util.*
+import xyz.cssxsh.arknights.GAME_SOURCE
 import xyz.cssxsh.arknights.bilibili.*
 import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.market.*
@@ -152,7 +153,7 @@ object ArknightsConfig : ReadOnlyPluginConfig("config"), ArknightsHelperData {
 
     @ValueName("auto_add_guard")
     @ValueDescription("开启新好友或新群自动蹲饼")
-    val auto by value(true)
+    val auto by value(false)
 
     @ValueName("video")
     @ValueDescription("开启订阅的b站视频类型 ANIME, MUSIC, GAME, ENTERTAINMENT")
@@ -162,8 +163,21 @@ object ArknightsConfig : ReadOnlyPluginConfig("config"), ArknightsHelperData {
     @ValueDescription("开启订阅的微博号 BYPRODUCT, MOUNTEN, HISTORICUS")
     val blog by value(BlogUser.values().toSet())
 
+    @ValueName("source")
+    @ValueDescription("游戏资源")
+    val source by value(GAME_SOURCE)
+
+    @ValueName("source_init_timeout")
+    @ValueDescription("游戏资源初始化时限")
+    val timeout by value(3600_000L)
+
     @ValueDescription("Key 是表情ID, Value 是表情Hash")
     val faces by value(DefaultFaceItems)
+
+    @OptIn(ConsoleExperimentalApi::class)
+    override fun onInit(owner: PluginDataHolder, storage: PluginDataStorage) {
+        super.onInit(owner, storage)
+    }
 }
 
 @OptIn(ConsoleExperimentalApi::class)

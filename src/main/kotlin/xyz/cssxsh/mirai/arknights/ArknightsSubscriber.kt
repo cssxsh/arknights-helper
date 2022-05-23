@@ -172,14 +172,21 @@ private suspend fun sendRecruitClock(id: Long, site: Int) {
 internal suspend fun downloadGameData(): Unit = supervisorScope {
     awaitAll(
         async {
-            ExcelData.download(flush = false)
-            val old = SemVersion(ExcelData.version.versionControl)
-            val now = SemVersion(ExcelDataVersion().versionControl)
-            if (now > old) ExcelData.download(flush = true)
-            logger.info { "ExcelData 数据加载完毕, 版本 $now" }
+            withTimeout(ArknightsConfig.timeout) {
+                ExcelData.download(flush = false)
+            }
+            logger.info { "ExcelData 数据加载完毕, 版本 ${ExcelData.version.versionControl}" }
+            launch {
+                val old = SemVersion(ExcelData.version.versionControl)
+                val now = SemVersion(ExcelDataVersion().versionControl)
+                if (now > old) {
+                    ExcelData.download(flush = true)
+                    logger.info { "ExcelData 数据更新完毕, 版本 $now" }
+                }
+            }
         },
         async {
-            PenguinData.download(flush = true)
+            PenguinData.download(flush = false)
             logger.info { "PenguinData 数据加载完毕" }
         },
         async {
@@ -266,7 +273,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
             runCatching {
                 VideoData.download(flush = true)
             }.onSuccess {
-                logger.info { "订阅器 VideoData (${VideoData.types}) 数据加载完毕" }
+                logger.verbose { "订阅器 VideoData (${VideoData.types}) 数据加载完毕" }
             }.onFailure {
                 if ("请求被拦截" in it.message.orEmpty()) {
                     delay(Slow.toMillis())
@@ -309,7 +316,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
             runCatching {
                 MicroBlogData.download(flush = true)
             }.onSuccess {
-                logger.info { "订阅器 MicroBlogData (${MicroBlogData.types}) 数据加载完毕" }
+                logger.verbose { "订阅器 MicroBlogData (${MicroBlogData.types}) 数据加载完毕" }
             }.onFailure {
                 logger.warning({ "订阅器 MicroBlogData (${MicroBlogData.types}) 数据加载失败" }, it)
             }
@@ -357,7 +364,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
             runCatching {
                 AnnouncementData.download(flush = true)
             }.onSuccess {
-                logger.info { "订阅器 AnnouncementData 数据加载完毕" }
+                logger.verbose { "订阅器 AnnouncementData 数据加载完毕" }
             }.onFailure {
                 logger.warning({ "订阅器 AnnouncementData 数据加载失败" }, it)
             }

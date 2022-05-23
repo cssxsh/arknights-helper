@@ -1,6 +1,5 @@
 package xyz.cssxsh.mirai.arknights
 
-import io.ktor.client.features.*
 import net.mamoe.mirai.*
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.contact.*
@@ -99,11 +98,10 @@ fun findContact(delegate: Long): Contact? {
 
 internal val DownloaderIgnore: suspend (Throwable) -> Boolean = {
     when (it) {
-        is UnknownHostException, is SSLHandshakeException -> {
+        is UnknownHostException, is SSLException -> {
             false
         }
-        is IOException,
-        is HttpRequestTimeoutException -> {
+        is IOException -> {
             logger.warning { "Downloader Ignore $it" }
             true
         }

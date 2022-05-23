@@ -215,7 +215,7 @@ enum class ExcelDataType(file: String) : GameDataType {
 
     override val path = "excel/${file}"
 
-    override val url: Url = jsdelivr(this)
+    override val url: Url = source(this)
 }
 
 private fun path(type: GameDataType): String = "${SERVER.locale}/gamedata/${type.path}"
@@ -231,7 +231,7 @@ internal fun File.readExcelDataVersion(): ExcelDataVersion {
 }
 
 internal suspend fun ExcelDataVersion(): ExcelDataVersion {
-    return Downloader.useHttpClient<String> { it.get(jsdelivr(ExcelDataType.VERSION)) }.readExcelDataVersion()
+    return Downloader.useHttpClient<String> { it.get(ExcelDataType.VERSION.url) }.readExcelDataVersion()
 }
 
 internal fun String.readExcelDataVersion(): ExcelDataVersion {
@@ -259,7 +259,6 @@ internal fun String.readExcelDataVersion(): ExcelDataVersion {
     )
 }
 
-private val github =
-    { type: ExcelDataType -> Url("https://raw.githubusercontent.com/$GITHUB_REPO/master/${path(type)}") }
-
-private val jsdelivr = { type: ExcelDataType -> Url("https://cdn.jsdelivr.net/gh/$GITHUB_REPO@master/${path(type)}") }
+private val source = { type: ExcelDataType ->
+    Url("${System.getProperty("xyz.cssxsh.arknights.source", GAME_SOURCE)}/${path(type)}")
+}
