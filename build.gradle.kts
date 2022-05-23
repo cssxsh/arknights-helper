@@ -1,8 +1,8 @@
 plugins {
-    kotlin("jvm") version "1.6.0"
-    kotlin("plugin.serialization") version "1.6.0"
+    kotlin("jvm") version "1.6.21"
+    kotlin("plugin.serialization") version "1.6.21"
 
-    id("net.mamoe.mirai-console") version "2.10.3"
+    id("net.mamoe.mirai-console") version "2.11.0"
     id("net.mamoe.maven-central-publish") version "0.7.1"
 }
 
@@ -15,6 +15,7 @@ mavenCentralPublish {
     licenseFromGitHubProject("AGPL-3.0", "master")
     publication {
         artifact(tasks.getByName("buildPlugin"))
+        artifact(tasks.getByName("buildPluginLegacy"))
     }
 }
 
@@ -24,10 +25,10 @@ repositories {
 }
 
 dependencies {
-    compileOnly("net.mamoe:mirai-core:2.10.3")
-    compileOnly("net.mamoe:mirai-core-utils:2.10.3")
+    compileOnly("net.mamoe:mirai-core:2.11.0")
+    compileOnly("net.mamoe:mirai-core-utils:2.11.0")
 
-    testImplementation(kotlin("test", "1.6.0"))
+    testImplementation(kotlin("test", "1.6.21"))
 }
 
 tasks {
