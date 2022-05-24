@@ -16,7 +16,7 @@ enum class ServerType(val locale: Locale, val zone: ZoneId) {
     TW(Locale.TAIWAN, ZoneId.of("GMT+08:00"));
 }
 
-const val GAME_SOURCE = "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/"
+const val GAME_SOURCE = "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master"
 
 var SERVER: ServerType = ServerType.CN
 
