@@ -23,8 +23,8 @@ object ArknightsMineCommand : SimpleCommand(
         noinline filter: suspend (P) -> Boolean = { true }
     ): P? {
         return withTimeoutOrNull(timeoutMillis) {
-            bot.eventChannel.nextEvent(priority) {
-                subject == this@nextAnswerOrNull.subject && filter(it)
+            bot.eventChannel.nextEvent(priority) { next ->
+                subject.id == next.subject.id && filter(next)
             }
         }
     }
