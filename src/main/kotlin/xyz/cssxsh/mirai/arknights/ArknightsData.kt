@@ -164,7 +164,7 @@ object ArknightsConfig : ReadOnlyPluginConfig("config"), ArknightsHelperData {
 
     @ValueName("source")
     @ValueDescription("游戏资源")
-    val source by value("https://cdn.jsdelivr.net/gh/Kengxxiao/ArknightsGameData@master/")
+    val source by value("https://raw.fastgit.org/Kengxxiao/ArknightsGameData/master")
 
     @ValueName("source_init_timeout")
     @ValueDescription("游戏资源初始化时限")

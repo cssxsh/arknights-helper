@@ -189,6 +189,7 @@ items:
 
 游戏资源，可选值：
 * `https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master`
+* `https://raw.fastgit.org/Kengxxiao/ArknightsGameData/master`
 * `https://cdn.jsdelivr.net/gh/Kengxxiao/ArknightsGameData@master`
 
 ## 安装
