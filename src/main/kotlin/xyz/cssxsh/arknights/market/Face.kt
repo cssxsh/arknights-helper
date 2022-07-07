@@ -3,7 +3,7 @@ package xyz.cssxsh.arknights.market
 import io.ktor.http.*
 import kotlinx.serialization.*
 import net.mamoe.mirai.message.data.*
-import net.mamoe.mirai.internal.message.*
+import net.mamoe.mirai.internal.message.data.*
 import net.mamoe.mirai.internal.network.protocol.data.proto.*
 import okio.ByteString.Companion.decodeHex
 import okio.ByteString.Companion.toByteString
