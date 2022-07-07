@@ -1,0 +1,10 @@
+xyz.cssxsh.mirai.arknights.command.ArknightsDataCommand
+xyz.cssxsh.mirai.arknights.command.ArknightsGachaCommand
+xyz.cssxsh.mirai.arknights.command.ArknightsGuardCommand
+xyz.cssxsh.mirai.arknights.command.ArknightsItemCommand
+xyz.cssxsh.mirai.arknights.command.ArknightsMineCommand
+xyz.cssxsh.mirai.arknights.command.ArknightsPlayerCommand
+xyz.cssxsh.mirai.arknights.command.ArknightsQuestionCommand
+xyz.cssxsh.mirai.arknights.command.ArknightsRecruitCommand
+xyz.cssxsh.mirai.arknights.command.ArknightsStageCommand
+xyz.cssxsh.mirai.arknights.command.ArknightsZoneCommand

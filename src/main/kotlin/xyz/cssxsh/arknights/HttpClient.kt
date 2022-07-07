@@ -2,12 +2,9 @@ package xyz.cssxsh.arknights
 
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
-import io.ktor.client.features.*
+import io.ktor.client.plugins.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
-import kotlinx.serialization.*
-import kotlinx.serialization.descriptors.*
-import kotlinx.serialization.encoding.*
 import kotlinx.serialization.json.*
 import java.io.IOException
 import java.time.*
@@ -53,17 +50,4 @@ internal object Downloader : Closeable {
     }
 }
 
-internal fun timestamp(value: Long) = OffsetDateTime.ofInstant(Instant.ofEpochSecond(value), SERVER_ZONE)
 
-object TimestampSerializer : KSerializer<OffsetDateTime> {
-    override val descriptor: SerialDescriptor =
-        PrimitiveSerialDescriptor(OffsetDateTime::class.qualifiedName!!, PrimitiveKind.LONG)
-
-    override fun deserialize(decoder: Decoder): OffsetDateTime {
-        return timestamp(decoder.decodeLong())
-    }
-
-    override fun serialize(encoder: Encoder, value: OffsetDateTime) {
-        encoder.encodeLong(value.toEpochSecond())
-    }
-}

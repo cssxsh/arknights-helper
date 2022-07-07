@@ -10,241 +10,241 @@ import java.time.*
  * 根据名字查找
  * @see Id.id
  */
-fun <V : Id> Iterable<V>.id(id: String) = first { it.id in id }
+public fun <V : Id> Iterable<V>.id(id: String): V = first { it.id in id }
 
 /**
  * 根据类型分类
  * @see Item.type
  */
-fun <T, V : Type<T>> Iterable<V>.types() = groupBy { it.type }
+public fun <T, V : Type<T>> Iterable<V>.types(): Map<T, List<V>> = groupBy { it.type }
 
 /**
  * 根据类型过滤
  * @see Item.type
  */
-fun <T, V : Type<T>> Iterable<V>.types(vararg types: T) = filter { it.type in types }.groupBy { it.type }
+public fun <T, V : Type<T>> Iterable<V>.types(vararg types: T): Map<T, List<V>> = filter { it.type in types }.groupBy { it.type }
 
 /**
  * 根据名称过滤
  */
-fun <V : NameI18n> Iterable<V>.name(name: String) = first { name in it.i18n.values }
+public fun <V : NameI18n> Iterable<V>.name(name: String): V = first { name in it.i18n.values }
 
 /**
  * 根据名字查找掉落
  * @see Item.i18n
  * @see Item.alias
  */
-fun Iterable<Item>.name(name: String) = first { name in it.i18n.values || it.alias.any { (_, names) -> name in names } }
+public fun Iterable<Item>.name(name: String): Item = first { name in it.i18n.values || it.alias.any { (_, names) -> name in names } }
 
 /**
- * 根据稀有度分类掉落 rarity in 0..4
+ * 根据稀有度分类掉落
  * @see Item.rarity
  */
-fun Iterable<Item>.rarities() = groupBy { it.rarity }
+public fun Iterable<Item>.rarities(): Map<Int, List<Item>> = groupBy { it.rarity }
 
 /**
  * 根据稀有度过滤掉落 rarity in 0..4
  * @see Item.rarity
  */
-fun Iterable<Item>.rarities(vararg rarities: Int) = filter { it.rarity in rarities }.groupBy { it.rarity }
+public fun Iterable<Item>.rarities(vararg rarities: Int): Map<Int, List<Item>> = filter { it.rarity in rarities }.groupBy { it.rarity }
 
 /**
  * 根据COST消耗分类关卡
  * @see Stage.cost
  */
-fun Iterable<Stage>.cost() = groupBy { it.cost }
+public fun Iterable<Stage>.cost(): Map<Int, List<Stage>> = groupBy { it.cost }
 
 /**
  * 根据COST消耗过滤关卡
  * @see Stage.cost
  */
-fun Iterable<Stage>.cost(costs: IntRange) = filter { it.cost in costs }.groupBy { it.cost }
+public fun Iterable<Stage>.cost(costs: IntRange): Map<Int, List<Stage>> = filter { it.cost in costs }.groupBy { it.cost }
 
 /**
  * 根据掉落物过滤
  * @see Drop.drops
  */
-fun <V : Drop> Iterable<V>.drop(item: Item) = filter { it.drops.any { info -> info.itemId == item.id } }
+public fun <V : Drop> Iterable<V>.drop(item: Item): List<V> = filter { it.drops.any { info -> info.itemId == item.id } }
 
 /**
  * 根据掉落物过滤
  * @see drop
  * @see name
  */
-fun <V : Drop> Pair<Iterable<V>, Iterable<Item>>.drop(name: String) = first.drop(second.name(name))
+public fun <V : Drop> Pair<Iterable<V>, Iterable<Item>>.drop(name: String): List<V> = first.drop(second.name(name))
 
 /**
  * 根据区域过滤
  * @see ZoneId.zoneId
  */
-fun <V : ZoneId> Iterable<V>.zone(zone: Zone) = filter { it.zoneId == zone.id }
+public fun <V : ZoneId> Iterable<V>.zone(zone: Zone): List<V> = filter { it.zoneId == zone.id }
 
 /**
  * 根据 isGacha 过滤关卡
  * @see Stage.isGacha
  */
-fun Iterable<Stage>.gacha(value: Boolean) = filter { it.isGacha == value }
+public fun Iterable<Stage>.gacha(value: Boolean): List<Stage> = filter { it.isGacha == value }
 
 /**
  * 根据名字过滤区域
  * @see Zone.i18n
  */
-fun <V : ZoneId> Pair<Iterable<Zone>, Iterable<V>>.name(name: String) = first.name(name).let { it to second.zone(it) }
+public fun <V : ZoneId> Pair<Iterable<Zone>, Iterable<V>>.name(name: String): Pair<Zone, List<V>> = first.name(name).let { it to second.zone(it) }
 
 /**
  * 根据名字过滤区域
  * @see Zone.i18n
  */
-fun <V : ZoneId> Iterable<V>.with(zones: Iterable<Zone>) = map { it to zones.id(it.zoneId) }
+public fun <V : ZoneId> Iterable<V>.with(zones: Iterable<Zone>): List<Pair<V, Zone>> = map { it to zones.id(it.zoneId) }
 
 /**
  * 根据物品ID过滤掉落记录
  * @see Matrix.itemId
  */
-fun <V : ItemId> Iterable<V>.item(item: Item) = filter { it.itemId == item.id }
+public fun <V : ItemId> Iterable<V>.item(item: Item): List<V> = filter { it.itemId == item.id }
 
 /**
  * 根据物品名过滤掉落记录
  * @see item
  * @see name
  */
-fun <V : ItemId> Pair<Iterable<Item>, Iterable<V>>.item(name: String) = first.name(name).let { it to second.item(it) }
+public fun <V : ItemId> Pair<Iterable<Item>, Iterable<V>>.item(name: String): Pair<Item, List<V>> = first.name(name).let { it to second.item(it) }
 
 /**
  * XXX
  */
 @JvmName("withItem")
-infix fun <V : ItemId> Iterable<V>.with(items: Iterable<Item>) = map { it to items.id(it.itemId) }
+public infix fun <V : ItemId> Iterable<V>.with(items: Iterable<Item>): List<Pair<V, Item>> = map { it to items.id(it.itemId) }
 
 /**
  * XXX
  */
-val Pair<Frequency, Item>.rarity get() = first.probability * second.rarity
+public val Pair<Frequency, Item>.rarity: Double get() = first.probability * second.rarity
 
 /**
  * 根据关卡过滤掉落记录
  * @see Matrix.stageId
  */
-fun <V : StageId> Iterable<V>.stage(stage: Stage) = filter { it.stageId == stage.id }
+public fun <V : StageId> Iterable<V>.stage(stage: Stage): List<V> = filter { it.stageId == stage.id }
 
 /**
  * 根据物品名过滤掉落记录
  * @see stage
  * @see code
  */
-fun <V : StageId> Pair<Iterable<Stage>, Iterable<V>>.stage(code: String) =
+public fun <V : StageId> Pair<Iterable<Stage>, Iterable<V>>.stage(code: String): Pair<Stage, List<V>> =
     first.name(code).let { it to second.stage(it) }
 
 /**
  * XXX
  */
 @JvmName("withStage")
-infix fun <V : StageId> Iterable<V>.with(stages: Iterable<Stage>) = map { it to stages.id(it.stageId) }
+public infix fun <V : StageId> Iterable<V>.with(stages: Iterable<Stage>): List<Pair<V, Stage>> = map { it to stages.id(it.stageId) }
 
 /**
  * XXX
  */
-val Pair<*, Stage>.stage get() = second
+public val Pair<*, Stage>.stage: Stage get() = second
 
 /**
  * XXX
  */
-val Pair<Frequency, *>.frequency get() = first
+public val Pair<Frequency, *>.frequency: Frequency get() = first
 
 /**
  * XXX
  */
-val Pair<Frequency, Stage>.single get() = stage.cost / frequency.probability
+public val Pair<Frequency, Stage>.single: Double get() = stage.cost / frequency.probability
 
 
 /**
  * XXX
  */
-val Pair<Frequency, Stage>.short get() = (stage.minClearTime / frequency.probability).toLong()
+public val Pair<Frequency, Stage>.short: Long get() = (stage.minClearTime / frequency.probability).toLong()
 
 /**
  * 根据时间戳过滤
  * @see TimePeriod
  */
-fun <V : TimePeriod> Iterable<V>.time(time: OffsetDateTime) = filter { time in it.start..it.end }
+public fun <V : TimePeriod> Iterable<V>.time(time: OffsetDateTime): List<V> = filter { time in it.start..it.end }
 
 /**
  * 根据当前时间戳过滤
  * @see TimePeriod
  */
-fun <V : TimePeriod> Iterable<V>.now() = time(OffsetDateTime.now())
+public fun <V : TimePeriod> Iterable<V>.now(): List<V> = time(OffsetDateTime.now())
 
-typealias I18n<T> = Map<String, T>
+public typealias I18n<T> = Map<String, T>
 
-object OffsetDataTimeSerializer : KSerializer<OffsetDateTime> {
+internal object OffsetDataTimeSerializer : KSerializer<OffsetDateTime> {
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor(OffsetDateTime::class.qualifiedName!!, PrimitiveKind.LONG)
 
     override fun deserialize(decoder: Decoder): OffsetDateTime {
-        return OffsetDateTime.ofInstant(Instant.ofEpochMilli(decoder.decodeLong()), SERVER_ZONE)
+        return OffsetDateTime.ofInstant(Instant.ofEpochMilli(decoder.decodeLong()), java.time.ZoneId.systemDefault())
     }
 
     override fun serialize(encoder: Encoder, value: OffsetDateTime) {
-        encoder.encodeLong(value.toEpochSecond() * 1_000)
+        encoder.encodeLong(value.toInstant().toEpochMilli())
     }
 
 }
 
-interface Existences {
-    val existence: Server<Existence>
+public interface Existences {
+    public val existence: Server<Existence>
 }
 
-interface NameI18n {
-    val i18n: I18n<String>
+public interface NameI18n {
+    public val i18n: I18n<String>
 }
 
-infix fun <T> I18n<T>.get(server: ServerType) = get(server.locale.language)
+public infix fun <T> I18n<T>.get(server: ServerType): T? = get(server.locale.language)
 
-fun <T> I18n<T>.get() = get(SERVER.locale.language)
+public fun <T> I18n<T>.get(): T? = get(SERVER.locale.language)
 
-interface Id {
-    val id: String
+public interface Id {
+    public val id: String
 }
 
-interface Type<T : Enum<T>> {
-    val type: T
+public interface Type<T : Enum<T>> {
+    public val type: T
 }
 
-interface Quantity {
-    val quantity: Long
+public interface Quantity {
+    public val quantity: Long
 }
 
-interface Times {
-    val times: Long
+public interface Times {
+    public val times: Long
 }
 
-interface Frequency : Quantity, Times {
-    val probability get() = (quantity.toDouble() / times)
+public interface Frequency : Quantity, Times {
+    public val probability: Double get() = (quantity.toDouble() / times)
 }
 
-interface TimePeriod {
-    val start: OffsetDateTime
-    val end: OffsetDateTime
+public interface TimePeriod {
+    public val start: OffsetDateTime
+    public val end: OffsetDateTime
 }
 
-interface ItemId {
-    val itemId: String
+public interface ItemId {
+    public val itemId: String
 }
 
-interface StageId {
-    val stageId: String
+public interface StageId {
+    public val stageId: String
 }
 
-interface ZoneId {
-    val zoneId: String
+public interface ZoneId {
+    public val zoneId: String
 }
 
-interface Drop {
-    val drops: List<ItemId>
+public interface Drop {
+    public val drops: List<ItemId>
 }
 
 @Serializable
-data class Existence(
+public data class Existence(
     @SerialName("exist")
     val exist: Boolean,
     @SerialName("openTime")
@@ -256,7 +256,7 @@ data class Existence(
 ) : TimePeriod
 
 @Serializable
-data class Item(
+public data class Item(
     @SerialName("addTimePoint")
     val addTimePoint: Int? = null,
     @SerialName("alias")
@@ -283,7 +283,7 @@ data class Item(
     val sprites: List<Int> = emptyList()
 ) : Existences, NameI18n, Id, Type<ItemType>
 
-enum class ItemType {
+public enum class ItemType {
     CARD_EXP,
     MATERIAL,
     FURN,
@@ -295,7 +295,7 @@ enum class ItemType {
 }
 
 @Serializable
-data class Stage(
+public data class Stage(
     @SerialName("apCost")
     val cost: Int,
     @SerialName("code")
@@ -323,7 +323,7 @@ data class Stage(
     val recognitionOnly: List<String> = emptyList()
 ) : Existences, NameI18n, Id, Type<StageType>, Drop, ZoneId
 
-enum class StageType {
+public enum class StageType {
     MAIN,
     SUB,
     ACTIVITY,
@@ -331,7 +331,7 @@ enum class StageType {
 }
 
 @Serializable
-data class DropInfo(
+public data class DropInfo(
     @SerialName("bounds")
     val bounds: Bounds,
     @SerialName("dropType")
@@ -340,7 +340,7 @@ data class DropInfo(
     override val itemId: String = ""
 ) : ItemId
 
-enum class DropType {
+public enum class DropType {
     NORMAL_DROP,
     EXTRA_DROP,
     FURNITURE,
@@ -348,7 +348,7 @@ enum class DropType {
 }
 
 @Serializable
-data class Bounds(
+public data class Bounds(
     @SerialName("lower")
     val lower: Int,
     @SerialName("upper")
@@ -358,7 +358,7 @@ data class Bounds(
 )
 
 @Serializable
-data class Zone(
+public data class Zone(
     @SerialName("background")
     val background: String? = null,
     @SerialName("existence")
@@ -377,14 +377,14 @@ data class Zone(
     override val i18n: I18n<String>
 ) : Existences, NameI18n, Id, Type<ZoneType>
 
-enum class ZoneType {
+public enum class ZoneType {
     MAINLINE,
     ACTIVITY,
     WEEKLY
 }
 
 @Serializable
-data class Period(
+public data class Period(
     @SerialName("existence")
     override val existence: Server<Existence>,
     @SerialName("label_i18n")
@@ -398,7 +398,7 @@ data class Period(
 ) : Existences, NameI18n, TimePeriod
 
 @Serializable
-data class ServerStats(
+public data class ServerStats(
     @SerialName("totalApCost")
     val totalCost: Long,
     @SerialName("totalItemQuantities")
@@ -410,7 +410,7 @@ data class ServerStats(
 )
 
 @Serializable
-data class ItemQuantity(
+public data class ItemQuantity(
     @SerialName("itemId")
     override val itemId: String,
     @SerialName("quantity")
@@ -418,7 +418,7 @@ data class ItemQuantity(
 ) : Quantity, ItemId
 
 @Serializable
-data class StageTimes(
+public data class StageTimes(
     @SerialName("stageId")
     override val stageId: String,
     @SerialName("times")
@@ -426,13 +426,13 @@ data class StageTimes(
 ) : Times, StageId
 
 @Serializable
-data class MatrixData(
+public data class MatrixData(
     @SerialName("matrix")
     val matrices: List<Matrix>
 )
 
 @Serializable
-data class Matrix(
+public data class Matrix(
     @SerialName("end")
     @Serializable(OffsetDataTimeSerializer::class)
     override val end: OffsetDateTime = OffsetDateTime.MAX,
@@ -450,13 +450,13 @@ data class Matrix(
 ) : Frequency, TimePeriod, ItemId, StageId
 
 @Serializable
-data class PatternData(
+public data class PatternData(
     @SerialName("pattern_matrix")
     val patterns: List<PatternMatrix>
 )
 
 @Serializable
-data class PatternMatrix(
+public data class PatternMatrix(
     @SerialName("end")
     @Serializable(OffsetDataTimeSerializer::class)
     override val end: OffsetDateTime = OffsetDateTime.now(),
@@ -474,7 +474,7 @@ data class PatternMatrix(
 ) : Frequency, TimePeriod, StageId
 
 @Serializable
-data class Pattern(
+public data class Pattern(
     @SerialName("drops")
     override val drops: List<ItemQuantity>
 ) : Drop

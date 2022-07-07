@@ -6,15 +6,15 @@ import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.mirai.arknights.*
 import java.time.*
 
-object ArknightsQuestionCommand : CompositeCommand(
+public object ArknightsQuestionCommand : CompositeCommand(
     owner = ArknightsHelperPlugin,
     "question", "问题",
     description = "明日方舟助手自定义问题指令"
-), ArknightsHelperCommand {
+) {
 
     @SubCommand("detail", "详情")
     @Description("查看问题详情")
-    suspend fun CommandSenderOnMessage<*>.detail(name: String) = sendMessage {
+    public suspend fun CommandSenderOnMessage<*>.detail(name: String): Unit = reply {
         requireNotNull(CustomQuestions[name]) { "没有找到题目${name}" }.let {
             buildMessageChain {
                 appendLine("问题：${it.problem}")
@@ -27,7 +27,7 @@ object ArknightsQuestionCommand : CompositeCommand(
 
     @SubCommand("list", "列表")
     @Description("列出已经设置的自定义问题")
-    suspend fun CommandSenderOnMessage<*>.list() = sendMessage {
+    public suspend fun CommandSenderOnMessage<*>.list(): Unit = reply {
         CustomQuestions.entries.joinToString("\n") { (name, question) ->
             "$name => ${question.problem}"
         }.toPlainText()
@@ -35,13 +35,13 @@ object ArknightsQuestionCommand : CompositeCommand(
 
     @SubCommand("delete", "删除")
     @Description("删除指定问题")
-    suspend fun CommandSenderOnMessage<*>.delete(name: String) = sendMessage {
+    public suspend fun CommandSenderOnMessage<*>.delete(name: String): Unit = reply {
         (CustomQuestions.remove(name)?.let { "问题：${it.problem} 已删除" } ?: "删除失败").toPlainText()
     }
 
     @SubCommand("add", "添加")
     @Description("设置问题")
-    suspend fun CommandSenderOnMessage<*>.add() = sendMessage {
+    public suspend fun CommandSenderOnMessage<*>.add(): Unit = reply {
         sendMessage("问题:")
         val problem = nextContent()
         sendMessage("正确选项(按行分割):")
@@ -61,5 +61,7 @@ object ArknightsQuestionCommand : CompositeCommand(
 
     @SubCommand("count", "统计")
     @Description("问题统计")
-    suspend fun CommandSenderOnMessage<*>.count() = sendMessage { tableMineCount().toPlainText() }
+    public suspend fun CommandSenderOnMessage<*>.count(): Unit = reply {
+        tableMineCount().toPlainText()
+    }
 }

@@ -11,11 +11,11 @@ import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.mirai.arknights.*
 
-object ArknightsMineCommand : SimpleCommand(
+public object ArknightsMineCommand : SimpleCommand(
     owner = ArknightsHelperPlugin,
     "mine", "挖矿", "答题",
     description = "明日方舟助手挖矿指令"
-), ArknightsHelperCommand {
+) {
 
     private suspend inline fun <reified P : MessageEvent> P.nextAnswerOrNull(
         timeoutMillis: Long,
@@ -30,7 +30,7 @@ object ArknightsMineCommand : SimpleCommand(
     }
 
     @Handler
-    suspend fun CommandSenderOnMessage<*>.handler(type: QuestionType = QuestionType.values().random()) {
+    public suspend fun CommandSenderOnMessage<*>.handler(type: QuestionType = QuestionType.values().random()) {
         val question = type.random()
 
         val (reply, time) = mutex.withLock {
@@ -50,7 +50,7 @@ object ArknightsMineCommand : SimpleCommand(
         var multiple = 1
         var deduct = false
         val origin = fromEvent.sender
-        reply.toCommandSender().sendMessage {
+        reply.toCommandSender().reply {
             buildMessageChain {
                 appendLine(question.problem)
                 if (reply.sender != origin) {

@@ -29,11 +29,11 @@ class VideoData(override val dir: File, override val types: Set<VideoDataType> =
     val all get() = types.flatMap { dir.readVideoHistory(it) }
 }
 
-val Video.url get() = Url("https://www.bilibili.com/video/${bvid}")
-val Video.cover get() = Url(pic)
+public val Video.url: Url get() = Url("https://www.bilibili.com/video/${bvid}")
+public val Video.cover: Url get() = Url(pic)
 
 @Serializable
-enum class VideoDataType(private val tid: Int, private val pn: Int = 1) : GameDataType {
+public enum class VideoDataType(private val tid: Int, private val pn: Int = 1) : GameDataType {
     ANIME(1),
     MUSIC(3),
     MUSIC_2(3, 2),
@@ -87,7 +87,7 @@ private data class VideoList(
 )
 
 @Serializable
-data class Video(
+public data class Video(
     @SerialName("aid")
     val aid: Int,
     @SerialName("author")

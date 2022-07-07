@@ -7,7 +7,7 @@ import java.time.*
 import java.time.format.*
 
 @Serializable
-data class Question(
+public data class Question(
     @SerialName("problem")
     val problem: String,
     @SerialName("options")
@@ -24,7 +24,10 @@ data class Question(
     val type: QuestionType
 )
 
-enum class QuestionType(val description: String, private val load: (QuestionDataLoader) -> QuestionBuild) {
+public enum class QuestionType(
+    public val description: String,
+    private val load: (QuestionDataLoader) -> QuestionBuild
+) {
     BUILDING("基建相关", { randomBuildingQuestion(it.excel().buffs) }),
     PLAYER("玩家相关", { randomPlayerQuestion(it.excel().const) }),
     TALENT("天赋相关", { randomTalentQuestion(it.excel().characters) }),
@@ -42,7 +45,7 @@ enum class QuestionType(val description: String, private val load: (QuestionData
     MUSIC("音乐相关", { randomMusicQuestion(it.video().music) }),
     OTHER("自选相关", { requireNotNull(it.others().values.randomOrNull()) { "题目集为空" } });
 
-    fun random(loader: QuestionDataLoader): Question = load(loader).build(this)
+    public fun random(loader: QuestionDataLoader): Question = load(loader).build(this)
 }
 
 private fun Boolean.Companion.random() = listOf(true, false).random()
@@ -57,17 +60,17 @@ private fun OffsetDateTime.randomMinutes(offset: Int = 30) = plusMinutes(offset 
 
 private val DefaultChoiceRange = 'A'..'D'
 
-data class QuestionDataLoader(
+public data class QuestionDataLoader(
     val excel: () -> ExcelData,
     val video: () -> VideoData,
     val others: () -> Map<String, CustomQuestion>,
 )
 
-sealed class QuestionBuild {
-    abstract fun build(type: QuestionType): Question
+public sealed class QuestionBuild {
+    public abstract fun build(type: QuestionType): Question
 }
 
-data class ChoiceQuestion(
+public data class ChoiceQuestion(
     val meaning: Pair<String, String>,
     val range: CharRange,
     val relation: () -> List<Pair<String, String>>
@@ -96,7 +99,7 @@ data class ChoiceQuestion(
 }
 
 @Serializable
-data class CustomQuestion(
+public data class CustomQuestion(
     @SerialName("problem")
     val problem: String,
     @SerialName("options")
@@ -108,7 +111,7 @@ data class CustomQuestion(
     @SerialName("timeout")
     val timeout: Long
 ) : QuestionBuild() {
-    constructor(
+    public constructor(
         problem: String,
         right: List<String>,
         error: List<String>,
@@ -137,7 +140,7 @@ data class CustomQuestion(
     }
 }
 
-data class DateTimeQuestion(
+public data class DateTimeQuestion(
     @SerialName("problem")
     val problem: String,
     @SerialName("datetime")
@@ -164,7 +167,7 @@ data class DateTimeQuestion(
     }
 }
 
-data class JudgmentQuestion(val generate: (Boolean) -> Pair<String, String>) : QuestionBuild() {
+public data class JudgmentQuestion(val generate: (Boolean) -> Pair<String, String>) : QuestionBuild() {
     override fun build(type: QuestionType): Question {
         val state = Boolean.random()
         val (problem, tips) = generate(state)
@@ -180,27 +183,27 @@ data class JudgmentQuestion(val generate: (Boolean) -> Pair<String, String>) : Q
     }
 }
 
-typealias ConstInfoQuestion = (const: ConstInfo) -> QuestionBuild
+public typealias ConstInfoQuestion = (const: ConstInfo) -> QuestionBuild
 
-typealias BuffQuestion = (buffs: BuffMap) -> QuestionBuild
+public typealias BuffQuestion = (buffs: BuffMap) -> QuestionBuild
 
-typealias CharacterQuestion = (characters: CharacterMap) -> QuestionBuild
+public typealias CharacterQuestion = (characters: CharacterMap) -> QuestionBuild
 
-typealias HandbookQuestion = (handbooks: HandbookMap) -> QuestionBuild
+public typealias HandbookQuestion = (handbooks: HandbookMap) -> QuestionBuild
 
-typealias SkillQuestion = (skills: SkillMap) -> QuestionBuild
+public typealias SkillQuestion = (skills: SkillMap) -> QuestionBuild
 
-typealias VideoQuestion = (videos: Collection<Video>) -> QuestionBuild
+public typealias VideoQuestion = (videos: Collection<Video>) -> QuestionBuild
 
-typealias PowerQuestion = (teams: PowerMap) -> QuestionBuild
+public typealias PowerQuestion = (teams: PowerMap) -> QuestionBuild
 
-typealias StoryQuestion = (stories: StoryMap) -> QuestionBuild
+public typealias StoryQuestion = (stories: StoryMap) -> QuestionBuild
 
-typealias EnemyQuestion = (enemies: EnemyMap) -> QuestionBuild
+public typealias EnemyQuestion = (enemies: EnemyMap) -> QuestionBuild
 
-typealias WeeklyQuestion = (zones: WeeklyMap) -> QuestionBuild
+public typealias WeeklyQuestion = (zones: WeeklyMap) -> QuestionBuild
 
-val randomPlayerQuestion: ConstInfoQuestion = { const ->
+internal val randomPlayerQuestion: ConstInfoQuestion = { const ->
     val map: Map<String, Pair<Int, Set<Int>>> = buildMap {
         val speed = const.playerApRegenSpeed
         put("理智回复速度是每%d分钟1理智", speed to ((1..10).toSet() - speed))
@@ -217,7 +220,7 @@ val randomPlayerQuestion: ConstInfoQuestion = { const ->
     }
 }
 
-val randomBuildingQuestion: BuffQuestion = { buffs ->
+internal val randomBuildingQuestion: BuffQuestion = { buffs ->
     ChoiceQuestion(meaning = "角色" to "基建技能", range = DefaultChoiceRange) {
         buffs.flatMap { (name, list) ->
             list.map { buff -> name to buff.name }
@@ -225,7 +228,7 @@ val randomBuildingQuestion: BuffQuestion = { buffs ->
     }
 }
 
-val randomTalentQuestion: CharacterQuestion = { characters ->
+internal val randomTalentQuestion: CharacterQuestion = { characters ->
     ChoiceQuestion(meaning = "角色" to "天赋", range = DefaultChoiceRange) {
         characters.flatMap { (name, character) ->
             character.talents().map { talent -> name to talent }
@@ -233,25 +236,25 @@ val randomTalentQuestion: CharacterQuestion = { characters ->
     }
 }
 
-val randomPositionQuestion: CharacterQuestion = { characters ->
+internal val randomPositionQuestion: CharacterQuestion = { characters ->
     ChoiceQuestion(meaning = "角色" to "放置位", range = DefaultChoiceRange) {
         characters.map { (name, character) -> name to character.position.text }
     }
 }
 
-val randomProfessionQuestion: CharacterQuestion = { characters ->
+internal val randomProfessionQuestion: CharacterQuestion = { characters ->
     ChoiceQuestion(meaning = "角色" to "职业", range = DefaultChoiceRange) {
         characters.map { (name, character) -> name to character.profession.text }
     }
 }
 
-val randomRarityQuestion: CharacterQuestion = { characters ->
+internal val randomRarityQuestion: CharacterQuestion = { characters ->
     ChoiceQuestion(meaning = "角色" to "稀有度", range = DefaultChoiceRange) {
         characters.map { (name, character) -> name to (character.rarity + 1).toString() }
     }
 }
 
-val randomTagQuestion: CharacterQuestion = { characters ->
+internal val randomTagQuestion: CharacterQuestion = { characters ->
     ChoiceQuestion(meaning = "角色" to "TAG", range = DefaultChoiceRange) {
         characters.flatMap { (name, character) ->
             character.tags.orEmpty().map { tag -> name to tag }
@@ -259,7 +262,7 @@ val randomTagQuestion: CharacterQuestion = { characters ->
     }
 }
 
-val randomPowerQuestion: PowerQuestion = { teams ->
+internal val randomPowerQuestion: PowerQuestion = { teams ->
     val level = PowerLevel.values().random()
     ChoiceQuestion(meaning = level.text to "角色", range = DefaultChoiceRange) {
         teams.getValue(level).filterKeys { it.id != DefaultTeam }.flatMap { (team, characters) ->
@@ -268,19 +271,19 @@ val randomPowerQuestion: PowerQuestion = { teams ->
     }
 }
 
-val randomIllustQuestion: HandbookQuestion = { handbooks ->
+internal val randomIllustQuestion: HandbookQuestion = { handbooks ->
     ChoiceQuestion(meaning = "画师" to "角色", range = DefaultChoiceRange) {
         handbooks.map { (name, handbook) -> handbook.illust to name }
     }
 }
 
-val randomCharacterVoiceQuestion: HandbookQuestion = { handbooks ->
+internal val randomCharacterVoiceQuestion: HandbookQuestion = { handbooks ->
     ChoiceQuestion(meaning = "声优" to "角色", range = DefaultChoiceRange) {
         handbooks.map { (name, handbook) -> handbook.voice to name }
     }
 }
 
-val randomInfoQuestion: HandbookQuestion = { handbooks ->
+internal val randomInfoQuestion: HandbookQuestion = { handbooks ->
     val tag = handbooks.tags().random()
     ChoiceQuestion(meaning = "角色" to tag, range = DefaultChoiceRange) {
         handbooks.mapNotNull { (name, handbook) ->
@@ -289,7 +292,7 @@ val randomInfoQuestion: HandbookQuestion = { handbooks ->
     }
 }
 
-val randomSkillQuestion: SkillQuestion = { skills ->
+internal val randomSkillQuestion: SkillQuestion = { skills ->
     ChoiceQuestion(meaning = "角色" to "技能", range = DefaultChoiceRange) {
         skills.flatMap { (name, list) ->
             list.map { skill -> name to skill.levels.first().name }
@@ -297,19 +300,19 @@ val randomSkillQuestion: SkillQuestion = { skills ->
     }
 }
 
-val randomMusicQuestion: VideoQuestion = { videos ->
+internal val randomMusicQuestion: VideoQuestion = { videos ->
     val video = videos.random()
     val problem = "${video.title}(${video.bvid})发布于"
     DateTimeQuestion(problem = problem, datetime = video.created)
 }
 
-val randomStoryQuestion: StoryQuestion = { stories ->
+internal val randomStoryQuestion: StoryQuestion = { stories ->
     val story = (stories - ActionType.NONE).values.flatten().random()
     val problem = "${story.action.text}<${story.name}>开始于"
     DateTimeQuestion(problem = problem, datetime = story.start)
 }
 
-val randomEnemyInfoQuestion: EnemyQuestion = { enemies ->
+internal val randomEnemyInfoQuestion: EnemyQuestion = { enemies ->
     val (attribute, value) = listOf<Pair<String, Enemy.() -> String>>(
         "攻击方式" to { type },
         "攻击力" to { attack },
@@ -326,7 +329,7 @@ val randomEnemyInfoQuestion: EnemyQuestion = { enemies ->
     }
 }
 
-val randomWeeklyQuestion: WeeklyQuestion = { weeks ->
+internal val randomWeeklyQuestion: WeeklyQuestion = { weeks ->
     ChoiceQuestion(meaning = "周常" to "开启时间", range = DefaultChoiceRange) {
         weeks.flatMap { (_, list) ->
             list.map { (zone, weekly) ->

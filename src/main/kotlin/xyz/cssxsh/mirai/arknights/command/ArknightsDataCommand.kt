@@ -5,16 +5,17 @@ import net.mamoe.mirai.message.data.*
 import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.user.*
 import xyz.cssxsh.mirai.arknights.*
+import xyz.cssxsh.mirai.arknights.data.ArknightsConfig
 
-object ArknightsDataCommand : CompositeCommand(
+public object ArknightsDataCommand : CompositeCommand(
     owner = ArknightsHelperPlugin,
     "data", "数据",
     description = "明日方舟助手数据指令"
-), ArknightsHelperCommand {
+) {
 
     @SubCommand("arknights", "方舟")
     @Description("方舟数据下载")
-    suspend fun CommandSenderOnMessage<*>.arknights() = sendMessage {
+    public suspend fun CommandSenderOnMessage<*>.arknights(): Unit = reply {
         runCatching {
             ExcelData.download(flush = true)
             "ExcelData 数据加载完毕"
@@ -25,7 +26,7 @@ object ArknightsDataCommand : CompositeCommand(
 
     @SubCommand("penguin", "企鹅", "企鹅物流")
     @Description("企鹅物流数据下载")
-    suspend fun CommandSenderOnMessage<*>.penguin() = sendMessage {
+    public suspend fun CommandSenderOnMessage<*>.penguin(): Unit = reply {
         runCatching {
             PenguinData.download(flush = true)
             "PenguinData 数据加载完毕"
@@ -36,18 +37,18 @@ object ArknightsDataCommand : CompositeCommand(
 
     @SubCommand("name", "alias", "别称", "别名")
     @Description("企鹅物流材料别称")
-    suspend fun CommandSenderOnMessage<*>.name() = sendMessage { alias() }
+    public suspend fun CommandSenderOnMessage<*>.name(): Unit = reply { alias() }
 
     @SubCommand("reload", "重载")
     @Description("重载Config数据")
-    suspend fun CommandSenderOnMessage<*>.reload() = sendMessage {
+    public suspend fun CommandSenderOnMessage<*>.reload(): Unit = reply {
         with(ArknightsHelperPlugin) { ArknightsConfig.reload() }
         "数据已重载".toPlainText()
     }
 
     @SubCommand("recruit", "公招")
     @Description("提交公招结果")
-    suspend fun CommandSenderOnMessage<*>.recruit(times: Int = 1) = sendMessage {
+    public suspend fun CommandSenderOnMessage<*>.recruit(times: Int = 1): Unit = reply {
         for (index in 1..times) {
             sendMessage(buildString {
                 appendLine("格式: (时间，干员，出现的词条, 选择的的词条, 移除的的词条): ")
@@ -83,20 +84,20 @@ object ArknightsDataCommand : CompositeCommand(
 
     @SubCommand("tag", "标签分析")
     @Description("标签分析")
-    suspend fun CommandSenderOnMessage<*>.tag() = sendMessage {
+    public suspend fun CommandSenderOnMessage<*>.tag(): Unit = reply {
         RecruitResult.values.flatten().tag().toPlainText()
     }
 
     @SubCommand("role", "干员分析")
     @Description("标签分析")
-    suspend fun CommandSenderOnMessage<*>.role() = sendMessage {
+    public suspend fun CommandSenderOnMessage<*>.role(): Unit = reply {
         val exclude = ExcelData.characters.values.rarities(1, 2).map { it.name }
         RecruitResult.values.flatten().role(exclude).toPlainText()
     }
 
     @SubCommand("clear", "清理")
     @Description("清理缓存")
-    suspend fun CommandSenderOnMessage<*>.clear() = sendMessage {
+    public suspend fun CommandSenderOnMessage<*>.clear(): Unit = reply {
         val list = listOf(MicroBlogData, VideoData, AnnouncementData)
         for (downloader in list) {
             for (file in downloader.dir.listFiles().orEmpty()) {

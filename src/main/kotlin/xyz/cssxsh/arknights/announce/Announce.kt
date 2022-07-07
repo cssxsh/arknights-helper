@@ -6,35 +6,26 @@ import xyz.cssxsh.arknights.*
 import java.io.File
 import java.time.*
 
-val Announcement.date: LocalDate get() = LocalDate.now().withMonth(month).withDayOfMonth(day)
+public val Announcement.date: LocalDate get() = LocalDate.now().withMonth(month).withDayOfMonth(day)
 
-val Announcement.web: Url get() = Url(webUrl)
+public val Announcement.web: Url get() = Url(webUrl)
 
-val AnnouncementMeta.focus get() = list.firstOrNull { it.id == focusId }
+public val AnnouncementMeta.focus: Announcement? get() = list.firstOrNull { it.id == focusId }
 
-enum class AnnounceType(platform: String) : GameDataType {
+@Serializable
+public enum class AnnounceType(platform: String): CacheKey {
     ANDROID("Android"),
     IOS("IOS"),
     BILIBILI("Bilibili");
 
-    override val path: String = "$platform.json"
+    override val filename: String = "${platform}.json"
 
-    override val url: Url =
+    public override val url: Url =
         Url("https://ak-conf.hypergryph.com/config/prod/announce_meta/$platform/announcement.meta.json")
 }
 
-class AnnouncementData(override val dir: File) : GameDataDownloader {
-    val android get() = dir.read<AnnouncementMeta>(AnnounceType.ANDROID)
-    val bilibili get() = dir.read<AnnouncementMeta>(AnnounceType.BILIBILI)
-    val ios get() = dir.read<AnnouncementMeta>(AnnounceType.IOS)
-
-    val all get() = (android.list + bilibili.list + ios.list).sortedBy { it.id }
-
-    override val types get() = AnnounceType.values().asIterable()
-}
-
 @Serializable
-data class AnnouncementMeta(
+public data class AnnouncementMeta(
     @SerialName("announceList")
     val list: List<Announcement>,
     @SerialName("extra")
@@ -44,7 +35,7 @@ data class AnnouncementMeta(
 )
 
 @Serializable
-data class Announcement(
+public data class Announcement(
     @SerialName("announceId")
     val id: Int,
     @SerialName("day")
@@ -59,15 +50,19 @@ data class Announcement(
     val title: String,
     @SerialName("webUrl")
     val webUrl: String = ""
-)
+) : CacheInfo {
+    @Transient
+    override var created: OffsetDateTime = OffsetDateTime.now().withMonth(month).withDayOfMonth(day)
+        internal set
+}
 
-enum class AnnouncementGroup {
+public enum class AnnouncementGroup {
     ACTIVITY,
     SYSTEM
 }
 
 @Serializable
-data class AnnouncementExtra(
+public data class AnnouncementExtra(
     @SerialName("enable")
     val enable: Boolean,
     @SerialName("name")

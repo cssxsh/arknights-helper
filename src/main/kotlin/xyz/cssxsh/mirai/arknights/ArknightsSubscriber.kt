@@ -1,5 +1,6 @@
 package xyz.cssxsh.mirai.arknights
 
+import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.*
@@ -16,7 +17,10 @@ import xyz.cssxsh.arknights.bilibili.*
 import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.*
 import xyz.cssxsh.arknights.weibo.*
+import xyz.cssxsh.mirai.arknights.data.ArknightsConfig
+import xyz.cssxsh.mirai.arknights.data.ArknightsUserData
 import java.time.*
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.*
 
 private val Url.filename get() = encodedPath.substringAfterLast('/')
@@ -57,7 +61,7 @@ private suspend fun sendVideo(video: Video) = sendToTaskContacts { contact ->
         val image = VideoData.dir.resolve(video.created.date()).resolve(video.cover.filename).apply {
             if (exists().not()) {
                 parentFile.mkdirs()
-                writeBytes(Downloader.useHttpClient { it.get(video.cover) })
+                writeBytes(Downloader.useHttpClient { it.get(video.cover).body() })
             }
         }
         append(image.uploadAsImage(contact))
@@ -76,10 +80,11 @@ private suspend fun MicroBlog.toMessage(contact: Contact): Message = buildMessag
 
     for (url in images) {
         try {
-            val file = MicroBlogData.dir.resolve(created.date()).resolve(url.filename).apply {
+            val file = MicroBlogData.folder.resolve(created.date()).resolve(url.filename).apply {
+                MicroBlogData
                 if (exists().not()) {
                     parentFile.mkdirs()
-                    writeBytes(Downloader.useHttpClient { it.get(url) })
+                    writeBytes(MicroBlogData.download(url))
                 }
             }
             append(file.uploadAsImage(contact))
@@ -195,13 +200,9 @@ internal suspend fun downloadGameData(): Unit = supervisorScope {
             logger.info { "VideoData ${VideoData.types} 数据加载完毕, last: $id" }
         },
         async {
-            MicroBlogData.download(flush = false)
-            val last = MicroBlogData.all.maxOfOrNull { it.created }
-            logger.info { "MicroBlogData ${MicroBlogData.types} 数据加载完毕, last: $last" }
-        },
-        async {
-            ArknightsFaceData.download(flush = false)
-            logger.info { "ArknightsFaceData 数据加载完毕" }
+            MicroBlogData.load(flush = false)
+            val last = MicroBlogData.raw()
+            logger.info { "MicroBlogData ${MicroBlogData.users} 数据加载完毕, last: $last" }
         },
         async {
             AnnouncementData.download(flush = false)
@@ -223,17 +224,13 @@ private operator fun LocalTime.minus(other: LocalTime): Duration =
 
 private fun OffsetDateTime.isToday(): Boolean = (toLocalDate() == LocalDate.now())
 
-private suspend fun waitContacts() = supervisorScope {
-    while (isActive && contacts().isEmpty()) {
-        logger.verbose { "蹲饼联系人没有实例，进入${Fast}等待" }
-        delay(Fast)
-    }
-}
-
-internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.childScope("ArknightsSubscriber") {
+public object ArknightsSubscriber : CoroutineScope {
+    override val coroutineContext: CoroutineContext =
+        CoroutineName(name = "arknights-subscriber") + SupervisorJob() + CoroutineExceptionHandler { context, throwable ->
+            logger.warning({ "$throwable in $context" }, throwable)
+        }
 
     private fun clock() = launch {
-        waitContacts()
         logger.info { "明日方舟 定时器 订阅器开始运行" }
         while (isActive) {
             for ((id, timestamp) in ArknightsUserData.reason) {
@@ -266,7 +263,6 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
         val start = list.minOrNull() ?: Start
         val end = list.maxOrNull() ?: End
         if (LocalTime.now() < start) delay(start - LocalTime.now())
-        waitContacts()
         logger.info { "明日方舟 哔哩哔哩 订阅器开始运行" }
         while (isActive) {
 
@@ -307,57 +303,41 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
     }
 
     private fun weibo() = launch {
-        val history = MicroBlogData.all.mapTo(HashSet()) { it.id }
+        val history = MicroBlogData.raw().mapTo(HashSet()) { it.id }
         if (LocalTime.now() < Start) delay(Start - LocalTime.now())
-        waitContacts()
         logger.info { "明日方舟 微博 订阅器开始运行" }
         while (isActive) {
 
             runCatching {
-                MicroBlogData.download(flush = true)
+                MicroBlogData.load(flush = true)
             }.onSuccess {
-                logger.verbose { "订阅器 MicroBlogData (${MicroBlogData.types}) 数据加载完毕" }
+                logger.verbose { "订阅器 MicroBlogData (${MicroBlogData.users}) 数据加载完毕" }
             }.onFailure {
-                logger.warning({ "订阅器 MicroBlogData (${MicroBlogData.types}) 数据加载失败" }, it)
+                logger.warning({ "订阅器 MicroBlogData (${MicroBlogData.users}) 数据加载失败" }, it)
             }
 
-            val new = with(MicroBlogData) {
-                val max = arknights.maxOfOrNull { it.id } ?: Long.MAX_VALUE
-                all.filterNot { it.id in history } + picture.filterNot { it.id <= max && it.id in history }
-            }.filter { blog -> blog.created.isToday() }
+            val raw = MicroBlogData.raw().filter { blog ->
+                blog.created.isToday() && blog.id !in history
+            }
 
-            if (new.isNotEmpty()) {
-                logger.info { "明日方舟 微博 订阅器 捕捉到结果" }
-                for (blog in new.sortedBy { it.id }) {
-                    if (blog.id in history) continue
-                    runCatching {
-                        sendMicroBlog(blog)
-                    }.onSuccess {
-                        history.add(blog.id)
-                    }.onFailure {
-                        logger.warning({ "微博[${blog.id}]推送失败" }, it)
-                    }
+            if (raw.isEmpty()) continue
+
+            logger.info { "明日方舟 微博 订阅器 捕捉到结果" }
+            for (blog in raw.sortedBy { it.id }) {
+                runCatching {
+                    sendMicroBlog(blog)
+                }.onSuccess {
+                    history.add(blog.id)
+                }.onFailure {
+                    logger.warning({ "微博[${blog.id}]推送失败" }, it)
                 }
             }
-
-            if (LocalTime.now() > End) {
-                logger.info { "明日方舟 微博 订阅器进入休眠" }
-                delay(Duration.ofDays(1) - (LocalTime.now() - Start))
-            }
-
-            if (LocalTime.now().minute in (55..59) + (0..3)) {
-                delay(Duration.ofSeconds(30))
-                continue
-            }
-
-            delay(Duration.ofMinutes(GuardInterval.toLong()))
         }
     }
 
     private fun announce() = launch {
         val history = AnnouncementData.all.mapTo(mutableSetOf()) { it.id }
         if (LocalTime.now() < Start) delay(Start - LocalTime.now())
-        waitContacts()
         logger.info { "明日方舟 公告 订阅器开始运行" }
         while (isActive) {
 
@@ -405,7 +385,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
         }
     }
 
-    fun start() {
+    public fun start() {
         clock()
         bilibili()
         weibo()
@@ -414,7 +394,7 @@ internal object ArknightsSubscriber : CoroutineScope by ArknightsHelperPlugin.ch
         friend()
     }
 
-    fun stop() {
+    public fun stop() {
         coroutineContext.cancelChildren()
     }
 }

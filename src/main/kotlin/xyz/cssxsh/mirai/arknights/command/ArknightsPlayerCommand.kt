@@ -6,15 +6,15 @@ import xyz.cssxsh.arknights.user.*
 import xyz.cssxsh.mirai.arknights.*
 import java.time.*
 
-object ArknightsPlayerCommand : CompositeCommand(
+public object ArknightsPlayerCommand : CompositeCommand(
     owner = ArknightsHelperPlugin,
     "player", "玩家",
     description = "明日方舟助手玩家指令"
-), ArknightsHelperCommand {
+) {
 
     @SubCommand("detail", "详情")
     @Description("查看玩家详情")
-    suspend fun CommandSenderOnMessage<*>.detail() = sendMessage {
+    public suspend fun CommandSenderOnMessage<*>.detail(): Unit = reply {
         buildMessageChain {
             appendLine("合成玉：${coin}")
             appendLine("等级：${level}")
@@ -38,7 +38,7 @@ object ArknightsPlayerCommand : CompositeCommand(
 
     @SubCommand("level", "等级")
     @Description("设置玩家等级")
-    suspend fun CommandSenderOnMessage<*>.level(index: Int = 0) = sendMessage {
+    public suspend fun CommandSenderOnMessage<*>.level(index: Int = 0): Unit = reply {
         check(index in PlayerLevelRange) { "等级不合法，${PlayerLevelRange}" }
         level = index
         "等级${index}已设置".toPlainText()
@@ -46,7 +46,7 @@ object ArknightsPlayerCommand : CompositeCommand(
 
     @SubCommand("reason", "理智")
     @Description("设置理智值并定时提醒")
-    suspend fun CommandSenderOnMessage<*>.reason(init: Int) = sendMessage {
+    public suspend fun CommandSenderOnMessage<*>.reason(init: Int): Unit = reply {
         check(init in 0 until max) { "理智不合法，level.${level}[${(0 until max)}]" }
         val duration = RegenSpeed * (max - init)
         reason = System.currentTimeMillis() + duration
@@ -55,7 +55,7 @@ object ArknightsPlayerCommand : CompositeCommand(
 
     @SubCommand("recruit", "公招")
     @Description("设置公招位时间并定时提醒")
-    suspend fun CommandSenderOnMessage<*>.recruit(site: Int, hours: Int = 9, minutes: Int = 0) = sendMessage {
+    public suspend fun CommandSenderOnMessage<*>.recruit(site: Int, hours: Int = 9, minutes: Int = 0): Unit = reply {
         val duration = (hours * 60 + minutes) * 60 * 1000
         check(duration in RecruitTime) { "公招时间${duration}不合法" }
         val time = System.currentTimeMillis() + duration
@@ -65,5 +65,7 @@ object ArknightsPlayerCommand : CompositeCommand(
 
     @SubCommand("record", "记录")
     @Description("公招结果记录")
-    suspend fun CommandSenderOnMessage<*>.record(page: Int = 1) = sendMessage { result.table(page).toPlainText() }
+    public suspend fun CommandSenderOnMessage<*>.record(page: Int = 1): Unit = reply {
+        result.table(page).toPlainText()
+    }
 }

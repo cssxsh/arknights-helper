@@ -5,15 +5,15 @@ import net.mamoe.mirai.message.data.*
 import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.mirai.arknights.*
 
-object ArknightsGachaCommand : CompositeCommand(
+public object ArknightsGachaCommand : CompositeCommand(
     owner = ArknightsHelperPlugin,
     "gacha", "抽卡",
     description = "明日方舟助手抽卡指令"
-), ArknightsHelperCommand {
+) {
 
     @SubCommand("one", "单抽")
     @Description("单抽times次")
-    suspend fun CommandSenderOnMessage<*>.one(times: Int = 1) = sendMessage {
+    public suspend fun CommandSenderOnMessage<*>.one(times: Int = 1): Unit = reply {
         if (coin >= times * PoolUseCoin) {
             coin -= times * PoolUseCoin
             val data = Obtain.pool(rule)
@@ -26,11 +26,11 @@ object ArknightsGachaCommand : CompositeCommand(
 
     @SubCommand("ten", "十连")
     @Description("十连times次")
-    suspend fun CommandSenderOnMessage<*>.ten(times: Int = 1) = one(times * 10)
+    public suspend fun CommandSenderOnMessage<*>.ten(times: Int = 1): Unit = one(times * 10)
 
     @SubCommand("pool", "卡池")
     @Description("设置新卡池")
-    suspend fun CommandSenderOnMessage<*>.pool(name_: String, set: Boolean = false) = sendMessage {
+    public suspend fun CommandSenderOnMessage<*>.pool(name_: String, set: Boolean = false): Unit = reply {
         val name = name_.lines().first()
         val lines = fromEvent.message.content.lines().filter {
             it.matches(BUILD_POOL_LINE) || it.startsWith('#')
@@ -44,7 +44,7 @@ object ArknightsGachaCommand : CompositeCommand(
 
     @SubCommand("detail", "详情")
     @Description("查看卡池规则")
-    suspend fun CommandSenderOnMessage<*>.detail() = sendMessage {
+    public suspend fun CommandSenderOnMessage<*>.detail(): Unit = reply {
         PoolRules.entries.joinToString("\n") { (name, rule) ->
             "===> [${name}]\n" + rule.split(';').joinToString("\n")
         }.toPlainText()
@@ -52,8 +52,8 @@ object ArknightsGachaCommand : CompositeCommand(
 
     @SubCommand("set", "设置")
     @Description("设置卡池")
-    suspend fun CommandSenderOnMessage<*>.set(name: String = GachaPoolRule.NORMAL.name) = sendMessage {
-        check(name in PoolRules) { "卡池不存在" }
+    public suspend fun CommandSenderOnMessage<*>.set(name: String = ""): Unit = reply {
+        check(name in PoolRules) { "卡池不存在, ${PoolRules.keys}" }
         pool = name
         "卡池[${pool}]设置完毕".toPlainText()
     }

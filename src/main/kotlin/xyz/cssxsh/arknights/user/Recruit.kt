@@ -6,7 +6,7 @@ import java.time.*
 import java.time.format.*
 
 @Serializable
-data class UserRecruit(
+public data class UserRecruit(
     @SerialName("words")
     val words: Set<String>,
     @SerialName("selected")
@@ -26,7 +26,7 @@ private val formatter = DateTimeFormatter.ofPattern("yy-MM-dd hh:mm:ss")
 /**
  * 构建TAG记录表
  */
-fun Collection<UserRecruit>.table(page: Int): String = buildString {
+public fun Collection<UserRecruit>.table(page: Int): String = buildString {
     val that = this@table
     val records = requireNotNull(that.sortedByDescending { it.timestamp }.chunked(10).getOrNull(page - 1)) {
         "不存在的页号${page}"
@@ -35,7 +35,7 @@ fun Collection<UserRecruit>.table(page: Int): String = buildString {
     appendLine("| 干员 | 招募时间 | 词条 | 记录时间 |")
     appendLine("|:---:|:---:|:---:|:---:|")
     for (recruit in records) {
-        val timestamp = timestamp(recruit.timestamp / 1_000).format(formatter)
+        val timestamp = TimestampSerializer.timestamp(recruit.timestamp / 1_000).format(formatter)
         val time = Duration.ofMinutes(recruit.time).run { "%d:%02d".format(toHours(), toMinutesPart()) }
         val words = recruit.words.joinToString(" ") { word ->
             when (word) {
@@ -53,7 +53,7 @@ private fun List<String>.most() = associateWith { tag -> count { tag == it } }.m
 /**
  * 构建TAG表
  */
-fun Collection<UserRecruit>.tag(): String = buildString {
+public fun Collection<UserRecruit>.tag(): String = buildString {
     val that = this@tag
     val words = that.flatMap { it.words }
     val tags = words.toSet().associateWith { tag -> words.count { tag == it } / that.size.toDouble() }
@@ -68,7 +68,7 @@ fun Collection<UserRecruit>.tag(): String = buildString {
 /**
  * 构建ROLE表
  */
-fun Collection<UserRecruit>.role(exclude: Collection<String> = emptySet()): String = buildString {
+public fun Collection<UserRecruit>.role(exclude: Collection<String> = emptySet()): String = buildString {
     val that = this@role
     val roles = (that.groupBy { it.role } - exclude).entries.sortedByDescending { it.value.size }
     appendLine("# 最匹配的TAG(样本量${that.size})")

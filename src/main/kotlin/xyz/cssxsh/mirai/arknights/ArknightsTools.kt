@@ -9,7 +9,6 @@ import net.mamoe.mirai.message.*
 import net.mamoe.mirai.utils.*
 import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.*
-import xyz.cssxsh.arknights.market.*
 import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.arknights.penguin.*
 import java.io.*
@@ -20,41 +19,46 @@ import kotlin.properties.*
 import kotlin.reflect.*
 
 internal val logger by lazy {
-    val open = System.getProperty("xyz.cssxsh.mirai.plugin.logger", "${true}").toBoolean()
-    if (open) ArknightsHelperPlugin.logger else SilentLogger
+    try {
+        ArknightsHelperPlugin.logger
+    } catch (_: Throwable) {
+        MiraiLogger.Factory.create(GameDataDownloader::class)
+    }
 }
 
 internal suspend fun <T : CommandSenderOnMessage<*>> T.nextContent(): String {
     return fromEvent.nextMessage { it.message.content.isNotBlank() }.content
 }
 
-const val SendDelay = 60 * 1000L
+internal const val SendDelay = 60 * 1000L
 
-suspend fun <T : CommandSenderOnMessage<*>> T.sendMessage(block: suspend T.(Contact) -> Message): Boolean {
-    return runCatching {
-        block(fromEvent.subject)
-    }.onSuccess { message ->
-        quoteReply(message)
-    }.onFailure { throwable ->
+internal suspend fun <T : CommandSenderOnMessage<*>> T.reply(block: suspend T.(Contact) -> Message) {
+    try {
+        quoteReply(message = block(fromEvent.subject))
+    } catch (throwable: Throwable) {
         logger.warning({ "发送消息失败" }, throwable)
         when {
             "本群每分钟只能发" in throwable.message.orEmpty() -> {
                 kotlinx.coroutines.delay(SendDelay)
-                sendMessage { throwable.message.orEmpty().toPlainText() }
+                reply { throwable.message.orEmpty().toPlainText() }
             }
             else -> {
                 quoteReply("发送消息失败， ${throwable.message}")
             }
         }
-    }.isSuccess
+    }
 }
 
-suspend fun CommandSenderOnMessage<*>.quoteReply(message: Message) = sendMessage(fromEvent.message.quote() + message)
+internal suspend fun CommandSenderOnMessage<*>.quoteReply(message: Message): MessageReceipt<Contact>? {
+    return sendMessage(fromEvent.message.quote() + message)
+}
 
-suspend fun CommandSenderOnMessage<*>.quoteReply(message: String) = quoteReply(message.toPlainText())
+internal suspend fun CommandSenderOnMessage<*>.quoteReply(message: String) = quoteReply(message.toPlainText())
 
-class SubjectDelegate<T>(private val default: (Contact) -> T) : ReadWriteProperty<CommandSenderOnMessage<*>, T> {
-    private val map: MutableMap<Contact, T> = mutableMapOf()
+internal class SubjectDelegate<T>(private val default: (Contact) -> T) :
+    ReadWriteProperty<CommandSenderOnMessage<*>, T> {
+
+    private val map: MutableMap<Contact, T> = HashMap()
 
     override fun setValue(thisRef: CommandSenderOnMessage<*>, property: KProperty<*>, value: T) {
         map[thisRef.fromEvent.subject] = value
@@ -68,13 +72,13 @@ class SubjectDelegate<T>(private val default: (Contact) -> T) : ReadWritePropert
 /**
  * 通过正负号区分群和用户
  */
-val Contact.delegate get() = if (this is Group) id * -1 else id
+internal val Contact.delegate get() = if (this is Group) id * -1 else id
 
 /**
  * 查找Contact
  */
-fun findContact(delegate: Long): Contact? {
-    for (bot in Bot.instances) {
+internal fun findContact(delegate: Long): Contact? {
+    for (bot in Bot.instances.shuffled()) {
         if (delegate < 0) {
             for (group in bot.groups) {
                 if (group.id == delegate * -1) return group
@@ -162,23 +166,7 @@ internal fun RecruitMap.toMessage() = buildMessageChain {
     }
 }
 
-@JvmName("buildMarketFaceMapMessage")
-internal fun ArknightsFaceMap.toMessage() = buildMessageChain {
-    appendLine("共${this@toMessage.size}个表情")
-    for ((name, list) in this@toMessage) {
-        appendLine("$name ${list.first().detail}")
-    }
-}
-
-@JvmName("buildArknightsFaceMapMessage")
-internal fun ArknightsFace.toMessage() = buildMessageChain {
-    appendLine("表情名: $title $content")
-    appendLine("详情: $detail")
-    appendLine("原图: $image")
-    appendLine("Hash: $key")
-}
-
-private fun duration(millis: Long) = Duration.ofMillis(millis).run { "${toMinutesPart()}m${toSecondsPart()}s" }
+private fun duration(millis: Long) = with(Duration.ofMillis(millis)) { "${toMinutesPart()}m${toSecondsPart()}s" }
 
 private fun Pair<Matrix, Stage>.toMessage() = buildMessageChain {
     appendLine("概率: ${frequency.quantity}/${frequency.times}=${frequency.probability.percentage()}")
