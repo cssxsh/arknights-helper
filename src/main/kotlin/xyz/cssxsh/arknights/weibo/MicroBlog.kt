@@ -1,6 +1,5 @@
 package xyz.cssxsh.arknights.weibo
 
-import io.ktor.http.*
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
@@ -14,7 +13,7 @@ internal const val BLOG_API: String = "https://m.weibo.cn/api/container/getIndex
 internal const val CONTENT_API: String = "https://m.weibo.cn/statuses/extend"
 
 @Serializable
-public enum class BlogUser(public val id: Long): CacheKey {
+public enum class BlogUser(public val id: Long) : CacheKey {
     ARKNIGHTS(6279793937),
     BYPRODUCT(6441489862),
     MOUNTEN(7506039414),
@@ -22,28 +21,24 @@ public enum class BlogUser(public val id: Long): CacheKey {
 
     override val filename: String = "Blog(${id}).json"
 
-    override val url: Url = Url("${BLOG_API}?containerid=107603${id}")
+    override val url: String = "${BLOG_API}?containerid=107603${id}"
 
     public val filename2: String = "BlogPicture(${id}).json"
 
-    public val picture: Url = Url("${BLOG_API}?containerid=107803${id}")
+    public val picture: String = "${BLOG_API}?containerid=107803${id}"
 }
 
 private val ImageServer = listOf("wx1", "wx2", "wx3", "wx4")
 
-internal val ImageExtensions = mapOf(
-    ContentType.Image.JPEG to "jpg",
-    ContentType.Image.GIF to "gif",
-    ContentType.Image.PNG to "png",
-)
+internal val ImageExtensions = listOf("jpg", "gif", "png")
 
-internal fun extension(pid: String) = ImageExtensions.values.first { it.startsWith(pid[21]) }
+internal fun extension(pid: String) = ImageExtensions.first { it.startsWith(pid[21]) }
 
-internal fun image(pid: String) = Url("https://${ImageServer.random()}.sinaimg.cn/large/${pid}.${extension(pid)}")
+internal fun image(pid: String) = "https://${ImageServer.random()}.sinaimg.cn/large/${pid}.${extension(pid)}"
 
 public val MicroBlog.content: String get() = raw ?: text.replace("<br />", "\n").remove(SIGN)
 
-public val MicroBlog.url: Url get() = Url("https://weibo.com/${user?.id ?: "detail"}/${bid.ifBlank { id }}")
+public val MicroBlog.url: String get() = "https://weibo.com/${user?.id ?: "detail"}/${bid.ifBlank { id }}"
 
 internal fun <T> Temp<T>.data() = requireNotNull(data) { message }
 

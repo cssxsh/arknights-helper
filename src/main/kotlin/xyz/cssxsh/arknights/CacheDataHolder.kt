@@ -9,7 +9,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.*
 import java.io.File
 
-public abstract class CacheDataHolder<K: CacheKey, R : CacheInfo> {
+public abstract class CacheDataHolder<K : CacheKey, R : CacheInfo> {
     protected val mutex: Mutex = Mutex()
     protected open val http: HttpClient = HttpClient(OkHttp) {
         BrowserUserAgent()

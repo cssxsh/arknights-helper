@@ -3,12 +3,10 @@ package xyz.cssxsh.arknights.weibo
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.*
 import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
-import xyz.cssxsh.mirai.arknights.*
 import java.io.File
 
 public class MicroBlogDataHolder(override val folder: File, override val ignore: suspend (Throwable) -> Boolean) :
@@ -43,6 +41,7 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
                 }
 
                 cache.replaceAll { _, blog ->
+                    // TODO: MicroBlogUser
                     blog.copy(created = TimestampSerializer.timestamp(timestamp(id = blog.id)))
                 }
             } catch (_: Throwable) {
@@ -73,15 +72,15 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
             }
         }
     }
-    private val MicroBlog.images: List<Url> get() = pictures.map { image(pid = it) }
 
-    private val MicroBlog.folder: File get() = folder.resolve(created.date()).apply { mkdirs() }
+    private val MicroBlog.folder: File get() = folder.resolve(created.toLocalDate().toString()).apply { mkdirs() }
 
     public suspend fun images(blog: MicroBlog): List<File> = mutex.withLock {
         val cache = ArrayList<File>(blog.pictures.size)
         val folder = blog.folder
-        for (url in blog.images) {
-            val file = folder.resolve(url.filename)
+        for (pid in blog.pictures) {
+            val url = image(pid = pid)
+            val file = folder.resolve(url.substringAfterLast('/'))
             if (file.exists().not()) {
                 file.writeBytes(useHttpClient { client -> client.get(url).body() })
             }
@@ -91,7 +90,7 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
     }
 
     public suspend fun content(blog: MicroBlog): String = mutex.withLock {
-        val file = blog.folder.resolve("${blog.id}.json")
+        val file = blog.folder.resolve("${blog.id}.content.json")
         val content = when {
             !blog.isLongText -> blog.raw ?: blog.text
             file.exists() -> file.readText()

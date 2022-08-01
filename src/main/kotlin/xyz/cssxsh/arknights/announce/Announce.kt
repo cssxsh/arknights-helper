@@ -1,27 +1,20 @@
 package xyz.cssxsh.arknights.announce
 
-import io.ktor.http.*
 import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
-import java.io.File
 import java.time.*
 
 public val Announcement.date: LocalDate get() = LocalDate.now().withMonth(month).withDayOfMonth(day)
 
-public val Announcement.web: Url get() = Url(webUrl)
-
 public val AnnouncementMeta.focus: Announcement? get() = list.firstOrNull { it.id == focusId }
 
 @Serializable
-public enum class AnnounceType(platform: String): CacheKey {
-    ANDROID("Android"),
-    IOS("IOS"),
-    BILIBILI("Bilibili");
+public enum class AnnounceType(override val url: String) : CacheKey {
+    ANDROID("https://ak-conf.hypergryph.com/config/prod/announce_meta/Android/announcement.meta.json"),
+    IOS("https://ak-conf.hypergryph.com/config/prod/announce_meta/IOS/announcement.meta.json"),
+    BILIBILI("https://ak-conf.hypergryph.com/config/prod/announce_meta/Bilibili/announcement.meta.json");
 
-    override val filename: String = "${platform}.json"
-
-    public override val url: Url =
-        Url("https://ak-conf.hypergryph.com/config/prod/announce_meta/$platform/announcement.meta.json")
+    override val filename: String = "${name}.json"
 }
 
 @Serializable
@@ -51,9 +44,23 @@ public data class Announcement(
     @SerialName("webUrl")
     val webUrl: String = ""
 ) : CacheInfo {
-    @Transient
-    override var created: OffsetDateTime = OffsetDateTime.now().withMonth(month).withDayOfMonth(day)
-        internal set
+    override val created: OffsetDateTime by lazy {
+        try {
+            val second = webUrl.substringAfterLast('_')
+                .substringBeforeLast('.')
+                .toLong()
+            TimestampSerializer.timestamp(second = second)
+        } catch (_: Throwable) {
+            LocalDate.now()
+                .withMonth(month).withDayOfMonth(day)
+                .atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime()
+        }
+    }
+    public val type: AnnounceType by lazy {
+        val path = webUrl.substringBefore("announce/")
+            .substringBefore("/announcement")
+        AnnounceType.valueOf(path)
+    }
 }
 
 public enum class AnnouncementGroup {

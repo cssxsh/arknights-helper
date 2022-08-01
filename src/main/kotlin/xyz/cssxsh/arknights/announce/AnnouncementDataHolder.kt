@@ -3,12 +3,10 @@ package xyz.cssxsh.arknights.announce
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.*
 import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
-import xyz.cssxsh.mirai.arknights.*
 import java.io.File
 
 public class AnnouncementDataHolder(override val folder: File, override val ignore: suspend (Throwable) -> Boolean) :
@@ -16,7 +14,7 @@ public class AnnouncementDataHolder(override val folder: File, override val igno
 
     public override val loaded: MutableSet<AnnounceType> = HashSet()
 
-    override suspend fun load(key: AnnounceType) {
+    override suspend fun load(key: AnnounceType): Unit = mutex.withLock {
         val response = http.get(key.url)
         val json = folder.resolve(key.filename)
         json.writeBytes(response.readBytes())
@@ -24,7 +22,7 @@ public class AnnouncementDataHolder(override val folder: File, override val igno
         loaded.add(key)
     }
 
-    override suspend fun raw(): List<Announcement> {
+    override suspend fun raw(): List<Announcement> = mutex.withLock {
         val cache: MutableMap<Int, Announcement> = HashMap()
         for (type in loaded) {
             try {
@@ -42,7 +40,7 @@ public class AnnouncementDataHolder(override val folder: File, override val igno
         return cache.values.toList()
     }
 
-    override suspend fun clear() {
+    override suspend fun clear(): Unit = mutex.withLock {
         runInterruptible(context = Dispatchers.IO) {
             for (item in folder.listFiles() ?: return@runInterruptible) {
                 if (!item.isDirectory) continue
@@ -51,8 +49,8 @@ public class AnnouncementDataHolder(override val folder: File, override val igno
         }
     }
 
-    public suspend fun download(url: Url): File = mutex.withLock {
-        val file = folder.resolve("html/${url.filename}")
+    public suspend fun download(url: String): File = mutex.withLock {
+        val file = folder.resolve("html/${url.substringAfterLast('/')}")
         if (file.exists().not()) {
             file.writeBytes(useHttpClient { client -> client.get(url).body() })
         }
