@@ -1,7 +1,7 @@
 package xyz.cssxsh.arknights.penguin
 
+import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import kotlinx.coroutines.sync.*
 import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
@@ -14,7 +14,7 @@ public class PenguinDataHolder(override val folder: File, override val ignore: s
 
     override suspend fun load(key: PenguinDataType): Unit = mutex.withLock {
         folder.resolve(key.filename)
-            .writeBytes(http.get(key.url).readBytes())
+            .writeBytes(http.get(key.url).body())
 
         loaded.add(key)
     }

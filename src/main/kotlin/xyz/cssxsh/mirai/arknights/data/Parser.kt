@@ -6,6 +6,8 @@ import com.cronutils.model.definition.*
 import com.cronutils.model.time.*
 import com.cronutils.parser.*
 import net.mamoe.mirai.console.command.descriptor.*
+import java.time.Duration
+import java.time.ZonedDateTime
 import java.util.*
 
 internal const val CRON_TYPE_KEY = "xyz.cssxsh.mirai.arknights.cron.type"
@@ -27,6 +29,13 @@ internal fun Cron.asData(): DataCron = this as? DataCron ?: DataCron(delegate = 
 internal fun Cron.toExecutionTime(): ExecutionTime = ExecutionTime.forCron((this as? DataCron)?.delegate ?: this)
 
 internal fun Cron.description(): String = DefaultCronDescriptor.describe(this)
+
+internal fun Cron.next(): Long {
+    return toExecutionTime()
+        .timeToNextExecution(ZonedDateTime.now())
+        .orElse(Duration.ofMinutes(30))
+        .toMillis()
+}
 
 internal val CronCommandArgumentContext: CommandArgumentContext = buildCommandArgumentContext {
     Cron::class with { text ->

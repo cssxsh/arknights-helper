@@ -8,20 +8,10 @@ internal const val BILIBILI_API = "https://api.bilibili.com/x/space/arc/search"
 
 internal const val BILIBILI_ID = 161775300L
 
-//class VideoData(override val dir: File, override val types: Set<VideoDataType> = VideoDataType.values().toSet()) :
-//    GameDataDownloader {
-//    val anime get() = dir.readVideoHistory(VideoDataType.ANIME)
-//    val music get() = dir.readVideoHistory(VideoDataType.MUSIC)
-//    val game get() = dir.readVideoHistory(VideoDataType.GAME)
-//    val entertainment get() = dir.readVideoHistory(VideoDataType.ENTERTAINMENT)
-//
-//    val all get() = types.flatMap { dir.readVideoHistory(it) }
-//}
-
 public val Video.url: String get() = "https://www.bilibili.com/video/${bvid}"
 
 @Serializable
-public enum class VideoDataType(public val tid: Int) : CacheKey {
+public enum class VideoType(public val tid: Int) : CacheKey {
     ANIME(1),
     MUSIC(3),
     GAME(4),
@@ -48,14 +38,14 @@ internal data class Temp(
 internal data class VideoHistory(
     @SerialName("list")
     val list: VideoList,
+    @SerialName("page")
+    val page: VideoPage
 )
 
 @Serializable
 internal data class VideoList(
     @SerialName("vlist")
-    val videos: List<Video>,
-    @SerialName("page")
-    val page: VideoPage
+    val videos: List<Video>
 )
 @Serializable
 internal data class VideoPage(

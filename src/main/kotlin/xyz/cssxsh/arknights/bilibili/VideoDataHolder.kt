@@ -11,11 +11,11 @@ import xyz.cssxsh.arknights.*
 import java.io.File
 
 public class VideoDataHolder(override val folder: File, override val ignore: suspend (Throwable) -> Boolean) :
-    CacheDataHolder<VideoDataType, Video>() {
+    CacheDataHolder<VideoType, Video>() {
 
-    override val loaded: MutableSet<VideoDataType> = HashSet()
+    override val loaded: MutableSet<VideoType> = HashSet()
 
-    override suspend fun load(key: VideoDataType): Unit = mutex.withLock {
+    override suspend fun load(key: VideoType): Unit = mutex.withLock {
         val cache: MutableList<Video> = ArrayList()
         for (index in 1..5) {
             val response = http.get(key.url) {
@@ -32,7 +32,7 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
 
             cache.addAll(temp.data.list.videos)
 
-            if (cache.size == temp.data.list.page.count) break
+            if (cache.size == temp.data.page.count) break
         }
         val file = folder.resolve(key.filename)
         file.writeText(CustomJson.encodeToString(cache))
@@ -66,10 +66,10 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
         }
     }
 
-    private val Video.folder: File get() = folder.resolve(created.toLocalDate().toString()).apply { mkdirs() }
+    private fun Video.folder(): File = folder.resolve(created.toLocalDate().toString()).apply { mkdirs() }
 
     public suspend fun cover(video: Video): File = mutex.withLock {
-        val file = video.folder.resolve(video.pic.substringAfterLast('/'))
+        val file = video.folder().resolve(video.pic.substringAfterLast('/'))
         if (file.exists().not()) {
             file.writeBytes(useHttpClient { client -> client.get(video.pic).body() })
         }

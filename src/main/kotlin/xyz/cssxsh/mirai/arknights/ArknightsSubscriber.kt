@@ -21,6 +21,7 @@ import kotlin.io.path.Path
 public object ArknightsSubscriber : SimpleListenerHost() {
     private val files: PluginFileExtensions by lazy {
         try {
+            ArknightsHelperPlugin.dataFolder
             ArknightsHelperPlugin
         } catch (_: Throwable) {
             object : PluginFileExtensions {
@@ -55,13 +56,13 @@ public object ArknightsSubscriber : SimpleListenerHost() {
     }
     private val flow: MutableSharedFlow<CacheInfo> = MutableSharedFlow()
     internal val videos: VideoDataHolder by lazy {
-        VideoDataHolder(files.resolveDataFile("BilibiliData"), ignore)
+        VideoDataHolder(files.resolveDataFile("BilibiliData").apply { mkdirs() }, ignore)
     }
     internal val blogs: MicroBlogDataHolder by lazy {
-        MicroBlogDataHolder(files.resolveDataFile("WeiboData"), ignore)
+        MicroBlogDataHolder(files.resolveDataFile("WeiboData").apply { mkdirs() }, ignore)
     }
     internal val announcements: AnnouncementDataHolder by lazy {
-        AnnouncementDataHolder(files.resolveDataFile("AnnouncementData"), ignore)
+        AnnouncementDataHolder(files.resolveDataFile("AnnouncementData").apply { mkdirs() }, ignore)
     }
     public val shared: SharedFlow<CacheInfo> = flow.asSharedFlow()
 
@@ -104,24 +105,24 @@ public object ArknightsSubscriber : SimpleListenerHost() {
 //        }
 //    }
 //
-    private fun video() = launch {
+    internal fun video() = launch {
         val history: MutableSet<String> = HashSet()
-        val cron: (VideoDataType) -> Cron = { ArknightsTaskConfig.video[it] ?: ArknightsTaskConfig.default }
+        val cron: (VideoType) -> Cron = { ArknightsCronConfig.video[it] ?: ArknightsCronConfig.default }
         runBlocking {
             videos.raw().forEach {
                 history.add(it.bvid)
             }
         }
-        for (type in VideoDataType.values()) {
+        for (type in VideoType.values()) {
             launch {
                 while (isActive) {
-                    delay(60_000)
+                    delay(10_000)
                     delay(cron(type).next())
                     // 加载
                     try {
                         videos.load(key = type)
                     } catch (cause: Throwable) {
-                        logger.warning({ "订阅 VideoData $type 数据加载失败" }, cause)
+                        logger.warning({ "明日方舟 视频 $type 数据加载失败" }, cause)
                         continue
                     }
                     // 推送
@@ -129,7 +130,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
                         .filter { video -> video.isToday() && video.bvid !in history }
                         .sortedBy { it.created }
                     if (new.isEmpty()) continue
-                    logger.info { "明日方舟 视频 订阅器 捕捉到结果" }
+                    logger.info { "明日方舟 视频 $type 捕捉到结果" }
                     for (video in new) {
                         try {
                             flow.emit(video)
@@ -145,7 +146,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
 
     private fun weibo() {
         val history: MutableSet<Long> = HashSet()
-        val cron: (BlogUser) -> Cron = { ArknightsTaskConfig.weibo[it] ?: ArknightsTaskConfig.default }
+        val cron: (BlogUser) -> Cron = { ArknightsCronConfig.blog[it] ?: ArknightsCronConfig.default }
         runBlocking {
             blogs.raw().forEach {
                 history.add(it.id)
@@ -154,13 +155,13 @@ public object ArknightsSubscriber : SimpleListenerHost() {
         for (user in BlogUser.values()) {
             launch {
                 while (isActive) {
-                    delay(60_000)
+                    delay(10_000)
                     delay(cron(user).next())
                     // 加载
                     try {
                         blogs.load(key = user)
                     } catch (cause: Throwable) {
-                        logger.warning({ "订阅 MicroBlog $user 数据加载失败" }, cause)
+                        logger.warning({ "明日方舟 微博 $user 数据加载失败" }, cause)
                         continue
                     }
                     // 推送
@@ -168,7 +169,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
                         .filter { blog -> blog.isToday() && blog.id !in history }
                         .sortedBy { it.created }
                     if (raw.isEmpty()) continue
-                    logger.info { "明日方舟 微博 订阅器 捕捉到结果" }
+                    logger.info { "明日方舟 微博 $user 捕捉到结果" }
                     for (blog in raw) {
                         try {
                             flow.emit(blog)
@@ -184,7 +185,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
 
     private fun announce() {
         val history: MutableSet<Int> = HashSet()
-        val cron: Cron = ArknightsTaskConfig.announce
+        val cron: (AnnounceType) -> Cron = { ArknightsCronConfig.announce }
         runBlocking {
             announcements.raw().forEach {
                 history.add(it.id)
@@ -193,13 +194,13 @@ public object ArknightsSubscriber : SimpleListenerHost() {
         for (type in AnnounceType.values()) {
             launch {
                 while (isActive) {
-                    delay(60_000)
-                    delay(cron.next())
+                    delay(10_000)
+                    delay(cron(type).next())
                     // 加载
                     try {
                         announcements.load(key = type)
                     } catch (cause: Throwable) {
-                        logger.warning({ "订阅 Announcement $type 数据加载失败" }, cause)
+                        logger.warning({ "明日方舟 公告 $type 数据加载失败" }, cause)
                         continue
                     }
                     // 推送
@@ -208,7 +209,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
                         .filter { announcement -> announcement.isToday() && announcement.id !in history }
                         .sortedBy { it.id }
                     if (new.isEmpty()) continue
-                    logger.info { "明日方舟 公告 订阅器 捕捉到结果" }
+                    logger.info { "明日方舟 公告 $type 捕捉到结果" }
                     for (announcement in new) {
                         try {
                             flow.emit(announcement)

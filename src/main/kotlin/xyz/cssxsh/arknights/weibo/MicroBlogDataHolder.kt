@@ -17,51 +17,61 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
     private fun timestamp(id: Long): Long = (id shr 22) + 515483463L
 
     override suspend fun load(key: BlogUser): Unit = mutex.withLock {
-        folder.resolve(key.filename)
-            .writeBytes(http.get(key.url).readBytes())
+        val cache: MutableMap<Long, MicroBlog> = HashMap()
 
-        folder.resolve(key.filename2)
-            .writeBytes(http.get(key.picture).readBytes())
+        try {
+            val text = http.get(BLOG_API) { parameter("containerid", "107803${key.id}") }
+                .bodyAsText()
+            val temp = CustomJson.decodeFromString<Temp<PictureData>>(text)
+
+            for (blog in temp.data().blogs()) {
+                cache.compute(blog.id) { _, old ->
+                    old?.copy(pictures = old.pictures + blog.pictures) ?: blog
+                }
+            }
+
+            cache.replaceAll { _, blog ->
+                blog.copy(
+                    created = TimestampSerializer.timestamp(second = timestamp(id = blog.id)),
+                    user = blog.user.copy(id = key.id, name = "此微博被锁定为热门，机器人无法获取详情，请打开链接自行查看")
+                )
+            }
+        } catch (_: Throwable) {
+            //
+        }
+
+        try {
+            val text = http.get(BLOG_API) { parameter("containerid", "107603${key.id}") }
+                .bodyAsText()
+            val temp = CustomJson.decodeFromString<Temp<WeiboData>>(text)
+
+            for (blog in temp.data().blogs()) {
+                cache[blog.id] = blog
+            }
+        } catch (_: Throwable) {
+            //
+        }
+
+        folder.resolve(key.filename).writeText(CustomJson.encodeToString(cache.values.toList()))
 
         loaded.add(key)
     }
 
     override suspend fun raw(): List<MicroBlog> = mutex.withLock {
-        val cache: MutableMap<Long, MicroBlog> = HashMap()
+        val cache: MutableList<MicroBlog> = ArrayList()
         for (user in loaded) {
             try {
-                val picture = folder.resolve(user.filename2)
+                val blogs = folder.resolve(user.filename)
                     .readText()
-                    .let { CustomJson.decodeFromString<Temp<PictureData>>(it) }
+                    .let { CustomJson.decodeFromString<List<MicroBlog>>(it) }
 
-                for (blog in picture.data().blogs()) {
-                    cache.compute(blog.id) { _, old ->
-                        old?.copy(pictures = old.pictures + blog.pictures) ?: blog
-                    }
-                }
-
-                cache.replaceAll { _, blog ->
-                    // TODO: MicroBlogUser
-                    blog.copy(created = TimestampSerializer.timestamp(timestamp(id = blog.id)))
-                }
-            } catch (_: Throwable) {
-                //
-            }
-
-            try {
-                val blog = folder.resolve(user.filename)
-                    .readText()
-                    .let { CustomJson.decodeFromString<Temp<WeiboData>>(it) }
-                for (card in blog.data().cards) {
-                    val b = card.blog ?: continue
-                    cache[b.id] = b
-                }
+                cache.addAll(blogs)
             } catch (_: Throwable) {
                 //
             }
         }
 
-        cache.values.toList()
+        cache
     }
 
     override suspend fun clear(): Unit = mutex.withLock {
@@ -73,11 +83,11 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
         }
     }
 
-    private val MicroBlog.folder: File get() = folder.resolve(created.toLocalDate().toString()).apply { mkdirs() }
+    private fun MicroBlog.folder(): File = folder.resolve(created.toLocalDate().toString()).apply { mkdirs() }
 
     public suspend fun images(blog: MicroBlog): List<File> = mutex.withLock {
         val cache = ArrayList<File>(blog.pictures.size)
-        val folder = blog.folder
+        val folder = blog.folder()
         for (pid in blog.pictures) {
             val url = image(pid = pid)
             val file = folder.resolve(url.substringAfterLast('/'))
@@ -90,9 +100,9 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
     }
 
     public suspend fun content(blog: MicroBlog): String = mutex.withLock {
-        val file = blog.folder.resolve("${blog.id}.content.json")
-        val content = when {
-            !blog.isLongText -> blog.raw ?: blog.text
+        val file = blog.folder().resolve("${blog.id}.content.json")
+        val json = when {
+            !blog.isLongText -> return blog.raw ?: blog.text
             file.exists() -> file.readText()
             else -> {
                 val json = useHttpClient { client ->
@@ -105,10 +115,10 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
                     }
                 }
                 file.writeText(json)
-
-                CustomJson.decodeFromString<Temp<LongTextContent>>(json).data().content
+                json
             }
         }
-        return content.replace("<br />", "\n").remove(SIGN)
+
+        CustomJson.decodeFromString<Temp<LongTextContent>>(json).data().content
     }
 }

@@ -1,5 +1,6 @@
 package xyz.cssxsh.arknights.excel
 
+import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.sync.*
@@ -14,7 +15,7 @@ public class ExcelDataHolder(override val folder: File, override val ignore: sus
 
     override suspend fun load(key: ExcelDataType): Unit = mutex.withLock {
         folder.resolve(key.filename)
-            .writeBytes(http.get(key.url).readBytes())
+            .writeBytes(http.get(key.url).body())
 
         loaded.add(key)
     }

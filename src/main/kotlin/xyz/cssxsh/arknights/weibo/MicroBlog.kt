@@ -21,11 +21,11 @@ public enum class BlogUser(public val id: Long) : CacheKey {
 
     override val filename: String = "Blog(${id}).json"
 
-    override val url: String = "${BLOG_API}?containerid=107603${id}"
+    override val url: String get() = BLOG_API
 
-    public val filename2: String = "BlogPicture(${id}).json"
-
-    public val picture: String = "${BLOG_API}?containerid=107803${id}"
+//    override val url: String = "${BLOG_API}?containerid=107603${id}"
+//
+//    public val picture: String = "${BLOG_API}?containerid=107803${id}"
 }
 
 private val ImageServer = listOf("wx1", "wx2", "wx3", "wx4")
@@ -36,21 +36,23 @@ internal fun extension(pid: String) = ImageExtensions.first { it.startsWith(pid[
 
 internal fun image(pid: String) = "https://${ImageServer.random()}.sinaimg.cn/large/${pid}.${extension(pid)}"
 
-public val MicroBlog.content: String get() = raw ?: text.replace("<br />", "\n").remove(SIGN)
-
-public val MicroBlog.url: String get() = "https://weibo.com/${user?.id ?: "detail"}/${bid.ifBlank { id }}"
+public val MicroBlog.url: String get() = "https://weibo.com/${user.id}/${bid.ifBlank { id }}"
 
 internal fun <T> Temp<T>.data() = requireNotNull(data) { message }
 
-internal fun PictureData.blogs(): List<MicroBlog> {
-    return buildList {
-        for (card in cards) {
-            for (group in card.group) {
-                for (picture in group.pictures) {
-                    add(picture.blog)
-                }
+internal fun PictureData.blogs(): Sequence<MicroBlog> = sequence {
+    for (card in cards) {
+        for (group in card.group) {
+            for (picture in group.pictures) {
+                (picture.blog)
             }
         }
+    }
+}
+
+internal fun WeiboData.blogs(): Sequence<MicroBlog> = sequence {
+    for (card in cards) {
+        yield(card.blog ?: continue)
     }
 }
 
@@ -96,7 +98,7 @@ public data class MicroBlog(
     @SerialName("text")
     val text: String = "",
     @SerialName("user")
-    val user: MicroBlogUser? = null,
+    val user: MicroBlogUser = MicroBlogUser("", "", 0, ""),
 ) : CacheInfo
 
 @Serializable

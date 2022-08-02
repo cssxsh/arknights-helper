@@ -12,6 +12,7 @@ import xyz.cssxsh.arknights.*
 import xyz.cssxsh.arknights.announce.*
 import xyz.cssxsh.arknights.bilibili.*
 import xyz.cssxsh.arknights.weibo.*
+import xyz.cssxsh.mirai.arknights.data.ArknightsTaskConfig
 
 public class ArknightsCollector(private val contact: Contact) :
     FlowCollector<CacheInfo> {
@@ -21,28 +22,40 @@ public class ArknightsCollector(private val contact: Contact) :
      */
     override suspend fun emit(value: CacheInfo) {
         val message = when (value) {
-            // TODO: 过滤屏蔽的类型
-            is MicroBlog -> buildMessageChain {
-                appendLine("鹰角有新微博！@${value.user?.name ?: "此微博被锁定为热门，机器人无法获取详情，请打开链接自行查看"}")
-
-                append(blog = value)
-
-                value.retweeted?.let { retweeted ->
-                    appendLine("----------------")
-                    appendLine("@${retweeted.user?.name}")
+            // 微博
+            is MicroBlog -> {
+                val accept = ArknightsTaskConfig.blog[contact.id] ?: return
+                if (accept.none { it.id == value.id }) return
+                buildMessageChain {
+                    appendLine("鹰角有新微博！@${value.user.name}")
 
                     append(blog = value)
+
+                    value.retweeted?.let { retweeted ->
+                        appendLine("----------------")
+                        appendLine("@${retweeted.user.name}")
+
+                        append(blog = value)
+                    }
                 }
             }
-            // TODO: 过滤屏蔽的类型
-            is Announcement -> buildMessageChain {
-                appendLine("鹰角有新公告！${value.title}")
-                append(announcement = value)
+            // 公告
+            is Announcement -> {
+                val accept = ArknightsTaskConfig.announce[contact.id] ?: return
+                if (accept == value.type) return
+                buildMessageChain {
+                    appendLine("鹰角有新公告！${value.title}")
+                    append(announcement = value)
+                }
             }
-            // TODO: 过滤屏蔽的类型
-            is Video -> buildMessageChain {
-                appendLine("鹰角有新视频！${value.title}")
-                append(video = value)
+            // 视频
+            is Video -> {
+                val accept = ArknightsTaskConfig.video[contact.id] ?: return
+                if (accept.none { it.tid == value.tid }) return
+                buildMessageChain {
+                    appendLine("鹰角有新视频！${value.title}")
+                    append(video = value)
+                }
             }
             // 未实现的类型
             else -> {
@@ -53,14 +66,55 @@ public class ArknightsCollector(private val contact: Contact) :
         contact.sendMessage(message)
     }
 
+    private fun parseNodes(html: String, baseUri: String): List<Node> {
+        val body = Parser.htmlParser().parseInput(html, baseUri).body()
+        val visitor = object : NodeVisitor, MutableList<Node> by ArrayList() {
+            override fun head(node: Node, depth: Int) {
+                if (node is TextNode) add(node)
+            }
+
+            override fun tail(node: Node, depth: Int) {
+                if (node is Element) add(node)
+            }
+        }
+        NodeTraversor.traverse(visitor, body)
+
+        return visitor
+    }
+
     private suspend fun MessageChainBuilder.append(blog: MicroBlog): MessageChainBuilder = apply {
         appendLine("时间: ${blog.created}")
         appendLine("链接: ${blog.url}")
-        try {
-            appendLine(ArknightsSubscriber.blogs.content(blog = blog))
+        val content = try {
+            ArknightsSubscriber.blogs.content(blog = blog)
         } catch (cause: Throwable) {
             logger.warning({ "加载[${blog.url}]长微博失败" }, cause)
-            appendLine(blog.content)
+            blog.raw ?: blog.text
+        }
+        for (node in parseNodes(content, blog.url)) {
+            when (node) {
+                is TextNode -> append(node.wholeText)
+                is Element -> when (node.nodeName()) {
+                    // 图片
+                    "img" -> {
+                        append("[图片]")
+                    }
+                    // 链接
+                    "a" -> {
+                        when {
+                            node.text() == node.attr("href").trim() -> Unit
+                            node.childrenSize() > 0 -> Unit
+                            else -> append("<${node.attr("href")}>")
+                        }
+                    }
+                    // 换行
+                    "br", "p" -> {
+                        append("\n")
+                    }
+                }
+                // 忽略未知
+                else -> continue
+            }
         }
 
         try {
@@ -74,25 +128,13 @@ public class ArknightsCollector(private val contact: Contact) :
     }
 
     private suspend fun MessageChainBuilder.append(announcement: Announcement): MessageChainBuilder = apply {
-        appendLine("日期: ${announcement.date}")
+        appendLine("日期: ${announcement.created.toLocalDate()}")
         appendLine("分类: ${announcement.group}")
         appendLine("链接: ${announcement.webUrl}")
         val html = ArknightsSubscriber.announcements.download(announcement.webUrl)
-        val document = Parser.htmlParser().parseInput(html.reader(), announcement.webUrl)
-        val visitor = object : NodeVisitor, MutableList<Node> by ArrayList() {
-            override fun head(node: Node, depth: Int) {
-                if (node is TextNode) add(node)
-            }
-
-            override fun tail(node: Node, depth: Int) {
-                if (node is Element) add(node)
-            }
-        }
-        NodeTraversor.traverse(visitor, document)
-
-        for (node in visitor) {
+        for (node in parseNodes(html.readText(), announcement.webUrl)) {
             when (node) {
-                is TextNode -> append(node.wholeText)
+                is TextNode -> append(node.wholeText.trim())
                 is Element -> when (node.nodeName()) {
                     // 图片
                     "img" -> {
@@ -108,13 +150,13 @@ public class ArknightsCollector(private val contact: Contact) :
                     // 链接
                     "a" -> {
                         when {
-                            node.text() == node.attr("href") -> Unit
+                            node.text() == node.attr("href").trim() -> Unit
                             node.childrenSize() > 0 -> Unit
                             else -> append("<${node.attr("href")}>")
                         }
                     }
                     // 换行
-                    "br" -> {
+                    "br", "p" -> {
                         append("\n")
                     }
                 }
@@ -125,9 +167,7 @@ public class ArknightsCollector(private val contact: Contact) :
     }
 
     private suspend fun MessageChainBuilder.append(video: Video): MessageChainBuilder = apply {
-        appendLine("鹰角有新视频了！")
         appendLine("链接: ${video.url}")
-        appendLine("标题: ${video.title}")
         appendLine("时间: ${video.created}")
         if (video.description.isNotBlank()) {
             appendLine("简介：")

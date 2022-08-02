@@ -4,15 +4,13 @@ import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
 import java.time.*
 
-public val Announcement.date: LocalDate get() = LocalDate.now().withMonth(month).withDayOfMonth(day)
-
 public val AnnouncementMeta.focus: Announcement? get() = list.firstOrNull { it.id == focusId }
 
 @Serializable
 public enum class AnnounceType(override val url: String) : CacheKey {
-    ANDROID("https://ak-conf.hypergryph.com/config/prod/announce_meta/Android/announcement.meta.json"),
+    Android("https://ak-conf.hypergryph.com/config/prod/announce_meta/Android/announcement.meta.json"),
     IOS("https://ak-conf.hypergryph.com/config/prod/announce_meta/IOS/announcement.meta.json"),
-    BILIBILI("https://ak-conf.hypergryph.com/config/prod/announce_meta/Bilibili/announcement.meta.json");
+    Bilibili("https://ak-conf.hypergryph.com/config/prod/announce_meta/Bilibili/announcement.meta.json");
 
     override val filename: String = "${name}.json"
 }
