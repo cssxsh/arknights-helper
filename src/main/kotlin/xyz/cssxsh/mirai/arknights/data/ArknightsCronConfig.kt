@@ -3,6 +3,7 @@ package xyz.cssxsh.mirai.arknights.data
 import kotlinx.serialization.modules.*
 import net.mamoe.mirai.console.data.*
 import xyz.cssxsh.arknights.bilibili.*
+import xyz.cssxsh.arknights.penguin.PenguinDataType
 import xyz.cssxsh.arknights.weibo.*
 
 public object ArknightsCronConfig : AutoSavePluginConfig("cron") {
@@ -22,4 +23,10 @@ public object ArknightsCronConfig : AutoSavePluginConfig("cron") {
 
     @ValueDescription("定时器 公告")
     public var announce: DataCron by value(DefaultCronParser.parse("0 0 * * * ? ").asData())
+
+    @ValueDescription("定时器 数据")
+    public val penguin: MutableMap<PenguinDataType, DataCron> by value()
+
+    @ValueDescription("定时器 数据")
+    public val excel: DataCron by value(DefaultCronParser.parse("0 0 * * * ? ").asData())
 }

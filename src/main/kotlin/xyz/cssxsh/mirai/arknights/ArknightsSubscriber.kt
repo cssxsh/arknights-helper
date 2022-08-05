@@ -5,6 +5,7 @@ import io.ktor.client.network.sockets.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.mamoe.mirai.console.plugin.*
+import net.mamoe.mirai.console.util.*
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.event.*
 import net.mamoe.mirai.event.events.*
@@ -12,6 +13,8 @@ import net.mamoe.mirai.utils.*
 import xyz.cssxsh.arknights.announce.*
 import xyz.cssxsh.arknights.*
 import xyz.cssxsh.arknights.bilibili.*
+import xyz.cssxsh.arknights.excel.*
+import xyz.cssxsh.arknights.penguin.*
 import xyz.cssxsh.arknights.weibo.*
 import xyz.cssxsh.mirai.arknights.data.*
 import java.time.LocalDate
@@ -55,14 +58,22 @@ public object ArknightsSubscriber : SimpleListenerHost() {
         }
     }
     private val flow: MutableSharedFlow<CacheInfo> = MutableSharedFlow()
-    internal val videos: VideoDataHolder by lazy {
+    private val listened: MutableSet<Long> = HashSet()
+
+    public val videos: VideoDataHolder by lazy {
         VideoDataHolder(files.resolveDataFile("BilibiliData").apply { mkdirs() }, ignore)
     }
-    internal val blogs: MicroBlogDataHolder by lazy {
+    public val blogs: MicroBlogDataHolder by lazy {
         MicroBlogDataHolder(files.resolveDataFile("WeiboData").apply { mkdirs() }, ignore)
     }
-    internal val announcements: AnnouncementDataHolder by lazy {
+    public val announcements: AnnouncementDataHolder by lazy {
         AnnouncementDataHolder(files.resolveDataFile("AnnouncementData").apply { mkdirs() }, ignore)
+    }
+    public val penguin: PenguinDataHolder by lazy {
+        PenguinDataHolder(files.resolveDataFile("PenguinStats").apply { mkdirs() }, ignore)
+    }
+    public val excel: ExcelDataHolder by lazy {
+        ExcelDataHolder(files.resolveDataFile("ArknightsGameData").apply { mkdirs() }, ignore)
     }
     public val shared: SharedFlow<CacheInfo> = flow.asSharedFlow()
 
@@ -105,16 +116,17 @@ public object ArknightsSubscriber : SimpleListenerHost() {
 //        }
 //    }
 //
-    internal fun video() = launch {
+    private fun video() {
         val history: MutableSet<String> = HashSet()
         val cron: (VideoType) -> Cron = { ArknightsCronConfig.video[it] ?: ArknightsCronConfig.default }
-        runBlocking {
+        val init = launch {
             videos.raw().forEach {
                 history.add(it.bvid)
             }
         }
         for (type in VideoType.values()) {
             launch {
+                init.join()
                 while (isActive) {
                     delay(10_000)
                     delay(cron(type).next())
@@ -147,13 +159,14 @@ public object ArknightsSubscriber : SimpleListenerHost() {
     private fun weibo() {
         val history: MutableSet<Long> = HashSet()
         val cron: (BlogUser) -> Cron = { ArknightsCronConfig.blog[it] ?: ArknightsCronConfig.default }
-        runBlocking {
+        val init = launch {
             blogs.raw().forEach {
                 history.add(it.id)
             }
         }
         for (user in BlogUser.values()) {
             launch {
+                init.join()
                 while (isActive) {
                     delay(10_000)
                     delay(cron(user).next())
@@ -185,17 +198,18 @@ public object ArknightsSubscriber : SimpleListenerHost() {
 
     private fun announce() {
         val history: MutableSet<Int> = HashSet()
-        val cron: (AnnounceType) -> Cron = { ArknightsCronConfig.announce }
-        runBlocking {
+        val cron = ArknightsCronConfig.announce
+        val init = launch {
             announcements.raw().forEach {
                 history.add(it.id)
             }
         }
         for (type in AnnounceType.values()) {
             launch {
+                init.join()
                 while (isActive) {
                     delay(10_000)
-                    delay(cron(type).next())
+                    delay(cron.next())
                     // 加载
                     try {
                         announcements.load(key = type)
@@ -223,36 +237,80 @@ public object ArknightsSubscriber : SimpleListenerHost() {
         }
     }
 
-//    private fun group() {
-//        if (AutoAddGuard) globalEventChannel().subscribeAlways<BotJoinGroupEvent> {
-//            GuardContacts.add(group.delegate)
-//            group.sendMessage("机器人加添加群组，已自动开启蹲饼")
-//        }
-//    }
-//
-//    private fun friend() {
-//        if (AutoAddGuard) globalEventChannel().subscribeAlways<FriendAddEvent> {
-//            GuardContacts.add(friend.delegate)
-//            friend.sendMessage("机器人加添加好友，已自动开启蹲饼")
-//        }
-//    }
+    private fun penguin() {
+        val cron: (PenguinDataType) -> Cron = { ArknightsCronConfig.penguin[it] ?: ArknightsCronConfig.default }
+        for (type in PenguinDataType.values()) {
+            launch {
+                while (isActive) {
+                    delay(10_000)
+                    delay(cron(type).next())
+                    // 加载
+                    try {
+                        penguin.load(key = type)
+                    } catch (cause: Throwable) {
+                        logger.warning({ "企鹅物流 数据 $type 数据加载失败" }, cause)
+                        continue
+                    }
+                }
+            }
+        }
+    }
+
+    private fun excel() {
+        val cron = ArknightsCronConfig.excel
+        launch {
+            while (isActive) {
+                delay(10_000)
+                delay(cron.next())
+
+                val local = SemVersion(version = excel.version().versionControl)
+                excel.load(ExcelDataType.VERSION)
+                val current = SemVersion(version = excel.version().versionControl)
+                if (local < current) continue
+
+                // 加载
+                for (type in ExcelDataType.values()) {
+                    try {
+                        excel.load(key = type)
+                    } catch (cause: Throwable) {
+                        logger.warning({ "游戏数值 数据 $type 数据加载失败" }, cause)
+                        continue
+                    }
+                }
+            }
+        }
+    }
 
     public fun start() {
         video()
         weibo()
         announce()
+        penguin()
+        excel()
+    }
+
+    public suspend fun clear() {
+        videos.clear()
+        blogs.clear()
+        announcements.clear()
+        penguin.clear()
+        excel.clear()
     }
 
     public fun listen(contact: Contact) {
         contact.launch(coroutineContext) {
-            ArknightsCollector(contact).emitAll(flow)
+            if (listened.add(contact.delegate)) {
+                ArknightsCollector(contact).emitAll(flow)
+            }
+        }.invokeOnCompletion {
+            listened.remove(contact.delegate)
         }
     }
 
     @EventHandler
     public fun BotOnlineEvent.online() {
         for (group in bot.groups) {
-            // TODO: check
+            if (group.delegate !in ArknightsTaskConfig.contacts) continue
             listen(contact = group)
         }
         for (friend in bot.friends) {
@@ -263,20 +321,20 @@ public object ArknightsSubscriber : SimpleListenerHost() {
 
     @EventHandler
     public fun BotJoinGroupEvent.join() {
-        // TODO: check
-        listen(contact = group)
+        if (!ArknightsTaskConfig.auto) return
         launch {
             delay(60_000)
+            listen(contact = group)
             group.sendMessage("机器人加添加群组，已自动开启蹲饼")
         }
     }
 
     @EventHandler
     public fun FriendAddEvent.add() {
-        // TODO: check
-        listen(contact = friend)
+        if (!ArknightsTaskConfig.auto) return
         launch {
             delay(60_000)
+            listen(contact = friend)
             friend.sendMessage("机器人加添加好友，已自动开启蹲饼")
         }
     }

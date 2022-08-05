@@ -6,6 +6,7 @@ import kotlinx.serialization.encoding.*
 import xyz.cssxsh.arknights.*
 import java.time.*
 
+@Serializable
 public enum class PenguinDataType(override val url: String) : CacheKey {
     // BASE
     ITEMS("https://penguin-stats.cn/PenguinStats/api/v2/items"),

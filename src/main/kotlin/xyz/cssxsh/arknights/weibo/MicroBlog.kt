@@ -22,10 +22,6 @@ public enum class BlogUser(public val id: Long) : CacheKey {
     override val filename: String = "Blog(${id}).json"
 
     override val url: String get() = BLOG_API
-
-//    override val url: String = "${BLOG_API}?containerid=107603${id}"
-//
-//    public val picture: String = "${BLOG_API}?containerid=107803${id}"
 }
 
 private val ImageServer = listOf("wx1", "wx2", "wx3", "wx4")
