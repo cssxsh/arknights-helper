@@ -1,8 +1,6 @@
 package xyz.cssxsh.arknights.weibo
 
-import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.*
 import kotlinx.serialization.*
@@ -20,8 +18,8 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
         val cache: MutableMap<Long, MicroBlog> = HashMap()
 
         try {
-            val text = http.get(BLOG_API) { parameter("containerid", "107803${key.id}") }
-                .bodyAsText()
+            val text = http.prepareGet(BLOG_API) { parameter("containerid", "107803${key.id}") }
+                .body<String>()
             val temp = CustomJson.decodeFromString<Temp<PictureData>>(text)
 
             for (blog in temp.data().blogs()) {
@@ -41,8 +39,8 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
         }
 
         try {
-            val text = http.get(BLOG_API) { parameter("containerid", "107603${key.id}") }
-                .bodyAsText()
+            val text = http.prepareGet(BLOG_API) { parameter("containerid", "107603${key.id}") }
+                .body<String>()
             val temp = CustomJson.decodeFromString<Temp<WeiboData>>(text)
 
             for (blog in temp.data().blogs()) {
@@ -52,7 +50,8 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
             //
         }
 
-        folder.resolve(key.filename).writeText(CustomJson.encodeToString(cache.values.toList()))
+        val json = CustomJson.encodeToString(cache.values.toList())
+        key.file.writeText(json)
 
         loaded.add(key)
     }
@@ -61,9 +60,8 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
         val cache: MutableList<MicroBlog> = ArrayList()
         for (user in loaded) {
             try {
-                val blogs = folder.resolve(user.filename)
-                    .readText()
-                    .let { CustomJson.decodeFromString<List<MicroBlog>>(it) }
+                val json = user.file.readText()
+                val blogs = CustomJson.decodeFromString<List<MicroBlog>>(json)
 
                 cache.addAll(blogs)
             } catch (_: Throwable) {
@@ -92,7 +90,7 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
             val url = image(pid = pid)
             val file = folder.resolve(url.substringAfterLast('/'))
             if (file.exists().not()) {
-                file.writeBytes(useHttpClient { client -> client.get(url).body() })
+                http.prepareGet(url).copyTo(file)
             }
             cache.add(file)
         }
@@ -105,16 +103,23 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
             !blog.isLongText -> return blog.raw ?: blog.text
             file.exists() -> file.readText()
             else -> {
-                val json = useHttpClient { client ->
-                    client.get(CONTENT_API) {
-                        parameter("id", blog.id)
-                    }.bodyAsText().also {
-                        if ("请求超时</p>" in it) throw IllegalStateException("请求超时")
-                        if ("登录注册更精彩</p>" in it) throw IllegalStateException("登陆锁定")
-                        if ("打开微博客户端，查看全文</p>" in it) throw IllegalStateException("微博客户端锁定")
-                    }
+                val statement = http.prepareGet(CONTENT_API) {
+                    parameter("id", blog.id)
                 }
-                file.writeText(json)
+                statement.copyTo(file)
+                val json = file.readText()
+                if ("请求超时</p>" in json) {
+                    file.delete()
+                    throw IllegalStateException("请求超时")
+                }
+                if ("登录注册更精彩</p>" in json) {
+                    file.delete()
+                    throw IllegalStateException("登陆锁定")
+                }
+                if ("打开微博客户端，查看全文</p>" in json) {
+                    file.delete()
+                    throw IllegalStateException("微博客户端锁定")
+                }
                 json
             }
         }

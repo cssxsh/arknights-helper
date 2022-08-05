@@ -1,9 +1,6 @@
 package xyz.cssxsh.arknights.announce
 
-import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.*
 import kotlinx.serialization.*
@@ -20,9 +17,7 @@ public class AnnouncementDataHolder(override val folder: File, override val igno
     public override val loaded: MutableSet<AnnounceType> = HashSet()
 
     override suspend fun load(key: AnnounceType): Unit = mutex.withLock {
-        val response = http.get(key.url)
-        val json = folder.resolve(key.filename)
-        json.writeBytes(response.body())
+        http.prepareGet(key.url).copyTo(target = key.file)
 
         loaded.add(key)
     }
@@ -31,9 +26,8 @@ public class AnnouncementDataHolder(override val folder: File, override val igno
         val cache: MutableMap<Int, Announcement> = HashMap()
         for (type in loaded) {
             try {
-                val meta = folder.resolve(type.filename)
-                    .readText()
-                    .let { CustomJson.decodeFromString<AnnouncementMeta>(it) }
+                val json = type.file.readText()
+                val meta = CustomJson.decodeFromString<AnnouncementMeta>(json)
                 for (announcement in meta.list) {
                     cache[announcement.id] = announcement
                 }
@@ -58,15 +52,7 @@ public class AnnouncementDataHolder(override val folder: File, override val igno
         val file = folder.resolve("html/${url.substringAfterLast('/')}")
         if (file.exists().not()) {
             file.parentFile.mkdirs()
-            useHttpClient { client -> 
-                client.prepareGet(url).execute { response ->
-                    file.outputStream().use { output ->
-                        val channel = response.bodyAsChannel()
-
-                        while (!channel.isClosedForRead) channel.copyTo(output)
-                    }
-                } 
-            }
+            http.prepareGet(url).copyTo(target = file)
         }
         file
     }

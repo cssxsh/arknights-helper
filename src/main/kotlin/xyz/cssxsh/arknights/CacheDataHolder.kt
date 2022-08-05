@@ -5,6 +5,8 @@ import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.compression.*
 import io.ktor.client.plugins.cookies.*
+import io.ktor.client.statement.*
+import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.*
 import java.io.File
@@ -36,14 +38,21 @@ public abstract class CacheDataHolder<K : CacheKey, R : CacheInfo> {
 
     protected abstract val ignore: suspend (exception: Throwable) -> Boolean
 
-    public suspend fun <T> useHttpClient(block: suspend (HttpClient) -> T): T = supervisorScope {
+    protected val CacheKey.file: File get() = folder.resolve(filename)
+
+    protected suspend fun HttpStatement.copyTo(target: File): Unit = supervisorScope {
         while (isActive) {
             try {
-                return@supervisorScope block(http)
+                execute { response ->
+                    target.outputStream().use { output ->
+                        val channel = response.bodyAsChannel()
+
+                        while (!channel.isClosedForRead) channel.copyTo(output)
+                    }
+                }
             } catch (cause: Throwable) {
                 if (ignore(cause).not()) throw cause
             }
         }
-        throw CancellationException()
     }
 }

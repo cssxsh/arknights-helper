@@ -255,6 +255,10 @@ public object ArknightsSubscriber : SimpleListenerHost() {
             // TODO: check
             listen(contact = group)
         }
+        for (friend in bot.friends) {
+            if (friend.delegate !in ArknightsTaskConfig.contacts) continue
+            listen(contact = friend)
+        }
     }
 
     @EventHandler

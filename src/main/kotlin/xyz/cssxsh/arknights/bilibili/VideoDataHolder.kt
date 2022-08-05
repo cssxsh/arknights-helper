@@ -1,6 +1,5 @@
 package xyz.cssxsh.arknights.bilibili
 
-import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -18,24 +17,24 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
     override suspend fun load(key: VideoType): Unit = mutex.withLock {
         val cache: MutableList<Video> = ArrayList()
         for (index in 1..5) {
-            val response = http.get(key.url) {
+            val history = http.prepareGet(key.url) {
                 parameter("mid", BILIBILI_ID)
                 parameter("ps", 50)
                 parameter("pn", index)
                 parameter("order", "pubdate")
                 parameter("tid", key.tid)
                 parameter("jsonp", "jsonp")
+            }.execute { response ->
+                val json = response.bodyAsText()
+                val temp = CustomJson.decodeFromString<Temp>(json)
+                temp.data ?: throw ResponseException(response, json)
             }
-            val json = response.bodyAsText()
-            val temp = CustomJson.decodeFromString<Temp>(json)
-            if (temp.data == null) throw ResponseException(response, json)
 
-            cache.addAll(temp.data.list.videos)
+            cache.addAll(history.list.videos)
 
-            if (cache.size == temp.data.page.count) break
+            if (cache.size == history.page.count) break
         }
-        val file = folder.resolve(key.filename)
-        file.writeText(CustomJson.encodeToString(cache))
+        key.file.writeText(CustomJson.encodeToString(cache))
 
         loaded.add(key)
     }
@@ -44,9 +43,8 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
         val cache: MutableList<Video> = ArrayList()
         for (type in loaded) {
             try {
-                val videos = folder.resolve(type.filename)
-                    .readText()
-                    .let { CustomJson.decodeFromString<List<Video>>(it) }
+                val json = type.file.readText()
+                val videos = CustomJson.decodeFromString<List<Video>>(json)
 
                 cache.addAll(videos)
             } catch (_: Throwable) {
@@ -71,7 +69,7 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
     public suspend fun cover(video: Video): File = mutex.withLock {
         val file = video.folder().resolve(video.pic.substringAfterLast('/'))
         if (file.exists().not()) {
-            file.writeBytes(useHttpClient { client -> client.get(video.pic).body() })
+            http.prepareGet(video.pic).copyTo(target = file)
         }
         return file
     }

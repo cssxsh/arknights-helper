@@ -14,8 +14,7 @@ import xyz.cssxsh.arknights.bilibili.*
 import xyz.cssxsh.arknights.weibo.*
 import xyz.cssxsh.mirai.arknights.data.ArknightsTaskConfig
 
-public class ArknightsCollector(private val contact: Contact) :
-    FlowCollector<CacheInfo> {
+public class ArknightsCollector(private val contact: Contact) : FlowCollector<CacheInfo> {
 
     /**
      * 推送 [value] 到 [contact]
