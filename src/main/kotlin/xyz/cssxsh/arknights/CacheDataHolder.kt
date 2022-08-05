@@ -9,6 +9,7 @@ import io.ktor.client.statement.*
 import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.*
+import kotlinx.serialization.*
 import java.io.File
 
 public abstract class CacheDataHolder<K : CacheKey, R : CacheInfo> {
@@ -39,6 +40,14 @@ public abstract class CacheDataHolder<K : CacheKey, R : CacheInfo> {
     protected abstract val ignore: suspend (exception: Throwable) -> Boolean
 
     protected val CacheKey.file: File get() = folder.resolve(filename)
+
+    protected suspend inline fun <reified T> K.read(): T = mutex.withLock {
+        return CustomJson.decodeFromString(file.readText())
+    }
+
+    protected suspend inline fun <reified T> K.write(data: T): Unit = mutex.withLock {
+        file.writeText(CustomJson.encodeToString(data))
+    }
 
     protected suspend fun HttpStatement.copyTo(target: File): Unit = supervisorScope {
         while (isActive) {

@@ -2,7 +2,6 @@ package xyz.cssxsh.arknights.excel
 
 import io.ktor.client.request.*
 import kotlinx.coroutines.sync.*
-import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
 import java.io.File
 
@@ -21,10 +20,6 @@ public class ExcelDataHolder(override val folder: File, override val ignore: sus
 
     override suspend fun clear(): Unit = Unit
 
-    private suspend inline fun <reified T> ExcelDataType.read(): T = mutex.withLock {
-        return CustomJson.decodeFromString(file.readText())
-    }
-
     public suspend fun version(): ExcelDataVersion = mutex.withLock {
         val text = ExcelDataType.VERSION.file.readText()
         lateinit var stream: String
@@ -38,7 +33,7 @@ public class ExcelDataHolder(override val folder: File, override val ignore: sus
                 else -> Unit
             }
         }
-        return ExcelDataVersion(
+        ExcelDataVersion(
             stream = stream,
             change = change,
             versionControl = versionControl

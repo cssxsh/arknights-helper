@@ -14,7 +14,7 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
 
     private fun timestamp(id: Long): Long = (id shr 22) + 515483463L
 
-    override suspend fun load(key: BlogUser): Unit = mutex.withLock {
+    override suspend fun load(key: BlogUser) {
         val cache: MutableMap<Long, MicroBlog> = HashMap()
 
         try {
@@ -50,18 +50,16 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
             //
         }
 
-        val json = CustomJson.encodeToString(cache.values.toList())
-        key.file.writeText(json)
+        key.write(cache.values.toList())
 
         loaded.add(key)
     }
 
-    override suspend fun raw(): List<MicroBlog> = mutex.withLock {
+    override suspend fun raw(): List<MicroBlog> {
         val cache: MutableList<MicroBlog> = ArrayList()
         for (user in loaded) {
             try {
-                val json = user.file.readText()
-                val blogs = CustomJson.decodeFromString<List<MicroBlog>>(json)
+                val blogs = user.read<List<MicroBlog>>()
 
                 cache.addAll(blogs)
             } catch (_: Throwable) {
@@ -69,7 +67,7 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
             }
         }
 
-        cache
+        return cache
     }
 
     override suspend fun clear(): Unit = mutex.withLock {

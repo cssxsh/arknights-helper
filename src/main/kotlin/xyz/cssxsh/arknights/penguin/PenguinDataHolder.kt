@@ -2,7 +2,6 @@ package xyz.cssxsh.arknights.penguin
 
 import io.ktor.client.request.*
 import kotlinx.coroutines.sync.*
-import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
 import java.io.File
 
@@ -20,10 +19,6 @@ public class PenguinDataHolder(override val folder: File, override val ignore: s
     override suspend fun raw(): List<CacheInfo> = emptyList()
 
     override suspend fun clear(): Unit = Unit
-
-    private suspend inline fun <reified T> PenguinDataType.read(): T = mutex.withLock {
-        return CustomJson.decodeFromString(folder.resolve(filename).readText())
-    }
 
     public suspend fun items(): List<Item> = PenguinDataType.ITEMS.read()
 

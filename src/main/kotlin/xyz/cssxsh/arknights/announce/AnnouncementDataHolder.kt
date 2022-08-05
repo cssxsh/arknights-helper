@@ -3,7 +3,6 @@ package xyz.cssxsh.arknights.announce
 import io.ktor.client.request.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.*
-import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
 import java.io.File
 
@@ -22,12 +21,11 @@ public class AnnouncementDataHolder(override val folder: File, override val igno
         loaded.add(key)
     }
 
-    override suspend fun raw(): List<Announcement> = mutex.withLock {
+    override suspend fun raw(): List<Announcement> {
         val cache: MutableMap<Int, Announcement> = HashMap()
         for (type in loaded) {
             try {
-                val json = type.file.readText()
-                val meta = CustomJson.decodeFromString<AnnouncementMeta>(json)
+                val meta = type.read<AnnouncementMeta>()
                 for (announcement in meta.list) {
                     cache[announcement.id] = announcement
                 }
@@ -36,7 +34,7 @@ public class AnnouncementDataHolder(override val folder: File, override val igno
             }
         }
 
-        cache.values.toList()
+        return cache.values.toList()
     }
 
     override suspend fun clear(): Unit = html.withLock {

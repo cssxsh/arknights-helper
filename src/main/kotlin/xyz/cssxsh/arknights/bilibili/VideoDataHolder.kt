@@ -14,7 +14,7 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
 
     override val loaded: MutableSet<VideoType> = HashSet()
 
-    override suspend fun load(key: VideoType): Unit = mutex.withLock {
+    override suspend fun load(key: VideoType) {
         val cache: MutableList<Video> = ArrayList()
         for (index in 1..5) {
             val history = http.prepareGet(key.url) {
@@ -34,7 +34,7 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
 
             if (cache.size == history.page.count) break
         }
-        key.file.writeText(CustomJson.encodeToString(cache))
+        key.write(cache)
 
         loaded.add(key)
     }
@@ -43,8 +43,7 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
         val cache: MutableList<Video> = ArrayList()
         for (type in loaded) {
             try {
-                val json = type.file.readText()
-                val videos = CustomJson.decodeFromString<List<Video>>(json)
+                val videos = type.read<List<Video>>()
 
                 cache.addAll(videos)
             } catch (_: Throwable) {
@@ -55,7 +54,7 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
         return cache
     }
 
-    override suspend fun clear() {
+    override suspend fun clear(): Unit = mutex.withLock {
         runInterruptible(context = Dispatchers.IO) {
             for (item in folder.listFiles() ?: return@runInterruptible) {
                 if (!item.isDirectory) continue
