@@ -3,12 +3,12 @@ package xyz.cssxsh.arknights.excel
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 
-typealias EnemyTable = Map<String, Enemy>
+public typealias EnemyTable = Map<String, Enemy>
 
-val Enemy.designation get() = "${name}(${race?.let { "$it#" }.orEmpty()}${level.text})"
+public val Enemy.designation: String get() = "${name}(${race?.let { "$it#" }.orEmpty()}${level.text})"
 
 @Serializable
-data class Enemy(
+public data class Enemy(
     @SerialName("ability")
     val ability: String?,
     @SerialName("attack")
@@ -43,7 +43,7 @@ data class Enemy(
     val sortId: Int
 ) : Id, Name, TagInfo
 
-enum class EnemyLevel(val text: String) {
+public enum class EnemyLevel(public val text: String) {
     NORMAL("普通"),
     ELITE("精英"),
     BOSS("领袖");

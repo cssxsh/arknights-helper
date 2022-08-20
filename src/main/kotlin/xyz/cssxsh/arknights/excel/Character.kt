@@ -3,102 +3,102 @@ package xyz.cssxsh.arknights.excel
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 
-typealias CharacterTable = Map<String, Character>
+public typealias CharacterTable = Map<String, Character>
 
 /**
  * @see Character.group
  */
-fun Collection<Character>.group(id: String) = filter { it.group == id }.toSet()
+public fun Collection<Character>.group(id: String): Set<Character> = filter { it.group == id }.toSet()
 
 /**
  * @see Character.nation
  */
-fun Collection<Character>.nation(id: String) = filter { it.nation == id }.toSet()
+public fun Collection<Character>.nation(id: String): Set<Character> = filter { it.nation == id }.toSet()
 
 /**
  * @see Character.team
  */
-fun Collection<Character>.team(id: String) = filter { it.team == id }.toSet()
+public fun Collection<Character>.team(id: String): Set<Character> = filter { it.team == id }.toSet()
 
 /**
  * @see Character.itemObtainApproach
  */
-fun Collection<Character>.obtain(approach: String) = filter { approach in it.itemObtainApproach.orEmpty() }.toSet()
+public fun Collection<Character>.obtain(approach: String): Set<Character> = filter { approach in it.itemObtainApproach.orEmpty() }.toSet()
 
 /**
  * @see Character.position
  */
-fun Collection<Character>.position(type: PositionType) = filter { it.position == type }.toSet()
+public fun Collection<Character>.position(type: PositionType): Set<Character> = filter { it.position == type }.toSet()
 
 /**
  * @see Character.profession
  */
-fun Collection<Character>.professions(vararg types: ProfessionType) = filter { it.profession in types }.toSet()
+public fun Collection<Character>.professions(vararg types: ProfessionType): Set<Character> = filter { it.profession in types }.toSet()
 
 /**
  * @see Character.profession
  */
-fun Collection<Character>.professions(types: Collection<ProfessionType>) = filter { it.profession in types }.toSet()
+public fun Collection<Character>.professions(types: Collection<ProfessionType>): Set<Character> = filter { it.profession in types }.toSet()
 
 /**
  * @see Character.isNotObtainable
  */
-fun Collection<Character>.obtainable(able: Boolean = true) = filter { it.isNotObtainable != able }.toSet()
+public fun Collection<Character>.obtainable(able: Boolean = true): Set<Character> = filter { it.isNotObtainable != able }.toSet()
 
 /**
  * @see Character.isSpecialCharacter
  */
-fun Collection<Character>.special(value: Boolean = true) = filter { it.isSpecialCharacter == value }.toSet()
+public fun Collection<Character>.special(value: Boolean = true): Set<Character> = filter { it.isSpecialCharacter == value }.toSet()
 
 /**
  * @see Character.maxPotentialLevel
  */
-fun Collection<Character>.potential(level: Int) = filter { it.maxPotentialLevel == level }.toSet()
+public fun Collection<Character>.potential(level: Int): Set<Character> = filter { it.maxPotentialLevel == level }.toSet()
 
 /**
  * @see Character.canUseGeneralPotentialItem
  */
-fun Collection<Character>.general(able: Boolean = true) = filter { it.canUseGeneralPotentialItem == able }.toSet()
+public fun Collection<Character>.general(able: Boolean = true): Set<Character> = filter { it.canUseGeneralPotentialItem == able }.toSet()
 
 /**
  * @see Character.rarity
  */
-fun Collection<Character>.rarities(levels: IntRange) = filter { it.rarity in levels }.toSet()
+public fun Collection<Character>.rarities(levels: IntRange): Set<Character> = filter { it.rarity in levels }.toSet()
 
 /**
  * @see Character.rarity
  */
-fun Collection<Character>.rarities(vararg levels: Int) = filter { it.rarity in levels }.toSet()
+public fun Collection<Character>.rarities(vararg levels: Int): Set<Character> = filter { it.rarity in levels }.toSet()
 
 /**
  * @see Character.rarity
  */
-fun Collection<Character>.rarities(levels: Collection<Int>) = filter { it.rarity in levels }.toSet()
+public fun Collection<Character>.rarities(levels: Collection<Int>): Set<Character> = filter { it.rarity in levels }.toSet()
 
 /**
  * @see Character.tags
  */
-fun Collection<Character>.tags(vararg words: String) = tags(words.toSet()).toSet()
+public fun Collection<Character>.tags(vararg words: String): Set<Character> = tags(words.toSet()).toSet()
 
 /**
  * @see Character.tags
  */
-fun Collection<Character>.tags(words: Collection<String>) = filter { it.tags.orEmpty().containsAll(words) }.toSet()
+public fun Collection<Character>.tags(words: Collection<String>): Set<Character> = filter { it.tags.orEmpty().containsAll(words) }.toSet()
 
 /**
  * @see Character.name
  */
-fun Collection<Character>.names(vararg names: String) = filter { it.name in names }.toSet()
+public fun Collection<Character>.names(vararg names: String): Set<Character> = filter { it.name in names }.toSet()
 
 /**
  * @see Character.name
  */
-fun Collection<Character>.names(names: Collection<String>) = filter { it.name in names }.toSet()
+public fun Collection<Character>.names(names: Collection<String>): Set<Character> = filter { it.name in names }.toSet()
 
 /**
  * 按照招募TAG过滤干员
  */
-fun Collection<Character>.filter(word: String): Set<Character> {
+public fun Collection<Character>.filter(word: String): Set<Character> {
     return when (word) {
         "高级资深干员" -> rarities(5)
         "资深干员" -> rarities(4)
@@ -120,22 +120,22 @@ fun Collection<Character>.filter(word: String): Set<Character> {
 /**
  * 所有干员名字
  */
-fun CharacterTable.name() = values.map { it.name }.toSet()
+public fun CharacterTable.name(): Set<String> = values.map { it.name }.toSet()
 
 /**
  * 干员全部天赋
  */
-fun Character.talents() = talents.orEmpty().flatMap { talent ->
+public fun Character.talents(): List<String> = talents.orEmpty().flatMap { talent ->
     talent.candidates.orEmpty().mapNotNull { it.name?.trim() }.toSet()
 }
 
 /**
  * 星级
  */
-val Character.star get() = (0..rarity).map { '*' }.toString()
+public val Character.star: String get() = (0..rarity).map { '*' }.toString()
 
 @Serializable
-data class Character(
+public data class Character(
     /**
      * 程序中名称
      */
@@ -273,7 +273,7 @@ data class Character(
     private val trait: JsonObject?
 ) : Role, TagInfo
 
-enum class ProfessionType(val text: String) {
+public enum class ProfessionType(public val text: String) {
     /**
      * 先锋
      */
@@ -324,15 +324,16 @@ enum class ProfessionType(val text: String) {
      */
     TRAP("装置");
 
-    companion object {
+    public companion object {
 
-        val NORMALS = listOf(PIONEER, SNIPER, WARRIOR, CASTER, TANK, MEDIC, SPECIAL, SUPPORT)
+        public val NORMALS: List<ProfessionType> =
+            listOf(PIONEER, SNIPER, WARRIOR, CASTER, TANK, MEDIC, SPECIAL, SUPPORT)
 
-        val SPECIALS = listOf(TOKEN, TRAP)
+        public val SPECIALS: List<ProfessionType> = listOf(TOKEN, TRAP)
     }
 }
 
-enum class PositionType(val text: String) {
+public enum class PositionType(public val text: String) {
     /**
      * 远程位
      */
@@ -355,13 +356,13 @@ enum class PositionType(val text: String) {
 }
 
 @Serializable
-data class Talent(
+public data class Talent(
     @SerialName("candidates")
     val candidates: List<Candidate>? = null
 )
 
 @Serializable
-data class Candidate(
+public data class Candidate(
     @SerialName("blackboard")
     val blackboard: List<Blackboard>?,
     @SerialName("description")
@@ -379,7 +380,7 @@ data class Candidate(
 )
 
 @Serializable
-data class SkillInfo(
+public data class SkillInfo(
     @SerialName("levelUpCostCond")
     val levelUpCostCond: List<LevelUpCostCond>,
     @SerialName("overridePrefabKey")
@@ -393,7 +394,7 @@ data class SkillInfo(
 ) : SkillId
 
 @Serializable
-data class LevelUpCostCond(
+public data class LevelUpCostCond(
     @SerialName("levelUpCost")
     val levelUpCost: List<LegacyItem>?,
     @SerialName("lvlUpTime")

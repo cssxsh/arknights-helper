@@ -31,7 +31,10 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
             cache.replaceAll { _, blog ->
                 blog.copy(
                     created = TimestampSerializer.timestamp(second = timestamp(id = blog.id)),
-                    user = blog.user.copy(id = key.id, name = "此微博被锁定为热门，机器人无法获取详情，请打开链接自行查看")
+                    user = blog.user.copy(
+                        id = key.id,
+                        name = "此微博被锁定为热门，机器人无法获取详情，请打开链接自行查看"
+                    )
                 )
             }
         } catch (_: Throwable) {

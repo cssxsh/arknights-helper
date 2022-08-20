@@ -5,7 +5,7 @@ import kotlinx.serialization.json.*
 
 private val TagRegex = """(?<=【|\[)(.+)(?:]|】)(.+)""".toRegex()
 
-fun Handbook.infos(): Map<String, String> {
+public fun Handbook.infos(): Map<String, String> {
     return stories.values.flatten().flatMap { text ->
         TagRegex.findAll(text).map { result ->
             result.destructured.let { (key, value) -> key to value.trim() }
@@ -13,12 +13,12 @@ fun Handbook.infos(): Map<String, String> {
     }.toMap()
 }
 
-val Handbook.stories get() = storyTextAudio.associate { info -> info.title to info.stories.map { it.text } }
+public val Handbook.stories: Map<String, List<String>> get() = storyTextAudio.associate { info -> info.title to info.stories.map { it.text } }
 
-fun HandbookMap.tags() = entries.fold(emptySet<String>()) { acc, (_, handbook) -> acc + handbook.infos().keys }
+public fun HandbookMap.tags(): Set<String> = entries.fold(emptySet<String>()) { acc, (_, handbook) -> acc + handbook.infos().keys }
 
 @Serializable
-data class HandbookTable(
+public data class HandbookTable(
     @SerialName("handbookDict")
     val handbooks: HandbookMap,
     @SerialName("npcDict")
@@ -32,7 +32,7 @@ data class HandbookTable(
 )
 
 @Serializable
-data class Handbook(
+public data class Handbook(
     @SerialName("charID")
     override val character: String,
     @SerialName("drawName")
@@ -46,7 +46,7 @@ data class Handbook(
 ) : Illust, Voice, CharacterId
 
 @Serializable
-data class StoryTextAudio(
+public data class StoryTextAudio(
     @SerialName("stories")
     val stories: List<HandbookStory>,
     @SerialName("storyTitle")
@@ -56,7 +56,7 @@ data class StoryTextAudio(
 )
 
 @Serializable
-data class HandbookStory(
+public data class HandbookStory(
     @SerialName("storyText")
     val text: String,
     @SerialName("unLockParam")
@@ -68,7 +68,7 @@ data class HandbookStory(
 )
 
 @Serializable
-data class NpcInfo(
+public data class NpcInfo(
     @SerialName("appellation")
     override val appellation: String,
     @SerialName("cv")
@@ -94,7 +94,7 @@ data class NpcInfo(
 ) : Illust, Voice, Role, Id
 
 @Serializable
-data class TeamInfo(
+public data class TeamInfo(
     @SerialName("favorPoint")
     val favorPoint: Int,
     @SerialName("id")

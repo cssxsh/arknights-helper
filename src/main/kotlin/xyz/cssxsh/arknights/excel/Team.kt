@@ -2,18 +2,18 @@ package xyz.cssxsh.arknights.excel
 
 import kotlinx.serialization.*
 
-typealias TeamTable = Map<String, Team>
+public typealias TeamTable = Map<String, Team>
 
-const val DefaultTeam = "none"
+public const val DefaultTeam: String = "none"
 
-enum class PowerLevel(val text: String, val get: (Character) -> String) {
+public enum class PowerLevel(public val text: String, public val get: (Character) -> String) {
     NATION("国家/地区", { it.nation ?: DefaultTeam }),
     GROUP("势力", { it.group ?: DefaultTeam }),
     TEAM("队伍", { it.team ?: DefaultTeam });
 }
 
 @Serializable
-data class Team(
+public data class Team(
     @SerialName("color")
     val color: String,
     @SerialName("isLimited")

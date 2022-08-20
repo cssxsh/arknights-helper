@@ -3,7 +3,7 @@ package xyz.cssxsh.arknights.excel
 import kotlinx.serialization.*
 
 @Serializable
-data class Building(
+public data class Building(
     @SerialName("buffs")
     val buffs: Map<String, BuildingBuff>,// XXX
     @SerialName("chars")
@@ -11,7 +11,7 @@ data class Building(
 )
 
 @Serializable
-data class CharacterBuildingInfo(
+public data class CharacterBuildingInfo(
     @SerialName("buffChar")
     val buffs: List<BuffChar>,
     @SerialName("charId")
@@ -21,13 +21,13 @@ data class CharacterBuildingInfo(
 ) : CharacterId
 
 @Serializable
-data class BuffChar(
+public data class BuffChar(
     @SerialName("buffData")
     val data: List<BuffData>
 )
 
 @Serializable
-data class BuffData(
+public data class BuffData(
     @SerialName("buffId")
     override val buff: String,
     @SerialName("cond")
@@ -35,7 +35,7 @@ data class BuffData(
 ) : BuffId
 
 @Serializable
-data class BuildingBuff(
+public data class BuildingBuff(
     @SerialName("buffCategory")
     val category: String,
     @SerialName("buffColor")
@@ -58,7 +58,7 @@ data class BuildingBuff(
     val textColor: String
 ) : Id, Name
 
-enum class RoomType {
+public enum class RoomType {
     CONTROL,
     POWER,
     MANUFACTURE,

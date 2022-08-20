@@ -6,11 +6,11 @@ import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 @Serializable(with = DataCron.Serializer::class)
-internal data class DataCron(val delegate: Cron) : Cron by delegate {
+public data class DataCron(val delegate: Cron) : Cron by delegate {
 
     override fun toString(): String = asString()
 
-    companion object Serializer : KSerializer<DataCron> {
+    public companion object Serializer : KSerializer<DataCron> {
 
         override val descriptor: SerialDescriptor =
             PrimitiveSerialDescriptor(this::class.qualifiedName!!, PrimitiveKind.STRING)
