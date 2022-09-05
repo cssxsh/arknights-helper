@@ -46,7 +46,7 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
                 val videos = type.read<List<Video>>()
 
                 cache.addAll(videos)
-            } catch (_: Throwable) {
+            } catch (_: Exception) {
                 //
             }
         }

@@ -8,8 +8,6 @@ internal const val BILIBILI_API = "https://api.bilibili.com/x/space/arc/search"
 
 internal const val BILIBILI_ID = 161775300L
 
-public val Video.url: String get() = "https://www.bilibili.com/video/${bvid}"
-
 @Serializable
 public enum class VideoType(public val tid: Int) : CacheKey {
     ANIME(1),
@@ -90,4 +88,6 @@ public data class Video(
     val title: String,
     @SerialName("typeid")
     val tid: Int,
-) : CacheInfo
+) : CacheInfo {
+    override val url: String by lazy { "https://www.bilibili.com/video/${bvid}" }
+}

@@ -26,7 +26,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
         try {
             ArknightsHelperPlugin.dataFolder
             ArknightsHelperPlugin
-        } catch (_: Throwable) {
+        } catch (_: ExceptionInInitializerError) {
             object : PluginFileExtensions {
                 override val configFolder by lazy { configFolderPath.toFile() }
                 override val configFolderPath by lazy { Path(System.setProperty("arknights.config", "./config")) }
@@ -58,7 +58,6 @@ public object ArknightsSubscriber : SimpleListenerHost() {
         }
     }
     private val flow: MutableSharedFlow<CacheInfo> = MutableSharedFlow()
-    private val listened: MutableSet<Long> = HashSet()
 
     public val videos: VideoDataHolder by lazy {
         VideoDataHolder(files.resolveDataFile("BilibiliData").apply { mkdirs() }, ignore)
@@ -133,7 +132,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
                     // 加载
                     try {
                         videos.load(key = type)
-                    } catch (cause: Throwable) {
+                    } catch (cause: Exception) {
                         logger.warning({ "明日方舟 视频 $type 数据加载失败" }, cause)
                         continue
                     }
@@ -147,7 +146,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
                         try {
                             flow.emit(video)
                             history.add(video.bvid)
-                        } catch (cause: Throwable) {
+                        } catch (cause: Exception) {
                             logger.warning({ "视频[${video.bvid}]推送失败" }, cause)
                         }
                     }
@@ -173,7 +172,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
                     // 加载
                     try {
                         blogs.load(key = user)
-                    } catch (cause: Throwable) {
+                    } catch (cause: Exception) {
                         logger.warning({ "明日方舟 微博 $user 数据加载失败" }, cause)
                         continue
                     }
@@ -187,7 +186,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
                         try {
                             flow.emit(blog)
                             history.add(blog.id)
-                        } catch (cause: Throwable) {
+                        } catch (cause: Exception) {
                             logger.warning({ "微博[${blog.id}]推送失败" }, cause)
                         }
                     }
@@ -213,7 +212,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
                     // 加载
                     try {
                         announcements.load(key = type)
-                    } catch (cause: Throwable) {
+                    } catch (cause: Exception) {
                         logger.warning({ "明日方舟 公告 $type 数据加载失败" }, cause)
                         continue
                     }
@@ -228,7 +227,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
                         try {
                             flow.emit(announcement)
                             history.add(announcement.id)
-                        } catch (cause: Throwable) {
+                        } catch (cause: Exception) {
                             logger.warning({ "公告[${announcement.webUrl}]推送失败" }, cause)
                         }
                     }
@@ -243,14 +242,14 @@ public object ArknightsSubscriber : SimpleListenerHost() {
             launch {
                 while (isActive) {
                     delay(10_000)
-                    delay(cron(type).next())
                     // 加载
                     try {
                         penguin.load(key = type)
-                    } catch (cause: Throwable) {
+                    } catch (cause: Exception) {
                         logger.warning({ "企鹅物流 数据 $type 数据加载失败" }, cause)
                         continue
                     }
+                    delay(cron(type).next())
                 }
             }
         }
@@ -258,25 +257,26 @@ public object ArknightsSubscriber : SimpleListenerHost() {
 
     private fun excel() {
         val cron = ArknightsCronConfig.excel
+        val values = ExcelDataType.values().toList() - ExcelDataType.VERSION
         launch {
             while (isActive) {
                 delay(10_000)
-                delay(cron.next())
 
                 val local = SemVersion(version = excel.version().versionControl)
                 excel.load(ExcelDataType.VERSION)
                 val current = SemVersion(version = excel.version().versionControl)
-                if (local < current) continue
+                if (local >= current) continue
 
                 // 加载
-                for (type in ExcelDataType.values()) {
+                for (type in values) {
                     try {
                         excel.load(key = type)
-                    } catch (cause: Throwable) {
+                    } catch (cause: Exception) {
                         logger.warning({ "游戏数值 数据 $type 数据加载失败" }, cause)
                         continue
                     }
                 }
+                delay(cron.next())
             }
         }
     }
@@ -299,29 +299,22 @@ public object ArknightsSubscriber : SimpleListenerHost() {
 
     public fun listen(contact: Contact) {
         contact.launch(coroutineContext) {
-            if (listened.add(contact.delegate)) {
-                ArknightsCollector(contact).emitAll(flow)
-            }
-        }.invokeOnCompletion {
-            listened.remove(contact.delegate)
+            ArknightsCollector(contact).emitAll(flow)
         }
     }
 
     @EventHandler
     public fun BotOnlineEvent.online() {
         for (group in bot.groups) {
-            if (group.delegate !in ArknightsTaskConfig.contacts) continue
             listen(contact = group)
         }
         for (friend in bot.friends) {
-            if (friend.delegate !in ArknightsTaskConfig.contacts) continue
             listen(contact = friend)
         }
     }
 
     @EventHandler
     public fun BotJoinGroupEvent.join() {
-        if (!ArknightsTaskConfig.auto) return
         launch {
             delay(60_000)
             listen(contact = group)
@@ -331,7 +324,6 @@ public object ArknightsSubscriber : SimpleListenerHost() {
 
     @EventHandler
     public fun FriendAddEvent.add() {
-        if (!ArknightsTaskConfig.auto) return
         launch {
             delay(60_000)
             listen(contact = friend)

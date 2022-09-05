@@ -21,11 +21,21 @@ public class ExcelDataHolder(override val folder: File, override val ignore: sus
     override suspend fun clear(): Unit = Unit
 
     public suspend fun version(): ExcelDataVersion = mutex.withLock {
-        val text = ExcelDataType.VERSION.file.readText()
-        lateinit var stream: String
-        lateinit var change: String
-        lateinit var versionControl: String
-        for ((name, value) in text.lines().filter(String::isNotBlank).map { it.split(":") }) {
+        val file = ExcelDataType.VERSION.file
+        if (file.exists().not()) {
+            return@withLock ExcelDataVersion(
+                stream = "",
+                change = "",
+                versionControl = "0.0.0"
+            )
+        }
+        val text = file.readText()
+        var stream: String? = null
+        var change: String? = null
+        var versionControl: String? = null
+        for (line in text.lineSequence()) {
+            if (line.isBlank()) continue
+            val (name, value) = line.split(":")
             when (name) {
                 "Stream" -> stream = value
                 "Change" -> change = value
@@ -34,9 +44,9 @@ public class ExcelDataHolder(override val folder: File, override val ignore: sus
             }
         }
         ExcelDataVersion(
-            stream = stream,
-            change = change,
-            versionControl = versionControl
+            stream = stream ?: "",
+            change = change ?: "",
+            versionControl = versionControl ?: "0.0.0"
         )
     }
 

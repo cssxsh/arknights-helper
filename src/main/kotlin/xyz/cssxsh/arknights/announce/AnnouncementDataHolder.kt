@@ -29,7 +29,7 @@ public class AnnouncementDataHolder(override val folder: File, override val igno
                 for (announcement in meta.list) {
                     cache[announcement.id] = announcement
                 }
-            } catch (_: Throwable) {
+            } catch (_: Exception) {
                 //
             }
         }

@@ -59,6 +59,7 @@ public data class Announcement(
             .substringBefore("/announcement")
         AnnounceType.valueOf(path)
     }
+    override val url: String get() = webUrl
 }
 
 public enum class AnnouncementGroup {

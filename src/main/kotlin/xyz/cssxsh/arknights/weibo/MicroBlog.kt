@@ -95,7 +95,9 @@ public data class MicroBlog(
     val text: String = "",
     @SerialName("user")
     val user: MicroBlogUser = MicroBlogUser("", "", 0, ""),
-) : CacheInfo
+) : CacheInfo {
+    override val url: String by lazy { "https://weibo.com/${user.id}/${bid.ifBlank { id }}" }
+}
 
 @Serializable
 public data class MicroBlogUser(

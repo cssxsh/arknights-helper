@@ -1,6 +1,7 @@
 package xyz.cssxsh.mirai.arknights
 
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.sync.*
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.*
@@ -12,14 +13,19 @@ import xyz.cssxsh.arknights.*
 import xyz.cssxsh.arknights.announce.*
 import xyz.cssxsh.arknights.bilibili.*
 import xyz.cssxsh.arknights.weibo.*
-import xyz.cssxsh.mirai.arknights.data.ArknightsTaskConfig
+import xyz.cssxsh.mirai.arknights.data.*
 
 public class ArknightsCollector(private val contact: Contact) : FlowCollector<CacheInfo> {
+    internal companion object {
+        val cache: MutableMap<Long, MutableSet<String>> = HashMap<Long, MutableSet<String>>().withDefault { HashSet() }
+        val mutex: Mutex = Mutex()
+    }
 
     /**
      * 推送 [value] 到 [contact]
      */
-    override suspend fun emit(value: CacheInfo) {
+    override suspend fun emit(value: CacheInfo): Unit = mutex.withLock {
+        if (cache.getValue(contact.id).contains(value.url)) return
         val message = when (value) {
             // 微博
             is MicroBlog -> {
@@ -41,7 +47,7 @@ public class ArknightsCollector(private val contact: Contact) : FlowCollector<Ca
             // 公告
             is Announcement -> {
                 val accept = ArknightsTaskConfig.announce[contact.id] ?: return
-                if (accept == value.type) return
+                if (accept.none { it == value.type }) return
                 buildMessageChain {
                     appendLine("鹰角有新公告！${value.title}")
                     append(announcement = value)
@@ -63,6 +69,7 @@ public class ArknightsCollector(private val contact: Contact) : FlowCollector<Ca
             }
         }
         contact.sendMessage(message)
+        cache.getValue(contact.id).add(value.url)
     }
 
     private fun parseNodes(html: String, baseUri: String): List<Node> {
@@ -86,7 +93,7 @@ public class ArknightsCollector(private val contact: Contact) : FlowCollector<Ca
         appendLine("链接: ${blog.url}")
         val content = try {
             ArknightsSubscriber.blogs.content(blog = blog)
-        } catch (cause: Throwable) {
+        } catch (cause: Exception) {
             logger.warning({ "加载[${blog.url}]长微博失败" }, cause)
             blog.raw ?: blog.text
         }
@@ -121,7 +128,7 @@ public class ArknightsCollector(private val contact: Contact) : FlowCollector<Ca
             for (file in images) {
                 append(file.uploadAsImage(contact))
             }
-        } catch (cause: Throwable) {
+        } catch (cause: Exception) {
             logger.warning({ "下载微博图片失败" }, cause)
         }
     }
@@ -129,9 +136,9 @@ public class ArknightsCollector(private val contact: Contact) : FlowCollector<Ca
     private suspend fun MessageChainBuilder.append(announcement: Announcement): MessageChainBuilder = apply {
         appendLine("日期: ${announcement.created.toLocalDate()}")
         appendLine("分类: ${announcement.group}")
-        appendLine("链接: ${announcement.webUrl}")
-        val html = ArknightsSubscriber.announcements.download(announcement.webUrl)
-        for (node in parseNodes(html.readText(), announcement.webUrl)) {
+        appendLine("链接: ${announcement.url}")
+        val html = ArknightsSubscriber.announcements.download(announcement.url)
+        for (node in parseNodes(html.readText(), announcement.url)) {
             when (node) {
                 is TextNode -> append(node.wholeText.trim())
                 is Element -> when (node.nodeName()) {
@@ -140,7 +147,7 @@ public class ArknightsCollector(private val contact: Contact) : FlowCollector<Ca
                         val image = try {
                             ArknightsSubscriber.announcements.download(url = node.attr("src"))
                                 .uploadAsImage(contact)
-                        } catch (cause: Throwable) {
+                        } catch (cause: Exception) {
                             logger.warning({ "下载微博图片失败" }, cause)
                             continue
                         }
@@ -177,7 +184,7 @@ public class ArknightsCollector(private val contact: Contact) : FlowCollector<Ca
             val image = ArknightsSubscriber.videos.cover(video = video)
                 .uploadAsImage(contact)
             append(image)
-        } catch (cause: Throwable) {
+        } catch (cause: Exception) {
             appendLine("添加图片[${video.pic}]失败, ${cause.message}")
         }
     }

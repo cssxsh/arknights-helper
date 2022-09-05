@@ -37,7 +37,7 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
                     )
                 )
             }
-        } catch (_: Throwable) {
+        } catch (_: Exception) {
             //
         }
 
@@ -49,7 +49,7 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
             for (blog in temp.data().blogs()) {
                 cache[blog.id] = blog
             }
-        } catch (_: Throwable) {
+        } catch (_: Exception) {
             //
         }
 
@@ -65,7 +65,7 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
                 val blogs = user.read<List<MicroBlog>>()
 
                 cache.addAll(blogs)
-            } catch (_: Throwable) {
+            } catch (_: Exception) {
                 //
             }
         }

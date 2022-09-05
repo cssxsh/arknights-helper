@@ -59,6 +59,7 @@ public abstract class CacheDataHolder<K : CacheKey, R : CacheInfo> {
                         while (!channel.isClosedForRead) channel.copyTo(output)
                     }
                 }
+                break
             } catch (cause: Throwable) {
                 if (ignore(cause).not()) throw cause
             }
