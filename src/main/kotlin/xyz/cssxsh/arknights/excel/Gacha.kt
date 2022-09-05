@@ -10,7 +10,7 @@ import java.util.*
  */
 public fun GachaTable.recruit(): Set<String> {
     // TODO: handle html
-    return recruitDetail.lines().flatMap { line ->
+    return recruitDetail.lineSequence().flatMap { line ->
         if (line.startsWith("★")) {
             line.substringAfterLast("""\n""").split("/").map { it.trim() }
         } else {
@@ -18,11 +18,6 @@ public fun GachaTable.recruit(): Set<String> {
         }
     }.toSet()
 }
-
-/**
- * 获取公招TAG
- */
-public fun GachaTable.tags(): Set<String> = tags.map { it.name }.toSet()
 
 public typealias RecruitResult = Map<Int, List<Character>>
 
@@ -33,10 +28,10 @@ public fun Collection<Character>.toRecruitResult(): SortedMap<Int, List<Characte
 /**
  * 列出公招结果
  */
-public fun CharacterMap.recruit(words: Set<String>, recruit: Set<String> = name()): RecruitMap {
+public fun CharacterMap.recruit(words: Set<String>, pool: Set<String>): RecruitMap {
     check(words.size in 1..5) { "词条数量不对" }
     val site = minOf(3, words.size)
-    val obtain = values.names(recruit)
+    val obtain = values.names(pool)
     return (0..site).fold(setOf<Set<String>>(emptySet())) { set, _ ->
         words.flatMap { a -> set.map { b -> b + a } }.toSet()
     }.sortedBy { it.size }.associateWith {

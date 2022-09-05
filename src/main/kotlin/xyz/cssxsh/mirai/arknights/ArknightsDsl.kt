@@ -116,31 +116,42 @@ internal val DownloaderIgnore: suspend (Throwable) -> Boolean = {
 }
 
 /**
- * 检查并转换TAG
+ * 公招
+ * @param words 公招词汇
  */
-internal fun tag(words: List<String>, tags: Set<String> = ExcelData.gacha.tags()): Set<String> {
-    val temp = tags.map { it.substring(0..1) }
-    return words.map { it.trim() }.filter { it.isNotBlank() }.map { word ->
-        when (word) {
-            in tags -> word
+public suspend fun recruit(vararg words: String): RecruitMap {
+    val character = ArknightsSubscriber.excel.character()
+    val gacha = ArknightsSubscriber.excel.gacha()
+    val target = HashSet<String>()
+    val pool = HashSet<String>()
+
+    loop@ for (word in words) {
+        for (tag in gacha.tags) {
+            if (tag.name.startsWith(word)) {
+                target.add(tag.name)
+                continue@loop
+            }
+        }
+
+        val transform = when (word) {
             "高资" -> "高级资深干员"
             "支援机械", "机械" -> "支援机械"
             "控制" -> "控场"
             "回费" -> "费用回复"
-            in temp -> tags.elementAt(temp.indexOf(word))
             else -> throw IllegalArgumentException("未知TAG: $word")
         }
-    }.toSet()
-}
-
-internal fun recruit(words: List<String>) = ExcelData.characters.recruit(tag(words), ExcelData.gacha.recruit())
-
-internal fun role(name: String, roles: Set<String> = ExcelData.gacha.recruit()) = name.trim().let {
-    when (it) {
-        in roles -> it
-        in RoleAlias -> RoleAlias.getValue(it)
-        else -> throw IllegalArgumentException("未知干员: $it")
+        target.add(transform)
     }
+
+    for (line in gacha.recruitDetail.lineSequence()) {
+        if (line.startsWith("★")) {
+            for (item in line.substringAfterLast("""\n""").splitToSequence("/")) {
+                pool.add(item.trim())
+            }
+        }
+    }
+
+    return character.recruit(words = target, pool = pool)
 }
 
 @JvmName("buildRecruitMessage")
