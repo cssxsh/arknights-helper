@@ -2,20 +2,36 @@ package xyz.cssxsh.arknights.excel
 
 import io.ktor.client.request.*
 import kotlinx.coroutines.sync.*
+import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
 import java.io.File
+import java.util.*
 
 public class ExcelDataHolder(override val folder: File, override val ignore: suspend (Throwable) -> Boolean) :
     CacheDataHolder<ExcelDataType, CacheInfo>() {
 
-    public override val loaded: MutableSet<ExcelDataType> = HashSet()
+    public override val loaded: Set<ExcelDataType> get() = cache.keys
+
+    private val cache: MutableMap<ExcelDataType, Any> = EnumMap(ExcelDataType::class.java)
+
+    private suspend inline fun <reified T: Any> ExcelDataType.get(): T = mutex.withLock {
+        val raw = cache[this]
+        return if (raw == null) {
+            val read = CustomJson.decodeFromString<T>(file.readText())
+            cache[this] = read
+            read
+        } else {
+            raw as T
+        }
+    }
 
     override suspend fun load(key: ExcelDataType): Unit = mutex.withLock {
         http.prepareGet(key.url).copyTo(target = key.file)
 
-        loaded.add(key)
+        cache.remove(key)
     }
 
+    @Deprecated(message = "raw is empty", level = DeprecationLevel.HIDDEN)
     override suspend fun raw(): List<CacheInfo> = emptyList()
 
     override suspend fun clear(): Unit = Unit
@@ -50,23 +66,23 @@ public class ExcelDataHolder(override val folder: File, override val ignore: sus
         )
     }
 
-    public suspend fun building(): Building = ExcelDataType.BUILDING.read()
+    public suspend fun building(): Building = ExcelDataType.BUILDING.get()
 
-    public suspend fun character(): CharacterTable = ExcelDataType.CHARACTER.read()
+    public suspend fun character(): CharacterTable = ExcelDataType.CHARACTER.get()
 
-    public suspend fun const(): ConstInfo = ExcelDataType.CONST.read()
+    public suspend fun const(): ConstInfo = ExcelDataType.CONST.get()
 
-    public suspend fun enemy(): EnemyTable = ExcelDataType.ENEMY.read()
+    public suspend fun enemy(): EnemyTable = ExcelDataType.ENEMY.get()
 
-    public suspend fun gacha(): GachaTable = ExcelDataType.GACHA.read()
+    public suspend fun gacha(): GachaTable = ExcelDataType.GACHA.get()
 
-    public suspend fun handbook(): HandbookTable = ExcelDataType.HANDBOOK.read()
+    public suspend fun handbook(): HandbookTable = ExcelDataType.HANDBOOK.get()
 
-    public suspend fun skill(): SkillTable = ExcelDataType.SKILL.read()
+    public suspend fun skill(): SkillTable = ExcelDataType.SKILL.get()
 
-    public suspend fun story(): StoryTable = ExcelDataType.STORY.read()
+    public suspend fun story(): StoryTable = ExcelDataType.STORY.get()
 
-    public suspend fun team(): TeamTable = ExcelDataType.TEAM.read()
+    public suspend fun team(): TeamTable = ExcelDataType.TEAM.get()
 
-    public suspend fun zone(): ZoneTable = ExcelDataType.ZONE.read()
+    public suspend fun zone(): ZoneTable = ExcelDataType.ZONE.get()
 }
