@@ -143,24 +143,14 @@ public enum class QuestionType(public val description: String) {
     },
     VOICE("声优相关") {
         override fun load(loader: QuestionDataLoader): QuestionBuilder {
-            val handbooks = runBlocking { loader.excel.handbook().handbooks }
+            val voices = runBlocking { loader.excel.word().voiceLangDict }
             val characters = runBlocking { loader.excel.character() }
             return ChoiceQuestionBuilder(meaning = "声优" to "角色", range = DefaultChoiceRange) {
-                for ((characterId, handbook) in handbooks) {
+                for ((characterId, voice) in voices) {
                     val character = characters[characterId] ?: continue
-                    // TODO voice
-                    add(handbook.voice to character.name)
-                }
-            }
-        }
-    },
-    INFO("档案相关") {
-        override fun load(loader: QuestionDataLoader): QuestionBuilder {
-            val handbooks = runBlocking { loader.excel.handbook().handbooks }
-            val tag = handbooks.tags().random()
-            return ChoiceQuestionBuilder(meaning = "角色" to tag, range = DefaultChoiceRange) {
-                handbooks.mapNotNull { (name, handbook) ->
-                    handbook.infos()[tag]?.let { value -> name to value }
+                    for ((_, dict) in voice.dict) {
+                        add(dict.cvName to character.name)
+                    }
                 }
             }
         }

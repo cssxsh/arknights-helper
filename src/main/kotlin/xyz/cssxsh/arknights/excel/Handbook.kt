@@ -3,24 +3,10 @@ package xyz.cssxsh.arknights.excel
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 
-private val TagRegex = """(?<=【|\[)(.+)(?:]|】)(.+)""".toRegex()
-
-public fun Handbook.infos(): Map<String, String> {
-    return stories.values.flatten().flatMap { text ->
-        TagRegex.findAll(text).map { result ->
-            result.destructured.let { (key, value) -> key to value.trim() }
-        }
-    }.toMap()
-}
-
-public val Handbook.stories: Map<String, List<String>> get() = storyTextAudio.associate { info -> info.title to info.stories.map { it.text } }
-
-public fun HandbookMap.tags(): Set<String> = entries.fold(emptySet<String>()) { acc, (_, handbook) -> acc + handbook.infos().keys }
-
 @Serializable
 public data class HandbookTable(
     @SerialName("handbookDict")
-    val handbooks: HandbookMap,
+    val handbooks: Map<String, Handbook>,
     @SerialName("npcDict")
     val npc: Map<String, NpcInfo>,
     @SerialName("teamMissionList")
