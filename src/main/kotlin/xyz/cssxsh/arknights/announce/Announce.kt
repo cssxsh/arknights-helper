@@ -48,7 +48,7 @@ public data class Announcement(
                 .substringBeforeLast('.')
                 .toLong()
             TimestampSerializer.timestamp(second = second)
-        } catch (_: Throwable) {
+        } catch (_: Exception) {
             LocalDate.now()
                 .withMonth(month).withDayOfMonth(day)
                 .atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime()

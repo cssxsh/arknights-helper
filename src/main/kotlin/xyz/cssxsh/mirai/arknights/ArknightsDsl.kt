@@ -21,8 +21,8 @@ import kotlin.reflect.*
 internal val logger by lazy {
     try {
         ArknightsHelperPlugin.logger
-    } catch (_: Throwable) {
-        MiraiLogger.Factory.create(GameDataDownloader::class)
+    } catch (_: ExceptionInInitializerError) {
+        MiraiLogger.Factory.create(ArknightsSubscriber::class)
     }
 }
 
@@ -30,22 +30,12 @@ internal suspend fun <T : CommandSenderOnMessage<*>> T.nextContent(): String {
     return fromEvent.nextMessage { it.message.content.isNotBlank() }.content
 }
 
-internal const val SendDelay = 60 * 1000L
-
 internal suspend fun <T : CommandSenderOnMessage<*>> T.reply(block: suspend T.(Contact) -> Message) {
     try {
         quoteReply(message = block(fromEvent.subject))
-    } catch (throwable: Throwable) {
-        logger.warning({ "发送消息失败" }, throwable)
-        when {
-            "本群每分钟只能发" in throwable.message.orEmpty() -> {
-                kotlinx.coroutines.delay(SendDelay)
-                reply { throwable.message.orEmpty().toPlainText() }
-            }
-            else -> {
-                quoteReply("发送消息失败， ${throwable.message}")
-            }
-        }
+    } catch (cause: Exception) {
+        logger.warning({ "发送消息失败" }, cause)
+        quoteReply("发送消息失败， ${cause.message}")
     }
 }
 
