@@ -1,6 +1,5 @@
 package xyz.cssxsh.mirai.arknights
 
-import net.mamoe.mirai.*
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.message.data.*
@@ -11,10 +10,7 @@ import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.*
 import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.arknights.penguin.*
-import java.io.*
-import java.net.*
 import java.time.*
-import javax.net.ssl.*
 import kotlin.properties.*
 import kotlin.reflect.*
 
@@ -56,52 +52,6 @@ internal class SubjectDelegate<T>(private val default: (Contact) -> T) :
 
     override fun getValue(thisRef: CommandSenderOnMessage<*>, property: KProperty<*>): T {
         return map.getOrPut(thisRef.fromEvent.subject) { default(thisRef.fromEvent.subject) }
-    }
-}
-
-/**
- * 通过正负号区分群和用户
- */
-internal val Contact.delegate get() = if (this is Group) id * -1 else id
-
-/**
- * 查找Contact
- */
-internal fun findContact(delegate: Long): Contact? {
-    for (bot in Bot.instances.shuffled()) {
-        if (delegate < 0) {
-            for (group in bot.groups) {
-                if (group.id == delegate * -1) return group
-            }
-        } else {
-            for (friend in bot.friends) {
-                if (friend.id == delegate) return friend
-            }
-            for (stranger in bot.strangers) {
-                if (stranger.id == delegate) return stranger
-            }
-            for (group in bot.groups) {
-                for (member in group.members) {
-                    if (member.id == delegate) return member
-                }
-            }
-        }
-    }
-    return null
-}
-
-internal val DownloaderIgnore: suspend (Throwable) -> Boolean = {
-    when (it) {
-        is UnknownHostException, is SSLException -> {
-            false
-        }
-        is IOException -> {
-            logger.warning { "Downloader Ignore $it" }
-            true
-        }
-        else -> {
-            false
-        }
     }
 }
 

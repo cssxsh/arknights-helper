@@ -5,12 +5,11 @@ import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
 import net.mamoe.mirai.console.data.*
-import net.mamoe.mirai.console.extension.*
 import net.mamoe.mirai.console.plugin.jvm.*
+import net.mamoe.mirai.event.*
 import net.mamoe.mirai.utils.*
-import xyz.cssxsh.arknights.*
+import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.mirai.arknights.data.*
-import java.util.*
 import kotlin.collections.*
 import kotlin.reflect.full.*
 
@@ -43,25 +42,19 @@ object ArknightsHelperPlugin : KotlinPlugin(
     }
 
     override fun onEnable() {
-        Downloader.ignore = DownloaderIgnore
         for (config in config) config.reload()
         for (data in data) data.reload()
         for (command in commands) command.register()
 
-        System.setProperty("xyz.cssxsh.arknights.source", ArknightsConfig.source)
+        System.setProperty(ExcelDataHolder.GAME_SOURCE_HOST_KEY, ArknightsConfig.host)
 
-        launch {
-            try {
-                downloadGameData()
-            } catch (cause: Throwable) {
-                logger.warning({ "数据下载失败, 功能可能会不正常" }, cause)
-            }
-        }
+        ArknightsSubscriber.registerTo(globalEventChannel())
+        ArknightsSubscriber.start()
     }
 
     override fun onDisable() {
         for (command in commands) command.unregister()
 
-        ArknightsSubscriber.stop()
+        ArknightsSubscriber.cancel()
     }
 }

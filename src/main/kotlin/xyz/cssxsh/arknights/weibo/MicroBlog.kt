@@ -32,15 +32,13 @@ internal fun extension(pid: String) = ImageExtensions.first { it.startsWith(pid[
 
 internal fun image(pid: String) = "https://${ImageServer.random()}.sinaimg.cn/large/${pid}.${extension(pid)}"
 
-public val MicroBlog.url: String get() = "https://weibo.com/${user.id}/${bid.ifBlank { id }}"
-
 internal fun <T> Temp<T>.data() = requireNotNull(data) { message }
 
 internal fun PictureData.blogs(): Sequence<MicroBlog> = sequence {
     for (card in cards) {
         for (group in card.group) {
             for (picture in group.pictures) {
-                (picture.blog)
+                yield(picture.blog)
             }
         }
     }

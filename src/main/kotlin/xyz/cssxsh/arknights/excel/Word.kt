@@ -52,7 +52,7 @@ public enum class VoiceLangGroupType {
 public data class VoiceLangTypeInfo(
     @SerialName("name")
     val name: String,
-    @SerialName("timestamp")
+    @SerialName("groupType")
     val groupType: VoiceLangGroupType
 )
 

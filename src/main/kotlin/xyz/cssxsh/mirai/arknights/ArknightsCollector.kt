@@ -14,10 +14,11 @@ import xyz.cssxsh.arknights.announce.*
 import xyz.cssxsh.arknights.bilibili.*
 import xyz.cssxsh.arknights.weibo.*
 import xyz.cssxsh.mirai.arknights.data.*
+import java.util.WeakHashMap
 
 public class ArknightsCollector(private val contact: Contact) : FlowCollector<CacheInfo> {
     internal companion object {
-        val cache: MutableMap<Long, MutableSet<String>> = HashMap<Long, MutableSet<String>>().withDefault { HashSet() }
+        val cache = HashMap<Long, MutableMap<String, Long>>().withDefault { WeakHashMap() }
         val mutex: Mutex = Mutex()
     }
 
@@ -69,7 +70,7 @@ public class ArknightsCollector(private val contact: Contact) : FlowCollector<Ca
             }
         }
         contact.sendMessage(message)
-        cache.getValue(contact.id).add(value.url)
+        cache.getValue(contact.id)[value.url] = System.currentTimeMillis()
     }
 
     private fun parseNodes(html: String, baseUri: String): List<Node> {

@@ -9,6 +9,9 @@ import java.util.*
 
 public class ExcelDataHolder(override val folder: File, override val ignore: suspend (Throwable) -> Boolean) :
     CacheDataHolder<ExcelDataType, CacheInfo>() {
+    public companion object {
+        internal const val GAME_SOURCE_HOST_KEY = "xyz.cssxsh.arknights.source"
+    }
 
     override val cache: MutableMap<ExcelDataType, Any> = EnumMap(ExcelDataType::class.java)
 
@@ -24,7 +27,10 @@ public class ExcelDataHolder(override val folder: File, override val ignore: sus
     }
 
     override suspend fun load(key: ExcelDataType): Unit = mutex.withLock {
-        http.prepareGet(key.url).copyTo(target = key.file)
+        http.prepareGet(key.url) {
+            val host = System.getProperty(GAME_SOURCE_HOST_KEY, "raw.githubusercontent.com")
+            if (this.host != host) this.host = host
+        }.copyTo(target = key.file)
 
         cache.remove(key)
     }
@@ -75,6 +81,8 @@ public class ExcelDataHolder(override val folder: File, override val ignore: sus
     public suspend fun gacha(): GachaTable = ExcelDataType.GACHA.get()
 
     public suspend fun handbook(): HandbookTable = ExcelDataType.HANDBOOK.get()
+
+    public suspend fun word(): Word = ExcelDataType.WORD.get()
 
     public suspend fun skill(): SkillTable = ExcelDataType.SKILL.get()
 
