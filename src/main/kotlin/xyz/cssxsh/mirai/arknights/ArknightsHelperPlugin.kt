@@ -12,6 +12,7 @@ import xyz.cssxsh.arknights.*
 import xyz.cssxsh.mirai.arknights.data.*
 import java.util.*
 import kotlin.collections.*
+import kotlin.reflect.full.*
 
 object ArknightsHelperPlugin : KotlinPlugin(
     JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "1.4.2") {
@@ -25,24 +26,20 @@ object ArknightsHelperPlugin : KotlinPlugin(
     private val data: List<PluginData> by lazy { service() }
 
     private inline fun <reified T> service(): List<T> {
-        val result: MutableList<T> = ArrayList()
-        ServiceLoader.load(T::class.java, jvmPluginClasspath.pluginClassLoader)
-            .stream().forEach { provider ->
-                try {
-                    val instance = provider.type().kotlin.objectInstance ?: provider.get()
-                    result.add(instance)
-                } catch (cause: Throwable) {
-                    logger.warning { "${provider.type().name} 注册失败" }
-                }
+        val text = getResource("META-INF/services/${T::class.qualifiedName}") ?: return emptyList()
+        return text.lineSequence().mapNotNull { name ->
+            try {
+                val clazz = jvmPluginClasspath.pluginClassLoader.loadClass(name)
+                val instance = clazz.kotlin.objectInstance ?: clazz.kotlin.createInstance()
+                instance as T
+            } catch (_: ClassNotFoundException) {
+                logger.warning { "SPI 服务 $name 注册错误" }
+                null
+            } catch (cause: Exception) {
+                logger.warning({ "SPI 服务 $name 初始化错误" }, cause)
+                null
             }
-
-        return result
-    }
-
-    override fun PluginComponentStorage.onLoad() {
-        runAfterStartup {
-            ArknightsSubscriber.start()
-        }
+        }.toList()
     }
 
     override fun onEnable() {
@@ -63,10 +60,7 @@ object ArknightsHelperPlugin : KotlinPlugin(
     }
 
     override fun onDisable() {
-        // Command
-        for (command in commands) {
-            command.unregister()
-        }
+        for (command in commands) command.unregister()
 
         ArknightsSubscriber.stop()
     }
