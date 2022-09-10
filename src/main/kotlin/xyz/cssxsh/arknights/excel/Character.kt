@@ -222,7 +222,7 @@ public data class Character(
     @SerialName("rarity")
     val rarity: Int,
     /**
-     * 技能 XXX
+     * 技能
      */
     @SerialName("skills")
     val skills: List<SkillInfo>,

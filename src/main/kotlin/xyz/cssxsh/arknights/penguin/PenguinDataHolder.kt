@@ -10,9 +10,7 @@ import java.util.*
 public class PenguinDataHolder(override val folder: File, override val ignore: suspend (Throwable) -> Boolean) :
     CacheDataHolder<PenguinDataType, CacheInfo>() {
 
-    public override val loaded: Set<PenguinDataType> get() = cache.keys
-
-    private val cache: MutableMap<PenguinDataType, Any> = EnumMap(PenguinDataType::class.java)
+    public override val cache: MutableMap<PenguinDataType, Any> = EnumMap(PenguinDataType::class.java)
 
     private suspend inline fun <reified T: Any> PenguinDataType.get(): T = mutex.withLock {
         val raw = cache[this]
@@ -32,7 +30,7 @@ public class PenguinDataHolder(override val folder: File, override val ignore: s
     }
 
     @Deprecated(message = "raw is empty", level = DeprecationLevel.HIDDEN)
-    override suspend fun raw(): List<CacheInfo> = emptyList()
+    override suspend fun raw(key: PenguinDataType): List<CacheInfo> = emptyList()
 
     override suspend fun clear(): Unit = Unit
 

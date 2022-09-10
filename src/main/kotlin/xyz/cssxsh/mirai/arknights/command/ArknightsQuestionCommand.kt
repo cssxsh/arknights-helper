@@ -8,29 +8,28 @@ import java.time.*
 
 public object ArknightsQuestionCommand : CompositeCommand(
     owner = ArknightsHelperPlugin,
-    "question", "问题",
+    "ark-question", "方舟问题",
     description = "明日方舟助手自定义问题指令"
 ) {
 
     @SubCommand("detail", "详情")
     @Description("查看问题详情")
     public suspend fun CommandSenderOnMessage<*>.detail(name: String): Unit = reply {
-        requireNotNull(CustomQuestions[name]) { "没有找到题目${name}" }.let {
-            buildMessageChain {
-                appendLine("问题：${it.problem}")
-                appendLine("选项：${it.options}")
-                appendLine("合成玉：${it.coin}")
-                appendLine("限时：${it.timeout / 1000}s")
-            }
+        val question = requireNotNull(CustomQuestions[name]) { "没有找到题目${name}" }
+        buildMessageChain {
+            appendLine("问题：${question.problem}")
+            appendLine("选项：${question.options}")
+            appendLine("合成玉：${question.coin}")
+            appendLine("限时：${question.timeout / 1000}s")
         }
     }
 
     @SubCommand("list", "列表")
     @Description("列出已经设置的自定义问题")
     public suspend fun CommandSenderOnMessage<*>.list(): Unit = reply {
-        CustomQuestions.entries.joinToString("\n") { (name, question) ->
+        CustomQuestions.entries.joinTo(MessageChainBuilder(),"\n") { (name, question) ->
             "$name => ${question.problem}"
-        }.toPlainText()
+        }.build()
     }
 
     @SubCommand("delete", "删除")
@@ -54,7 +53,7 @@ public object ArknightsQuestionCommand : CompositeCommand(
         val tips = nextContent()
         sendMessage("时间(单位秒):")
         val duration = nextContent().toLong() * 1000
-        val question = CustomQuestion(problem, right, error, coin, tips, duration)
+        val question = CustomQuestionInfo(problem, right, error, coin, tips, duration)
         CustomQuestions += ("${fromEvent.sender.nick} ${OffsetDateTime.now().withNano(0)}" to question)
         "问题${question} 已添加".toPlainText()
     }

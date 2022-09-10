@@ -5,9 +5,9 @@ import kotlinx.serialization.*
 @Serializable
 public data class Building(
     @SerialName("buffs")
-    val buffs: Map<String, BuildingBuff>,// XXX
+    val buffs: Map<String, BuildingBuff>,
     @SerialName("chars")
-    val characters: Map<String, CharacterBuildingInfo>,// XXX
+    val characters: Map<String, CharacterBuildingInfo>,
 )
 
 @Serializable

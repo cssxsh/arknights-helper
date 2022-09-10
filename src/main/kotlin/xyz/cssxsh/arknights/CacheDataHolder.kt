@@ -29,11 +29,11 @@ public abstract class CacheDataHolder<K : CacheKey, R : CacheInfo> {
     }
     public abstract val folder: File
 
-    public abstract val loaded: Set<K>
+    protected abstract val cache: MutableMap<K, *>
 
     public abstract suspend fun load(key: K)
 
-    public abstract suspend fun raw(): List<R>
+    public abstract suspend fun raw(key: K): List<R>
 
     public abstract suspend fun clear()
 

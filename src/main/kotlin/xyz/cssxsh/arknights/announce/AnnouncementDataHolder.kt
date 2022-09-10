@@ -5,6 +5,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.*
 import xyz.cssxsh.arknights.*
 import java.io.File
+import java.util.*
 
 public class AnnouncementDataHolder(override val folder: File, override val ignore: suspend (Throwable) -> Boolean) :
     CacheDataHolder<AnnounceType, Announcement>() {
@@ -13,28 +14,15 @@ public class AnnouncementDataHolder(override val folder: File, override val igno
         private val html: Mutex = Mutex()
     }
 
-    public override val loaded: MutableSet<AnnounceType> = HashSet()
+    override val cache: MutableMap<AnnounceType, List<Announcement>> = EnumMap(AnnounceType::class.java)
 
     override suspend fun load(key: AnnounceType): Unit = mutex.withLock {
         http.prepareGet(key.url).copyTo(target = key.file)
-
-        loaded.add(key)
+        cache.remove(key)
     }
 
-    override suspend fun raw(): List<Announcement> {
-        val cache: MutableMap<Int, Announcement> = HashMap()
-        for (type in loaded) {
-            try {
-                val meta = type.read<AnnouncementMeta>()
-                for (announcement in meta.list) {
-                    cache[announcement.id] = announcement
-                }
-            } catch (_: Exception) {
-                //
-            }
-        }
-
-        return cache.values.toList()
+    override suspend fun raw(key: AnnounceType): List<Announcement> = mutex.withLock {
+        cache[key] ?: key.read<AnnouncementMeta>().list
     }
 
     override suspend fun clear(): Unit = html.withLock {

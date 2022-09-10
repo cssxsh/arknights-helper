@@ -1,13 +1,10 @@
 package xyz.cssxsh.mirai.arknights.data
 
-import net.mamoe.mirai.console.data.AutoSavePluginData
-import net.mamoe.mirai.console.data.ValueDescription
-import net.mamoe.mirai.console.data.value
-import xyz.cssxsh.arknights.mine.CustomQuestion
-import xyz.cssxsh.arknights.mine.QuestionType
+import net.mamoe.mirai.console.data.*
+import xyz.cssxsh.arknights.mine.*
 
-public object ArknightsMineData : AutoSavePluginData("mine") {
-    private val default = CustomQuestion(
+public object ArknightsMineData : AutoSavePluginData("mine"), CustomQuestionHolder {
+    private val default = CustomQuestionInfo(
         problem = "以下那个干员被称为老女人",
         options = mapOf(
             "凯尔希" to true,
@@ -21,7 +18,7 @@ public object ArknightsMineData : AutoSavePluginData("mine") {
     )
 
     @ValueDescription("Key 是问题ID，Value是问题")
-    public val question: MutableMap<String, CustomQuestion> by value(mutableMapOf("default" to default))
+    public override val question: MutableMap<String, CustomQuestionInfo> by value(mutableMapOf("default" to default))
 
     @ValueDescription("正确数 错误数 和 超时数")
     public val count: MutableMap<QuestionType, MutableList<Int>> by value()

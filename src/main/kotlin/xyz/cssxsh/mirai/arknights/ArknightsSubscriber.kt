@@ -118,14 +118,11 @@ public object ArknightsSubscriber : SimpleListenerHost() {
     private fun video() {
         val history: MutableSet<String> = HashSet()
         val cron: (VideoType) -> Cron = { ArknightsCronConfig.video[it] ?: ArknightsCronConfig.default }
-        val init = launch {
-            videos.raw().forEach {
-                history.add(it.bvid)
-            }
-        }
         for (type in VideoType.values()) {
             launch {
-                init.join()
+                for (video in videos.raw(type)) {
+                    history.add(video.bvid)
+                }
                 while (isActive) {
                     delay(10_000)
                     delay(cron(type).next())
@@ -137,7 +134,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
                         continue
                     }
                     // 推送
-                    val new = videos.raw()
+                    val new = videos.raw(type)
                         .filter { video -> video.isToday() && video.bvid !in history }
                         .sortedBy { it.created }
                     if (new.isEmpty()) continue
@@ -158,14 +155,11 @@ public object ArknightsSubscriber : SimpleListenerHost() {
     private fun weibo() {
         val history: MutableSet<Long> = HashSet()
         val cron: (BlogUser) -> Cron = { ArknightsCronConfig.blog[it] ?: ArknightsCronConfig.default }
-        val init = launch {
-            blogs.raw().forEach {
-                history.add(it.id)
-            }
-        }
         for (user in BlogUser.values()) {
             launch {
-                init.join()
+                for (blog in blogs.raw(user)) {
+                    history.add(blog.id)
+                }
                 while (isActive) {
                     delay(10_000)
                     delay(cron(user).next())
@@ -177,7 +171,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
                         continue
                     }
                     // 推送
-                    val raw = blogs.raw()
+                    val raw = blogs.raw(user)
                         .filter { blog -> blog.isToday() && blog.id !in history }
                         .sortedBy { it.created }
                     if (raw.isEmpty()) continue
@@ -198,14 +192,11 @@ public object ArknightsSubscriber : SimpleListenerHost() {
     private fun announce() {
         val history: MutableSet<Int> = HashSet()
         val cron = ArknightsCronConfig.announce
-        val init = launch {
-            announcements.raw().forEach {
-                history.add(it.id)
-            }
-        }
         for (type in AnnounceType.values()) {
             launch {
-                init.join()
+                for (announcement in announcements.raw(type)) {
+                    history.add(announcement.id)
+                }
                 while (isActive) {
                     delay(10_000)
                     delay(cron.next())
@@ -218,7 +209,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
                     }
                     // 推送
 
-                    val new = announcements.raw()
+                    val new = announcements.raw(type)
                         .filter { announcement -> announcement.isToday() && announcement.id !in history }
                         .sortedBy { it.id }
                     if (new.isEmpty()) continue

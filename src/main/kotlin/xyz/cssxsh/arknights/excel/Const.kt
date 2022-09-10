@@ -149,9 +149,6 @@ public data class ConstInfo(
     private val weeklyOverrideDesc: String
 )
 
-/**
- * XXX
- */
 @Serializable
 public data class CharAssistRefreshTime(
     @SerialName("Hour")

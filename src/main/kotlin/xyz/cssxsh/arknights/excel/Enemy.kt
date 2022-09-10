@@ -14,7 +14,7 @@ public data class Enemy(
     @SerialName("attack")
     val attack: String,
     @SerialName("attackType")
-    val type: String,// XXX 多属性用空格分开
+    val type: String,// 多属性用空格分开
     @SerialName("defence")
     val defence: String,
     @SerialName("description")

@@ -6,16 +6,18 @@ import kotlinx.coroutines.sync.*
 import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
 import java.io.File
+import java.util.*
+import kotlin.collections.*
 
 public class MicroBlogDataHolder(override val folder: File, override val ignore: suspend (Throwable) -> Boolean) :
     CacheDataHolder<BlogUser, MicroBlog>() {
 
-    public override val loaded: MutableSet<BlogUser> = HashSet()
+    override val cache: MutableMap<BlogUser, List<MicroBlog>> = EnumMap(BlogUser::class.java)
 
     private fun timestamp(id: Long): Long = (id shr 22) + 515483463L
 
     override suspend fun load(key: BlogUser) {
-        val cache: MutableMap<Long, MicroBlog> = HashMap()
+        val blogs: MutableMap<Long, MicroBlog> = HashMap()
 
         try {
             val text = http.prepareGet(BLOG_API) { parameter("containerid", "107803${key.id}") }
@@ -23,12 +25,12 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
             val temp = CustomJson.decodeFromString<Temp<PictureData>>(text)
 
             for (blog in temp.data().blogs()) {
-                cache.compute(blog.id) { _, old ->
+                blogs.compute(blog.id) { _, old ->
                     old?.copy(pictures = old.pictures + blog.pictures) ?: blog
                 }
             }
 
-            cache.replaceAll { _, blog ->
+            blogs.replaceAll { _, blog ->
                 blog.copy(
                     created = TimestampSerializer.timestamp(second = timestamp(id = blog.id)),
                     user = blog.user.copy(
@@ -47,7 +49,7 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
             val temp = CustomJson.decodeFromString<Temp<WeiboData>>(text)
 
             for (blog in temp.data().blogs()) {
-                cache[blog.id] = blog
+                blogs[blog.id] = blog
             }
         } catch (_: Exception) {
             //
@@ -55,22 +57,15 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
 
         key.write(cache.values.toList())
 
-        loaded.add(key)
+        cache[key] = blogs.values.toList()
     }
 
-    override suspend fun raw(): List<MicroBlog> {
-        val cache: MutableList<MicroBlog> = ArrayList()
-        for (user in loaded) {
-            try {
-                val blogs = user.read<List<MicroBlog>>()
-
-                cache.addAll(blogs)
-            } catch (_: Exception) {
-                //
-            }
+    override suspend fun raw(key: BlogUser): List<MicroBlog> {
+        return cache[key] ?: try {
+            key.read()
+        } catch (_: NoSuchFileException) {
+            emptyList()
         }
-
-        return cache
     }
 
     override suspend fun clear(): Unit = mutex.withLock {

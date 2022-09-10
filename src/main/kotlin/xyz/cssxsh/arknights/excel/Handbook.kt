@@ -86,7 +86,7 @@ public data class NpcInfo(
     @SerialName("npcId")
     override val id: String,
     @SerialName("profession")
-    val profession: String,// XXX
+    val profession: String,
     @SerialName("teamId")
     override val team: String?,
     @SerialName("unlockDict")
@@ -102,7 +102,7 @@ public data class TeamInfo(
     @SerialName("item")
     val item: LegacyItem,
     @SerialName("powerId")
-    val powerId: String, // XXX
+    val powerId: String,
     @SerialName("powerName")
     val powerName: String,
     @SerialName("sort")

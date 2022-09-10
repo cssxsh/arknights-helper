@@ -10,9 +10,7 @@ import java.util.*
 public class ExcelDataHolder(override val folder: File, override val ignore: suspend (Throwable) -> Boolean) :
     CacheDataHolder<ExcelDataType, CacheInfo>() {
 
-    public override val loaded: Set<ExcelDataType> get() = cache.keys
-
-    private val cache: MutableMap<ExcelDataType, Any> = EnumMap(ExcelDataType::class.java)
+    override val cache: MutableMap<ExcelDataType, Any> = EnumMap(ExcelDataType::class.java)
 
     private suspend inline fun <reified T: Any> ExcelDataType.get(): T = mutex.withLock {
         val raw = cache[this]
@@ -32,7 +30,7 @@ public class ExcelDataHolder(override val folder: File, override val ignore: sus
     }
 
     @Deprecated(message = "raw is empty", level = DeprecationLevel.HIDDEN)
-    override suspend fun raw(): List<CacheInfo> = emptyList()
+    override suspend fun raw(key: ExcelDataType): List<CacheInfo> = emptyList()
 
     override suspend fun clear(): Unit = Unit
 

@@ -8,14 +8,16 @@ import kotlinx.coroutines.sync.*
 import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
 import java.io.File
+import java.util.*
+import kotlin.collections.*
 
 public class VideoDataHolder(override val folder: File, override val ignore: suspend (Throwable) -> Boolean) :
     CacheDataHolder<VideoType, Video>() {
 
-    override val loaded: MutableSet<VideoType> = HashSet()
+    public override val cache: MutableMap<VideoType, List<Video>> = EnumMap(VideoType::class.java)
 
     override suspend fun load(key: VideoType) {
-        val cache: MutableList<Video> = ArrayList()
+        val videos: MutableList<Video> = ArrayList()
         for (index in 1..5) {
             val history = http.prepareGet(key.url) {
                 parameter("mid", BILIBILI_ID)
@@ -30,28 +32,21 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
                 temp.data ?: throw ResponseException(response, json)
             }
 
-            cache.addAll(history.list.videos)
+            videos.addAll(history.list.videos)
 
-            if (cache.size == history.page.count) break
+            if (videos.size == history.page.count) break
         }
-        key.write(cache)
+        key.write(videos)
 
-        loaded.add(key)
+        cache[key] = videos
     }
 
-    override suspend fun raw(): List<Video> {
-        val cache: MutableList<Video> = ArrayList()
-        for (type in loaded) {
-            try {
-                val videos = type.read<List<Video>>()
-
-                cache.addAll(videos)
-            } catch (_: Exception) {
-                //
-            }
+    override suspend fun raw(key: VideoType): List<Video> {
+        return cache[key] ?: try {
+            key.read()
+        } catch (_: NoSuchFileException) {
+            emptyList()
         }
-
-        return cache
     }
 
     override suspend fun clear(): Unit = mutex.withLock {
