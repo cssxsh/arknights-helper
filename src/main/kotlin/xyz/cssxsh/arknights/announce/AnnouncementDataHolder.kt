@@ -4,7 +4,7 @@ import io.ktor.client.request.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.*
 import xyz.cssxsh.arknights.*
-import java.io.File
+import java.io.*
 import java.util.*
 
 public class AnnouncementDataHolder(override val folder: File, override val ignore: suspend (Throwable) -> Boolean) :
@@ -22,7 +22,11 @@ public class AnnouncementDataHolder(override val folder: File, override val igno
     }
 
     override suspend fun raw(key: AnnounceType): List<Announcement> = mutex.withLock {
-        cache[key] ?: key.read<AnnouncementMeta>().list
+        return cache[key] ?: try {
+            key.read<AnnouncementMeta>().list
+        } catch (_: FileNotFoundException) {
+            emptyList()
+        }
     }
 
     override suspend fun clear(): Unit = html.withLock {

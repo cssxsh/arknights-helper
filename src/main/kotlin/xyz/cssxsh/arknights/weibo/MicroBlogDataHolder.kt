@@ -5,7 +5,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.*
 import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
-import java.io.File
+import java.io.*
 import java.util.*
 import kotlin.collections.*
 
@@ -55,7 +55,7 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
             //
         }
 
-        key.write(cache.values.toList())
+        key.write(blogs.values.toList())
 
         cache[key] = blogs.values.toList()
     }
@@ -63,7 +63,7 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
     override suspend fun raw(key: BlogUser): List<MicroBlog> {
         return cache[key] ?: try {
             key.read()
-        } catch (_: NoSuchFileException) {
+        } catch (_: FileNotFoundException) {
             emptyList()
         }
     }

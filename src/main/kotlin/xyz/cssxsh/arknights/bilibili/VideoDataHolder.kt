@@ -7,7 +7,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.*
 import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
-import java.io.File
+import java.io.*
 import java.util.*
 import kotlin.collections.*
 
@@ -44,7 +44,7 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
     override suspend fun raw(key: VideoType): List<Video> {
         return cache[key] ?: try {
             key.read()
-        } catch (_: NoSuchFileException) {
+        } catch (_: FileNotFoundException) {
             emptyList()
         }
     }
