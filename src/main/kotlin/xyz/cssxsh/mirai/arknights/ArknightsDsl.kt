@@ -26,20 +26,18 @@ internal suspend fun <T : CommandSenderOnMessage<*>> T.nextContent(): String {
     return fromEvent.nextMessage { it.message.content.isNotBlank() }.content
 }
 
-internal suspend fun <T : CommandSenderOnMessage<*>> T.reply(block: suspend T.(Contact) -> Message) {
+internal suspend fun CommandSenderOnMessage<*>.reply(block: suspend UserCommandSender.() -> Message) {
     try {
-        quoteReply(message = block(fromEvent.subject))
+        quoteReply(message = block.invoke(this as UserCommandSender))
     } catch (cause: Exception) {
         logger.warning({ "发送消息失败" }, cause)
-        quoteReply("发送消息失败， ${cause.message}")
+        quoteReply(message = "发送消息失败， ${cause.message}".toPlainText())
     }
 }
 
 internal suspend fun CommandSenderOnMessage<*>.quoteReply(message: Message): MessageReceipt<Contact>? {
     return sendMessage(fromEvent.message.quote() + message)
 }
-
-internal suspend fun CommandSenderOnMessage<*>.quoteReply(message: String) = quoteReply(message.toPlainText())
 
 internal class SubjectDelegate<T>(private val default: (Contact) -> T) :
     ReadWriteProperty<CommandSenderOnMessage<*>, T> {
