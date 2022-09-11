@@ -7,11 +7,9 @@ import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
 import net.mamoe.mirai.console.data.*
 import net.mamoe.mirai.console.plugin.jvm.*
 import net.mamoe.mirai.event.*
-import net.mamoe.mirai.utils.*
 import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.mirai.arknights.data.*
 import kotlin.collections.*
-import kotlin.reflect.full.*
 
 object ArknightsHelperPlugin : KotlinPlugin(
     JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "1.4.2") {
@@ -20,25 +18,17 @@ object ArknightsHelperPlugin : KotlinPlugin(
     }
 ) {
 
-    private val commands: List<Command> by lazy { service() }
-    private val config: List<PluginConfig> by lazy { service() }
-    private val data: List<PluginData> by lazy { service() }
+    private val commands: List<Command> by services()
+    private val config: List<PluginConfig> by services()
+    private val data: List<PluginData> by services()
 
-    private inline fun <reified T> service(): List<T> {
-        val text = getResource("META-INF/services/${T::class.qualifiedName}") ?: return emptyList()
-        return text.lineSequence().mapNotNull { name ->
-            try {
-                val clazz = jvmPluginClasspath.pluginClassLoader.loadClass(name)
-                val instance = clazz.kotlin.objectInstance ?: clazz.kotlin.createInstance()
-                instance as T
-            } catch (_: ClassNotFoundException) {
-                logger.warning { "SPI 服务 $name 注册错误" }
-                null
-            } catch (cause: Exception) {
-                logger.warning({ "SPI 服务 $name 初始化错误" }, cause)
-                null
-            }
-        }.toList()
+    @Suppress("INVISIBLE_MEMBER")
+    private inline fun <reified T : Any> services(): Lazy<List<T>> = lazy {
+        with(net.mamoe.mirai.console.internal.util.PluginServiceHelper) {
+            jvmPluginClasspath.pluginClassLoader
+                .findServices<T>()
+                .loadAllServices()
+        }
     }
 
     override fun onEnable() {
