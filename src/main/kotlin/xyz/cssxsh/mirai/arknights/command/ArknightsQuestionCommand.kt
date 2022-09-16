@@ -15,7 +15,7 @@ public object ArknightsQuestionCommand : CompositeCommand(
     @SubCommand("detail", "详情")
     @Description("查看问题详情")
     public suspend fun CommandSenderOnMessage<*>.detail(name: String): Unit = reply {
-        val question = requireNotNull(CustomQuestions[name]) { "没有找到题目${name}" }
+        val question = requireNotNull(ArknightsQuestionLoader.custom.question[name]) { "没有找到题目${name}" }
         buildMessageChain {
             appendLine("问题：${question.problem}")
             appendLine("选项：${question.options}")
@@ -27,15 +27,18 @@ public object ArknightsQuestionCommand : CompositeCommand(
     @SubCommand("list", "列表")
     @Description("列出已经设置的自定义问题")
     public suspend fun CommandSenderOnMessage<*>.list(): Unit = reply {
-        CustomQuestions.entries.joinTo(MessageChainBuilder(),"\n") { (name, question) ->
-            "$name => ${question.problem}"
-        }.build()
+        buildMessageChain {
+            for ((name, question) in ArknightsQuestionLoader.custom.question) {
+                appendLine("$name => ${question.problem}")
+            }
+        }
     }
 
     @SubCommand("delete", "删除")
     @Description("删除指定问题")
     public suspend fun CommandSenderOnMessage<*>.delete(name: String): Unit = reply {
-        (CustomQuestions.remove(name)?.let { "问题：${it.problem} 已删除" } ?: "删除失败").toPlainText()
+        (ArknightsQuestionLoader.custom.question.remove(name)?.let { "问题：${it.problem} 已删除" } ?: "删除失败")
+            .toPlainText()
     }
 
     @SubCommand("add", "添加")
@@ -54,7 +57,8 @@ public object ArknightsQuestionCommand : CompositeCommand(
         sendMessage("时间(单位秒):")
         val duration = nextContent().toLong() * 1000
         val question = CustomQuestionInfo(problem, right, error, coin, tips, duration)
-        CustomQuestions += ("${fromEvent.sender.nick} ${OffsetDateTime.now().withNano(0)}" to question)
+        val name = "${fromEvent.sender.nick} ${OffsetDateTime.now().withNano(0)}"
+        ArknightsQuestionLoader.custom.question[name] = question
         "问题${question} 已添加".toPlainText()
     }
 

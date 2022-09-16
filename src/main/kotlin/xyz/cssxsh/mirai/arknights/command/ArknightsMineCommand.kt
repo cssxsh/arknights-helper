@@ -20,12 +20,6 @@ public object ArknightsMineCommand : SimpleCommand(
     description = "明日方舟助手挖矿指令"
 ) {
 
-    private val loader = object : QuestionDataLoader {
-        override val excel: ExcelDataHolder get() = ArknightsSubscriber.excel
-        override val video: VideoDataHolder get() = ArknightsSubscriber.videos
-        override val custom: CustomQuestionHolder get() = ArknightsMineData
-    }
-
     private suspend inline fun <reified P : MessageEvent> P.nextAnswerOrNull(
         timeoutMillis: Long,
         priority: EventPriority = EventPriority.MONITOR,
@@ -40,7 +34,7 @@ public object ArknightsMineCommand : SimpleCommand(
 
     @Handler
     public suspend fun CommandSenderOnMessage<*>.handler(type: QuestionType = QuestionType.values().random()) {
-        val question = type.random(loader)
+        val question = type.random(ArknightsQuestionLoader)
 
         val (reply, time) = mutex.withLock {
             sendMessage(fromEvent.message.quote() + question.toMessage())

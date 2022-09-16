@@ -249,7 +249,7 @@ public interface QuestionDataLoader {
 }
 
 public interface CustomQuestionHolder {
-    public val question: Map<String, CustomQuestionInfo>
+    public val question: MutableMap<String, CustomQuestionInfo>
 }
 
 public sealed class QuestionBuilder {
