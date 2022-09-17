@@ -31,13 +31,25 @@ public object ArknightsMineCommand : SimpleCommand(
             }
         }
     }
+    
+    private fun countQuestionType(type: QuestionType, mode: Int) {
+        ArknightsMineData.count.compute(type) { _, s ->
+            (s ?: mutableListOf(0, 0, 0)).apply { this[mode] += 1 }
+        }
+    }
 
     @Handler
     public suspend fun CommandSenderOnMessage<*>.handler(type: QuestionType = QuestionType.values().random()) {
         val question = type.random(ArknightsQuestionLoader)
 
         val (reply, time) = mutex.withLock {
-            sendMessage(fromEvent.message.quote() + question.toMessage())
+            sendMessage(buildMessageChain {
+                append(fromEvent.message.quote())
+                appendLine("[${type}]<${question.coin}>：${question.problem} (${question.timeout / 1000}s内作答)")
+                for ((index, text) in question.options) {
+                    appendLine("${index}.${text}")
+                }
+            })
 
             val start = System.currentTimeMillis()
             fromEvent.nextAnswerOrNull(question.timeout) { next ->

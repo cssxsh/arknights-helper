@@ -4,6 +4,7 @@ import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.message.data.*
 import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.mirai.arknights.*
+import xyz.cssxsh.mirai.arknights.data.*
 import java.time.*
 
 public object ArknightsQuestionCommand : CompositeCommand(
@@ -11,6 +12,8 @@ public object ArknightsQuestionCommand : CompositeCommand(
     "ark-question", "方舟问题",
     description = "明日方舟助手自定义问题指令"
 ) {
+
+    private val count get() = ArknightsMineData.count
 
     @SubCommand("detail", "详情")
     @Description("查看问题详情")
@@ -65,6 +68,13 @@ public object ArknightsQuestionCommand : CompositeCommand(
     @SubCommand("count", "统计")
     @Description("问题统计")
     public suspend fun CommandSenderOnMessage<*>.count(): Unit = reply {
-        tableMineCount().toPlainText()
+        buildMessageChain {
+            appendLine("# 答题统计")
+            appendLine("| 类型 | 正确 | 错误 | 超时 | 总计 |")
+            appendLine("|:----:|:----:|:----:|:----:|:----:|")
+            count.forEach { type, (f, s, t) ->
+                appendLine("| $type | $f | $s | $t | ${f + s + t} |")
+            }
+        }
     }
 }
