@@ -29,6 +29,7 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
             }.execute { response ->
                 val json = response.bodyAsText()
                 val temp = CustomJson.decodeFromString<Temp>(json)
+                if (temp.code != 0) throw ResponseException(response, json)
                 temp.data ?: throw ResponseException(response, json)
             }
 

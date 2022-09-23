@@ -8,11 +8,11 @@ public val AnnouncementMeta.focus: Announcement? get() = list.firstOrNull { it.i
 
 @Serializable
 public enum class AnnounceType(override val url: String) : CacheKey {
-    Android("https://ak-conf.hypergryph.com/config/prod/announce_meta/Android/announcement.meta.json"),
+    ANDROID("https://ak-conf.hypergryph.com/config/prod/announce_meta/Android/announcement.meta.json"),
     IOS("https://ak-conf.hypergryph.com/config/prod/announce_meta/IOS/announcement.meta.json"),
-    Bilibili("https://ak-conf.hypergryph.com/config/prod/announce_meta/Bilibili/announcement.meta.json");
+    BILIBILI("https://ak-conf.hypergryph.com/config/prod/announce_meta/Bilibili/announcement.meta.json");
 
-    override val filename: String = "${name}.json"
+    override val filename: String = "ANNOUNCE.${name}.json"
 }
 
 @Serializable
