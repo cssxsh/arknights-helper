@@ -15,7 +15,7 @@ public enum class VideoType(public val tid: Int) : CacheKey {
     GAME(4),
     ENTERTAINMENT(5);
 
-    override val filename: String = "${name}.json"
+    override val filename: String = "BILIBILI.${name}.json"
 
     override val url: String = BILIBILI_API
 }
@@ -35,9 +35,9 @@ internal data class Temp(
 @Serializable
 internal data class VideoHistory(
     @SerialName("list")
-    val list: VideoList,
+    val list: VideoList = VideoList(emptyList()),
     @SerialName("page")
-    val page: VideoPage
+    val page: VideoPage? = null
 )
 
 @Serializable

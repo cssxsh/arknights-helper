@@ -19,7 +19,7 @@ public enum class BlogUser(public val id: Long) : CacheKey {
     MOUNTEN(7506039414),
     HISTORICUS(7499841383);
 
-    override val filename: String = "Blog(${id}).json"
+    override val filename: String = "BLOG.${name}.json"
 
     override val url: String get() = BLOG_API
 }

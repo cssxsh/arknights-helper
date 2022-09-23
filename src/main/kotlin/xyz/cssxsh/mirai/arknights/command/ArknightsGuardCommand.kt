@@ -37,8 +37,8 @@ public object ArknightsGuardCommand : CompositeCommand(
 
     @SubCommand("blog", "微博")
     @Description("设置微博蹲饼内容")
-    public suspend fun CommandSender.blog(contact: Long, vararg blogs: BlogUser) {
-        ArknightsTaskConfig.blog[contact] = blogs.asList()
+    public suspend fun CommandSender.blog(contact: Long, vararg blogs: String) {
+        ArknightsTaskConfig.blog[contact] = blogs.map { BlogUser.valueOf(it) }
         val message = buildMessageChain {
             append("当前微博订阅内容 ")
             append(blogs.joinToString(", ").ifEmpty { "为空" })
@@ -49,8 +49,8 @@ public object ArknightsGuardCommand : CompositeCommand(
 
     @SubCommand("video", "视频")
     @Description("设置视频蹲饼内容")
-    public suspend fun CommandSender.video(contact: Long, vararg videos: VideoType) {
-        ArknightsTaskConfig.video[contact] = videos.asList()
+    public suspend fun CommandSender.video(contact: Long, vararg videos: String) {
+        ArknightsTaskConfig.video[contact] = videos.map { VideoType.valueOf(it) }
         val message = buildMessageChain {
             append("当前视频订阅内容 ")
             append(videos.joinToString(", ").ifEmpty { "为空" })
@@ -61,11 +61,11 @@ public object ArknightsGuardCommand : CompositeCommand(
 
     @SubCommand("announce", "公告")
     @Description("设置视频蹲饼内容")
-    public suspend fun CommandSender.announce(contact: Long, vararg videos: AnnounceType) {
-        ArknightsTaskConfig.announce[contact] = videos.asList()
+    public suspend fun CommandSender.announce(contact: Long, vararg announces: String) {
+        ArknightsTaskConfig.announce[contact] = announces.map { AnnounceType.valueOf(it) }
         val message = buildMessageChain {
             append("当前公告订阅内容 ")
-            append(videos.joinToString(", ").ifEmpty { "为空" })
+            append(announces.joinToString(", ").ifEmpty { "为空" })
         }
 
         sendMessage(message = message)

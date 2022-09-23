@@ -18,7 +18,7 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
 
     override suspend fun load(key: VideoType) {
         val videos: MutableList<Video> = ArrayList()
-        for (index in 1..5) {
+        for (index in 1..3) {
             val history = http.prepareGet(key.url) {
                 parameter("mid", BILIBILI_ID)
                 parameter("ps", 50)
@@ -34,6 +34,7 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
 
             videos.addAll(history.list.videos)
 
+            history.page ?: break
             if (videos.size == history.page.count) break
         }
         key.write(videos)
