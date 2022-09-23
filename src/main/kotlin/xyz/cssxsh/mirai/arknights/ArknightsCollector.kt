@@ -57,7 +57,7 @@ public class ArknightsCollector(private val contact: Contact) : FlowCollector<Ca
             // 视频
             is Video -> {
                 val accept = ArknightsTaskConfig.video[contact.id] ?: return
-                if (accept.none { it.tid == value.tid }) return
+                if (accept.none { value.type in it.sub }) return
                 buildMessageChain {
                     appendLine("鹰角有新视频！${value.title}")
                     append(video = value)

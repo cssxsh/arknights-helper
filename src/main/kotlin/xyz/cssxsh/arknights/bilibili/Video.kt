@@ -9,11 +9,11 @@ internal const val BILIBILI_API = "https://api.bilibili.com/x/space/arc/search"
 internal const val BILIBILI_ID = 161775300L
 
 @Serializable
-public enum class VideoType(public val tid: Int) : CacheKey {
-    ANIME(1),
-    MUSIC(3),
-    GAME(4),
-    ENTERTAINMENT(5);
+public enum class VideoType(public val tid: Int, public vararg val sub: Int) : CacheKey {
+    ANIME(1, 27),
+    MUSIC(3, 28, 29, 130, 193),
+    GAME(4, 172),
+    ENTERTAINMENT(5, 71);
 
     override val filename: String = "BILIBILI.${name}.json"
 
@@ -87,7 +87,7 @@ public data class Video(
     @SerialName("title")
     val title: String,
     @SerialName("typeid")
-    val tid: Int,
+    val type: Int,
 ) : CacheInfo {
     override val url: String by lazy { "https://www.bilibili.com/video/${bvid}" }
 }

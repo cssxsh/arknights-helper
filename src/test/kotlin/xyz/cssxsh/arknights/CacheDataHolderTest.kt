@@ -14,7 +14,7 @@ internal class CacheDataHolderTest {
 
     @Test
     fun video(): Unit = runBlocking {
-        video.load(VideoType.ANIME)
+        video.load(VideoType.MUSIC)
     }
 
     @Test
@@ -24,6 +24,6 @@ internal class CacheDataHolderTest {
 
     @Test
     fun announcement(): Unit = runBlocking {
-        announcement.load(AnnounceType.Bilibili)
+        announcement.load(AnnounceType.BILIBILI)
     }
 }

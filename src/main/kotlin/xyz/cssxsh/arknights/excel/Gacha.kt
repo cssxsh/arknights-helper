@@ -23,7 +23,7 @@ public typealias RecruitResult = Map<Int, List<Character>>
 
 public typealias RecruitMap = Map<Set<String>, RecruitResult>
 
-public fun Collection<Character>.toRecruitResult(): SortedMap<Int, List<Character>> = groupBy { it.rarity }.toSortedMap()
+public fun Collection<Character>.toRecruitResult(): Map<Int, List<Character>> = groupBy { it.rarity }.toSortedMap()
 
 /**
  * 列出公招结果
