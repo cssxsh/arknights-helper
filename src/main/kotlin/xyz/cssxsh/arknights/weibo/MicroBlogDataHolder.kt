@@ -20,7 +20,7 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
         val blogs: MutableMap<Long, MicroBlog> = HashMap()
 
         try {
-            val text = http.prepareGet(BLOG_API) { parameter("containerid", "107803${key.id}") }
+            val text = http.prepareGet(BLOG_API) { parameter("containerid", "107803${key.uid}") }
                 .body<String>()
             val temp = CustomJson.decodeFromString<Temp<PictureData>>(text)
 
@@ -34,7 +34,7 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
                 blog.copy(
                     created = TimestampSerializer.timestamp(second = timestamp(id = blog.id)),
                     user = blog.user.copy(
-                        id = key.id,
+                        id = key.uid,
                         name = "此微博被锁定为热门，机器人无法获取详情，请打开链接自行查看"
                     )
                 )
@@ -44,7 +44,7 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
         }
 
         try {
-            val text = http.prepareGet(BLOG_API) { parameter("containerid", "107603${key.id}") }
+            val text = http.prepareGet(BLOG_API) { parameter("containerid", "107603${key.uid}") }
                 .body<String>()
             val temp = CustomJson.decodeFromString<Temp<WeiboData>>(text)
 

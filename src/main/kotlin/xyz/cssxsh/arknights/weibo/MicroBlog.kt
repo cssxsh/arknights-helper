@@ -13,7 +13,7 @@ internal const val BLOG_API: String = "https://m.weibo.cn/api/container/getIndex
 internal const val CONTENT_API: String = "https://m.weibo.cn/statuses/extend"
 
 @Serializable
-public enum class BlogUser(public val id: Long) : CacheKey {
+public enum class BlogUser(public val uid: Long) : CacheKey {
     ARKNIGHTS(6279793937),
     BYPRODUCT(6441489862),
     MOUNTEN(7506039414),

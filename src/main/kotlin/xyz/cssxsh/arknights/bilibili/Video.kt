@@ -17,7 +17,7 @@ public enum class VideoType(public val tid: Int, public vararg val sub: Int) : C
 
     override val filename: String = "BILIBILI.${name}.json"
 
-    override val url: String = BILIBILI_API
+    override val url: String get() = BILIBILI_API
 }
 
 @Serializable
