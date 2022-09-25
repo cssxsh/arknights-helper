@@ -19,6 +19,7 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
 
     override suspend fun load(key: VideoType) {
         val videos: MutableList<Video> = raw(key).toMutableList()
+        http.get("https://www.bilibili.com/").bodyAsText()
         http.get("https://space.bilibili.com/161775300/video").bodyAsText()
         for (index in 1..3) {
             val history = http.prepareGet(key.url) {
