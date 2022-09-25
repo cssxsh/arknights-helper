@@ -15,7 +15,7 @@ import java.io.File
 public abstract class CacheDataHolder<K : CacheKey, R : CacheInfo> {
     protected open val mutex: Mutex = Mutex()
     protected open val http: HttpClient = HttpClient(OkHttp) {
-        CurlUserAgent()
+        BrowserUserAgent()
         ContentEncoding()
         expectSuccess = true
         install(HttpTimeout) {

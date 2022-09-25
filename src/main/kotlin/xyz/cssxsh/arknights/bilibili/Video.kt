@@ -45,6 +45,7 @@ internal data class VideoList(
     @SerialName("vlist")
     val videos: List<Video>
 )
+
 @Serializable
 internal data class VideoPage(
     @SerialName("pn")
