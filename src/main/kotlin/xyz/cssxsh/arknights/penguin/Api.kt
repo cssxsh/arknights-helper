@@ -75,6 +75,7 @@ public data class Item(
     val sprites: List<Int> = emptyList()
 ) : Existences, NameI18n, Id, Type<ItemType>
 
+@Serializable
 public enum class ItemType {
     CARD_EXP,
     MATERIAL,
@@ -83,7 +84,8 @@ public enum class ItemType {
     TEMP,
     LGG_SHD,
     ARKPLANNER,
-    CHIP
+    CHIP,
+    RECRUIT_TAG
 }
 
 @Serializable
@@ -115,6 +117,7 @@ public data class Stage(
     val recognitionOnly: List<String> = emptyList()
 ) : Existences, NameI18n, Id, Type<StageType>, Drop, ZoneId
 
+@Serializable
 public enum class StageType {
     MAIN,
     SUB,
@@ -132,6 +135,7 @@ public data class DropInfo(
     override val itemId: String = ""
 ) : ItemId
 
+@Serializable
 public enum class DropType {
     NORMAL_DROP,
     EXTRA_DROP,
@@ -169,10 +173,14 @@ public data class Zone(
     override val i18n: I18n<String>
 ) : Existences, NameI18n, Id, Type<ZoneType>
 
+@Serializable
 public enum class ZoneType {
     MAINLINE,
     ACTIVITY,
-    WEEKLY
+    ACTIVITY_PERMANENT,
+    WEEKLY,
+    GACHABOX,
+    RECRUIT
 }
 
 @Serializable

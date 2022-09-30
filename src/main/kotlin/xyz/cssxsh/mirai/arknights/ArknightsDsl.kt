@@ -113,83 +113,11 @@ internal fun RecruitMap.toMessage() = buildMessageChain {
 
 private fun duration(millis: Long) = with(Duration.ofMillis(millis)) { "${toMinutesPart()}m${toSecondsPart()}s" }
 
-private fun Pair<Matrix, Stage>.toMessage() = buildMessageChain {
-    appendLine("概率: ${frequency.quantity}/${frequency.times}=${frequency.probability.percentage()}")
+internal fun MessageChainBuilder.append(matrix: Matrix, stage: Stage) {
+    val single = (matrix to stage).single
+    val short = (matrix to stage).short
+    appendLine("概率: ${matrix.quantity}/${matrix.times}=${matrix.probability.percentage()}")
     appendLine("单件期望理智: ${single.intercept()}")
     appendLine("最短通关用时: ${duration(stage.minClearTime)}")
     appendLine("单件期望用时: ${duration(short)}")
-}
-
-private val Stage.zone get() = ExcelData.zone.zones[zoneId]
-
-internal fun item(name: String, limit: Int, now: Boolean) = buildMessageChain {
-    val (item, list) = (PenguinData.items to PenguinData.matrices.let { if (now) it.now() else it }).item(name)
-    appendLine("${item.alias.get()} 统计结果 By 企鹅物流数据统计")
-    if (list.isEmpty()) {
-        appendLine("列表为空，请尝试更新数据")
-        return@buildMessageChain
-    }
-    var count = 0
-    for (pair in (list with PenguinData.stages).sortedBy { it.single }) {
-        if (count >= limit) break
-        if (pair.stage.isGacha) continue
-        appendLine("====> 作战: [${pair.stage.code}] <${pair.stage.zone?.title}> (cost=${pair.stage.cost})")
-        append(pair.toMessage())
-        count++
-    }
-}
-
-internal fun alias() = buildMessageChain {
-    appendLine("企鹅物流材料别名")
-    for (item in PenguinData.items) {
-        appendLine("名称: ${item.i18n.get()}，别名: ${item.alias.get()}")
-    }
-}
-
-internal fun stage(code: String, limit: Int, now: Boolean) = buildMessageChain {
-    val (stage, list) = (PenguinData.stages to PenguinData.matrices.let { if (now) it.now() else it }).stage(code)
-    appendLine("[${stage.code}] <${stage.zone?.title}> (cost=${stage.cost}) 统计结果 By 企鹅物流数据统计")
-    if (list.isEmpty()) {
-        appendLine("列表为空，请尝试更新数据")
-        return@buildMessageChain
-    }
-    var count = 0
-    for ((matrix, item) in (list with PenguinData.items).sortedByDescending { it.rarity }) {
-        if (count >= limit) break
-        if (item.type != ItemType.MATERIAL) continue
-        appendLine("=======> 掉落: ${item.name} (rarity=${item.rarity}) ")
-        append((matrix to stage).toMessage())
-        count++
-    }
-}
-
-internal fun zone(name: String, limit: Int, now: Boolean) = buildMessageChain {
-    val (_, list) = (PenguinData.zones to PenguinData.stages).name(name)
-    for (stage in list) {
-        append(stage(stage.code, limit, now))
-    }
-}
-
-internal fun QuestionType.random() = random(QuestionDataLoader)
-
-internal fun countQuestionType(type: QuestionType, mode: Int) {
-    MineCount.compute(type) { _, s ->
-        (s ?: mutableListOf(0, 0, 0)).apply { this[mode] += 1 }
-    }
-}
-
-internal fun tableMineCount() = buildString {
-    appendLine("# 答题统计")
-    appendLine("| 类型 | 正确 | 错误 | 超时 | 总计 |")
-    appendLine("|:----:|:----:|:----:|:----:|:----:|")
-    MineCount.forEach { type, (f, s, t) ->
-        appendLine("| $type | $f | $s | $t | ${f + s + t} |")
-    }
-}
-
-internal fun Question.toMessage() = buildMessageChain {
-    appendLine("[${type}]<${coin}>：${problem} (${timeout / 1000}s内作答)")
-    for ((index, text) in options) {
-        appendLine("${index}.${text}")
-    }
 }
