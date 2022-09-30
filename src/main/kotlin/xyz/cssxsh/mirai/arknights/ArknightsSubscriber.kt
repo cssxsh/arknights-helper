@@ -38,11 +38,14 @@ public object ArknightsSubscriber : SimpleListenerHost() {
     private val ignore: suspend (Throwable) -> Boolean = { cause ->
         when (cause) {
             // 路由问题，重连可以解决
-            is java.net.UnknownHostException, is javax.net.ssl.SSLException -> {
+            is java.net.UnknownHostException,
+            is java.net.NoRouteToHostException,
+            is javax.net.ssl.SSLException -> {
                 false
             }
             // 缩短信息文本
-            is SocketTimeoutException, is ConnectTimeoutException -> {
+            is SocketTimeoutException,
+            is ConnectTimeoutException -> {
                 logger.warning { cause.message ?: "Timeout" }
                 true
             }
