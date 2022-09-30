@@ -3,45 +3,12 @@ package xyz.cssxsh.arknights.excel
 import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
 import java.time.*
-import java.util.*
-
-/**
- * 获取公招干员
- */
-public fun GachaTable.recruit(): Set<String> {
-    // TODO: handle html
-    return recruitDetail.lineSequence().flatMap { line ->
-        if (line.startsWith("★")) {
-            line.substringAfterLast("""\n""").split("/").map { it.trim() }
-        } else {
-            emptyList()
-        }
-    }.toSet()
-}
 
 public typealias RecruitResult = Map<Int, List<Character>>
 
 public typealias RecruitMap = Map<Set<String>, RecruitResult>
 
-public fun Collection<Character>.toRecruitResult(): Map<Int, List<Character>> = groupBy { it.rarity }.toSortedMap()
-
-/**
- * 列出公招结果
- */
-public fun CharacterMap.recruit(words: Set<String>, pool: Set<String>): RecruitMap {
-    check(words.size in 1..5) { "词条数量不对" }
-    val site = minOf(3, words.size)
-    val obtain = values.names(pool)
-    return (0..site).fold(setOf<Set<String>>(emptySet())) { set, _ ->
-        words.flatMap { a -> set.map { b -> b + a } }.toSet()
-    }.sortedBy { it.size }.associateWith {
-        it.fold(obtain) { s, word -> s.filter(word) }
-    }.mapValues { (_, characters) ->
-        characters.groupBy { it.rarity }
-    }.filter { (_, characters) ->
-        characters.isNotEmpty()
-    }
-}
+public fun Collection<Character>.toRecruitResult(): RecruitResult = groupBy { it.rarity }.toSortedMap()
 
 /**
  * 过滤当前卡池
