@@ -7,6 +7,7 @@
 [![MiraiForum](https://img.shields.io/badge/post-on%20MiraiForum-yellow)](https://mirai.mamoe.net/topic/203)
 
 **使用前应该查阅的相关文档或项目**
+**Arknights Helper 在2.0版本进行了重构 需要重新配置订阅 详见 方舟蹲饼**
 
 * [User Manual](https://github.com/mamoe/mirai/blob/dev/docs/UserManual.md)
 * [Permission Command](https://github.com/mamoe/mirai/blob/dev/mirai-console/docs/BuiltInCommands.md#permissioncommand)
@@ -21,9 +22,11 @@
 `{...}`表示连续的多个参数  
 
 本插件指令权限ID 格式为 `xyz.cssxsh.mirai.plugin.arknights-helper:command.*`, `*` 是指令的第一指令名  
-例如 `/抽卡 十连` 的权限ID为 `xyz.cssxsh.mirai.plugin.arknights-helper:command.gacha`
+例如 `/公招 远程位 支援` 的权限ID为 `xyz.cssxsh.mirai.plugin.arknights-helper:command.ark-recruit`
 
 ### 助手抽卡指令
+
+**抽卡指令 2.0 版本重构中 咱不可用**
 
 | 指令                                            | 描述                                          |
 |:----------------------------------------------|:--------------------------------------------|
@@ -56,6 +59,8 @@ other:0.42
 
 ### 助手答题指令
 
+**表情指令 2.0 版本重构中 咱不可用**
+
 | 指令                                  | 描述                |
 |:------------------------------------|:------------------|
 | `/<mine 挖矿 答题> [type]?`             | 机器人会提出一个问题        |
@@ -81,25 +86,27 @@ B. 选项
 
 ### 助手公招指令
 
-| 指令                      | 描述                |
-|:------------------------|:------------------|
-| `/<recruit 公招> {words}` | 查看关键词`words`的公招干员 |
+| 指令                            | 描述                |
+|:------------------------------|:------------------|
+| `/<ark-recruit 方舟公招> {words}` | 查看关键词`words`的公招干员 |
 
-`words`的数量为1~5
+* `words`的数量为1~5  
+  例如 `/方舟公招 远程位 支援`
 
 ### 助手材料指令
 
-| 指令                                        | 描述             |
-|:------------------------------------------|:---------------|
-| `/<item 材料> [name] [limit]? [now]?`       | 查看材料的关卡掉落率     |
-| `/<stage 关卡> [name] [limit]? [now]?`      | 查看关卡的材料掉落率     |
-| `/<zone 章节 活动 地图> [name] [limit]? [now]?` | 查看地图所有关卡的材料掉落率 |
+| 指令                                         | 描述             |
+|:-------------------------------------------|:---------------|
+| `/<ark-item 方舟材料> [name] [limit]? [now]?`  | 查看材料的关卡掉落率     |
+| `/<ark-stage 方舟关卡> [name] [limit]? [now]?` | 查看关卡的材料掉落率     |
+| `/<ark-zone 方舟章节> [name] [limit]? [now]?`  | 查看地图所有关卡的材料掉落率 |
 
-`limit` 是显示前多少项查询结果  
-`now` 是是否只显示当前开启关卡，默认为 `true`  
-可以通过配置[材料别名](#items)设置可选的材料索引
+* `limit` 是显示前多少项查询结果  
+* `now` 是是否只显示当前开启关卡，默认为 `true`  
 
 ### 助手玩家指令
+
+**表情指令 2.0 版本重构中 咱不可用**
 
 | 指令                                                   | 描述                    |
 |:-----------------------------------------------------|:----------------------|
@@ -114,33 +121,31 @@ B. 选项
 
 ### 助手蹲饼指令
 
-| 指令                                  | 描述                 |
-|:------------------------------------|:-------------------|
-| `/<guard 蹲饼> <detail 详情>`           | 当前蹲饼的状态和轮询时间       |
-| `/<guard 蹲饼> <speed 速度>`            | 设置蹲饼轮询时间是`speed`分钟 |
-| `/<guard 蹲饼> <open 打开> [contact]?`  | 开启蹲饼状态             |
-| `/<guard 蹲饼> <close 关闭> [contact]?` | 关闭蹲饼状态             |
+| 指令                                                      | 描述       |
+|:--------------------------------------------------------|:---------|
+| `/<ark-guard 方舟蹲饼> <detail 详情>`                         | 查看蹲饼详情   |
+| `/<ark-guard 方舟蹲饼> <blog 微博> [contact] {blogs}`         | 设置微博蹲饼内容 |
+| `/<ark-guard 方舟蹲饼> <video 视频> [contact] {videos}`       | 设置视频蹲饼内容 |
+| `/<ark-guard 方舟蹲饼> <announce 公告> [contact] {announces}` | 设置视频蹲饼内容 |
 
-`contact` 为群号或Q号，可选参数，可以自动从当前聊天环境中获取，比如私聊就获取好友Q号，群聊就获取群号  
-玩家的默认等级为`120`  
-理智的提醒时间会根据玩家等级和当前理智值`init`设置
+* `contact` 为群号或Q号  
+* `blogs` 可选值为 `ARKNIGHTS`(官号), `BYPRODUCT`(朝陇山), `MOUNTEN`(一拾山), `HISTORICUS`(泰拉记事社)
+  例如 `/方舟蹲饼 微博 123456 ARKNIGHTS MOUNTEN`, 就订阅了官方号和一拾山
+* `video` 可选值为 `ANIME, MUSIC, GAME, ENTERTAINMENT`  
+  例如 `/方舟蹲饼 视频 123456 GAME MUSIC`, 就订阅了PV和音乐单曲
+* `announce` 可选值为 `ANDROID, IOS, BILIBILI`
+  例如 `/方舟蹲饼 公告 123456 ANDROID`, 就订阅了官服的公告 
 
 ### 助手数据指令
 
-| 指令                              | 描述     |
-|:--------------------------------|:-------|
-| `/<data 数据> <arknights 方舟>`     | 更新游戏数据 |
-| `/<data 数据> <penguin 企鹅 掉落>`    | 更新掉落数据 |
-| `/<data 数据> <name alias 别称 别名>` | 查看掉落别名 |
-| `/<data 数据> <reload 重载>`        | 重载插件配置 |
-| `/<data 数据> <recruit alias 公招>` | 提交公招结果 |
-| `/<data 数据> <tag 标签分析>`         | 分析公招结果 |
-| `/<data 数据> <role 干员分析>`        | 分析公招结果 |
-| `/<data 数据> <clear 清理>`         | 清理数据   |
-
-提交公招结果之前，可以设置[干员别名](#roles)方便输入
+| 指令                            | 描述     |
+|:------------------------------|:-------|
+| `/<ark-data 方舟数据> <clear 清理>` | 清理缓存   |
+| `/<ark-data 方舟数据> <cron 定时>`  | 重载定时设置 |
 
 ### 助手表情指令
+
+**表情指令 2.0 版本重构中 咱不可用**
 
 | 指令                                  | 描述                           |
 |:------------------------------------|:-----------------------------|
@@ -154,44 +159,6 @@ B. 选项
 
 位于`Mirai-Console`运行目录下的`config/xyz.cssxsh.mirai.plugin.arknights-helper`文件夹下的`config`文件
 
-### roles
-
-干员别名
-
-```
-roles:
-  小羊: 艾雅法拉
-  鳄鱼: 艾丝黛尔
-```
-
-### items
-
-材料别名
-
-```
-items:
-  绿管: 晶体元件
-```
-
-### auto_add_guard
-
-自动开启蹲饼功能 在机器人添加新好友和新群时自动开启蹲饼功能
-
-### video
-
-开启订阅的b站视频类型 `ANIME`, `MUSIC`, `GAME`, `ENTERTAINMENT`
-
-### blog
-
-开启订阅的微博号 `BYPRODUCT`(朝陇山), `MOUNTEN`(一拾山), `HISTORICUS`(泰拉记事社)
-
-### source
-
-游戏资源，可选值：
-* `https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master`
-* `https://raw.fastgit.org/Kengxxiao/ArknightsGameData/master`
-* `https://cdn.jsdelivr.net/gh/Kengxxiao/ArknightsGameData@master`
-
 ## 安装
 
 ### MCL 指令安装
@@ -201,7 +168,7 @@ items:
 ### 手动安装
 
 1. 运行 [Mirai Console](https://github.com/mamoe/mirai-console) 生成`plugins`文件夹
-1. 从 [Releases](https://github.com/cssxsh/arknights-helper/releases) 下载`jar`并将其放入`plugins`文件夹中
+2. 从 [Releases](https://github.com/cssxsh/arknights-helper/releases) 下载`jar`并将其放入`plugins`文件夹中
 
 ## TODO
 

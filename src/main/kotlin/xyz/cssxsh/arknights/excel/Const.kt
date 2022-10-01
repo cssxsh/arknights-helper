@@ -4,7 +4,7 @@ import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 
 @Serializable
-data class ConstInfo(
+public data class ConstInfo(
     @SerialName("advancedGachaCrystalCost")
     private val advancedGachaCrystalCost: Int,
     @SerialName("apBuyCost")
@@ -149,11 +149,8 @@ data class ConstInfo(
     private val weeklyOverrideDesc: String
 )
 
-/**
- * XXX
- */
 @Serializable
-data class CharAssistRefreshTime(
+public data class CharAssistRefreshTime(
     @SerialName("Hour")
     val hour: Int,
     @SerialName("Minute")

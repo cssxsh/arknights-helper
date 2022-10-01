@@ -4,12 +4,12 @@ import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
 import java.time.*
 
-typealias StoryTable = Map<String, Story>
+public typealias StoryTable = Map<String, Story>
 
-val Story.start get() = startTime.takeIf { it.toEpochSecond() > 1 } ?: startShowTime
+public val Story.start: OffsetDateTime get() = startTime.takeIf { it.toEpochSecond() > 1 } ?: startShowTime
 
 @Serializable
-data class Story(
+public data class Story(
     @SerialName("actType")
     val action: ActionType,
     @SerialName("endShowTime")
@@ -52,14 +52,14 @@ data class Story(
     val storyPicId: String?
 ) : Id, Name
 
-enum class ActionType(val text: String) {
+public enum class ActionType(public val text: String) {
     ACTIVITY_STORY("活动剧情"),
     MINI_STORY("微型故事集"),
     MAIN_STORY("主线剧情"),
     NONE("其他故事");
 }
 
-enum class EntryType(val text: String) {
+public enum class EntryType(public val text: String) {
     ACTIVITY("活动"),
     MINI_ACTIVITY("微型活动"),
     MAINLINE("主线"),
@@ -67,7 +67,7 @@ enum class EntryType(val text: String) {
 }
 
 @Serializable
-data class StoryInfo(
+public data class StoryInfo(
     @SerialName("avgTag")
     val avgTag: String,
     @SerialName("costItemCount")
@@ -108,18 +108,18 @@ data class StoryInfo(
     val unLockType: UnLockType
 ) : StoryId
 
-enum class CostItemType {
+public enum class CostItemType {
     NONE,
     MATERIAL;
 }
 
-enum class UnLockType {
+public enum class UnLockType {
     STAGE_CLEAR,
     USE_ITEM;
 }
 
 @Serializable
-data class StoryStage(
+public data class StoryStage(
     @SerialName("stageId")
     val stage: String,
     @SerialName("minState")

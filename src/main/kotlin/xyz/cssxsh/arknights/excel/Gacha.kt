@@ -4,54 +4,13 @@ import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
 import java.time.*
 
-/**
- * 获取公招干员
- */
-fun GachaTable.recruit(): Set<String> {
-    return recruitDetail.remove(SIGN).lines().flatMap { line ->
-        if (line.startsWith("★")) {
-            line.substringAfterLast("""\n""").split("/").map { it.trim() }
-        } else {
-            emptyList()
-        }
-    }.toSet()
-}
-
-/**
- * 获取公招TAG
- */
-fun GachaTable.tags() = tags.map { it.name }.toSet()
-
-typealias RecruitResult = Map<Int, List<Character>>
-
-typealias RecruitMap = Map<Set<String>, RecruitResult>
-
-fun Collection<Character>.toRecruitResult() = groupBy { it.rarity }.toSortedMap()
-
-/**
- * 列出公招结果
- */
-fun CharacterMap.recruit(words: Set<String>, recruit: Set<String> = name()): RecruitMap {
-    check(words.size in 1..5) { "词条数量不对" }
-    val site = minOf(3, words.size)
-    val obtain = values.names(recruit)
-    return (0..site).fold(setOf<Set<String>>(emptySet())) { set, _ ->
-        words.flatMap { a -> set.map { b -> b + a } }.toSet()
-    }.sortedBy { it.size }.associateWith {
-        it.fold(obtain) { s, word -> s.filter(word) }
-    }.mapValues { (_, characters) ->
-        characters.groupBy { it.rarity }
-    }.filter { (_, characters) ->
-        characters.isNotEmpty()
-    }
-}
 
 /**
  * 过滤当前卡池
  */
-fun Collection<GachaPool>.open() = filter { it.end > OffsetDateTime.now() }
+public fun Collection<GachaPool>.open(): List<GachaPool> = filter { it.end > OffsetDateTime.now() }
 
-typealias PoolData = List<Pair<Set<Character>, Double>>
+public typealias PoolData = List<Pair<Set<Character>, Double>>
 
 private const val CAPACITY = 1000
 
@@ -65,7 +24,7 @@ private fun one(prob: Collection<Double>) {
 /**
  * 抽卡
  */
-fun gacha(pool: PoolData): Character {
+public fun gacha(pool: PoolData): Character {
     one(pool.map { it.second })
     val temp = (1..CAPACITY).toMutableList()
     val balls = pool.map { (set, prob) ->
@@ -75,7 +34,7 @@ fun gacha(pool: PoolData): Character {
     return balls.first { (_, ball) -> random in ball }.first.random()
 }
 
-val BUILD_POOL_LINE = """\s*([^|]+(\s*[|]\s*[^|]+)*)\s*:\s*(0\.\d+)\s*""".toRegex()
+public val BUILD_POOL_LINE: Regex = """\s*([^|]+(\s*[|]\s*[^|]+)*)\s*:\s*(0\.\d+)\s*""".toRegex()
 
 /**
  *  使用 几个 * 值表示几星干员，
@@ -85,7 +44,7 @@ val BUILD_POOL_LINE = """\s*([^|]+(\s*[|]\s*[^|]+)*)\s*:\s*(0\.\d+)\s*""".toRege
  *  注释#开头
  *  @see BUILD_POOL_LINE
  */
-fun Collection<Character>.pool(rule: String): PoolData = pool(rule.split("\r\n", "\n", "\r", ";"))
+public fun Collection<Character>.pool(rule: String): PoolData = pool(rule.split("\r\n", "\n", "\r", ";"))
 
 /**
  *  使用 几个 * 值表示几星干员，
@@ -94,7 +53,7 @@ fun Collection<Character>.pool(rule: String): PoolData = pool(rule.split("\r\n",
  *  注释#开头
  *  @see BUILD_POOL_LINE
  */
-fun Collection<Character>.pool(rule: Collection<String>): PoolData {
+public fun Collection<Character>.pool(rule: Collection<String>): PoolData {
     check(rule.all { it.matches(BUILD_POOL_LINE) || it.startsWith("#") }) { "rule: $rule" }
     val map = rule.filter { it.matches(BUILD_POOL_LINE) }.associate { line ->
         line.split(':').let { (a, b) ->
@@ -122,7 +81,7 @@ fun Collection<Character>.pool(rule: Collection<String>): PoolData {
 }
 
 @Serializable
-data class GachaTable(
+public data class GachaTable(
     /**
      * 公招TAG
      */
@@ -159,7 +118,7 @@ data class GachaTable(
 )
 
 @Serializable
-data class GachaTagInfo(
+public data class GachaTagInfo(
     @SerialName("tagId")
     val id: Int,
     @SerialName("tagName")
@@ -169,7 +128,7 @@ data class GachaTagInfo(
 )
 
 @Serializable
-data class GachaPool(
+public data class GachaPool(
     @SerialName("gachaPoolDetail")
     val detail: String?,
     @SerialName("endTime")
@@ -204,7 +163,7 @@ data class GachaPool(
 //    private val lmtgsid: String?
 ) : Id, Name, Period
 
-enum class GachaPoolRule(vararg lines: String) {
+public enum class GachaPoolRule(vararg lines: String) {
     /**
      * 正常
      */
@@ -225,5 +184,5 @@ enum class GachaPoolRule(vararg lines: String) {
      */
     ATTAIN;
 
-    val rule = "#${name};" + lines.joinToString(";")
+    public val rule: String = "#${name};" + lines.joinToString(";")
 }

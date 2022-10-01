@@ -4,10 +4,8 @@ import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
 import java.time.*
 
-val Zone.title get() = nameFirst?.let { "$it " }.orEmpty() + nameSecond.orEmpty() + nameThird?.let { " $it" }.orEmpty()
-
 @Serializable
-data class ZoneTable(
+public data class ZoneTable(
     @SerialName("mainlineAdditionInfo")
     val mainline: Map<String, Mainline>,
     @SerialName("weeklyAdditionInfo")
@@ -19,7 +17,7 @@ data class ZoneTable(
 )
 
 @Serializable
-data class Mainline(
+public data class Mainline(
     @SerialName("chapterId")
     val chapterId: String,
     @SerialName("endStageId")
@@ -37,21 +35,22 @@ data class Mainline(
 ) : ZoneId
 
 @Serializable
-data class Weekly(
+public data class Weekly(
     @SerialName("daysOfWeek")
     val daysOfWeek: List<Int>,
     @SerialName("type")
     val type: WeeklyType
 )
 
-enum class WeeklyType(val text: String) {
+@Serializable
+public enum class WeeklyType(public val text: String) {
     EVOLVE("进化"),
     MATERIAL("材料"),
     SPECIAL("特殊")
 }
 
 @Serializable
-data class ValidInfo(
+public data class ValidInfo(
     @SerialName("endTs")
     @Serializable(TimestampSerializer::class)
     override val end: OffsetDateTime,
@@ -61,7 +60,7 @@ data class ValidInfo(
 ) : Period
 
 @Serializable
-data class Zone(
+public data class Zone(
     @SerialName("canPreview")
     val preview: Boolean,
     @SerialName("lockedText")
@@ -84,9 +83,12 @@ data class Zone(
     val nameTitleEx: String?,
     @SerialName("zoneNameTitleUnCurrent")
     val nameTitleUnCurrent: String?
-) : Id
+) : Id {
+    public val title: String = "${nameFirst.orEmpty()} ${nameSecond.orEmpty()} ${nameThird.orEmpty()}"
+}
 
-enum class ZoneType(val text: String) {
+@Serializable
+public enum class ZoneType(public val text: String) {
     MAINLINE("主线"),
     GUIDE("指导"),
     WEEKLY("周常"),

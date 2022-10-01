@@ -1,50 +1,48 @@
 package xyz.cssxsh.mirai.arknights
 
 import kotlinx.coroutines.*
+import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
 import net.mamoe.mirai.console.data.*
 import net.mamoe.mirai.console.plugin.jvm.*
+import net.mamoe.mirai.event.*
 import net.mamoe.mirai.utils.*
-import xyz.cssxsh.arknights.*
-import xyz.cssxsh.mirai.arknights.command.*
+import kotlin.collections.*
 
-object ArknightsHelperPlugin : KotlinPlugin(
-    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "1.4.2") {
+public object ArknightsHelperPlugin : KotlinPlugin(
+    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "2.0.0") {
         name("arknights-helper")
         author("cssxsh")
     }
 ) {
 
-    override fun onEnable() {
-        Downloader.ignore = DownloaderIgnore
-        // Data and config
-        for (data in ArknightsHelperData) {
-            (data as? PluginConfig)?.reload() ?: data.reload()
-        }
-        System.setProperty("xyz.cssxsh.arknights.source", ArknightsConfig.source)
-        launch {
-            try {
-                downloadGameData()
-            } catch (cause: Throwable) {
-                logger.warning({ "数据下载失败, 功能可能会不正常" }, cause)
-            }
-        }.invokeOnCompletion {
-            // Command
-            for (command in ArknightsHelperCommand) {
-                command.register()
-            }
+    private val commands: List<Command> by services()
+    private val config: List<PluginConfig> by services()
+    private val data: List<PluginData> by services()
+    private val listeners: List<ListenerHost> by services()
 
-            ArknightsSubscriber.start()
+    @Suppress("INVISIBLE_MEMBER")
+    private inline fun <reified T : Any> services(): Lazy<List<T>> = lazy {
+        with(net.mamoe.mirai.console.internal.util.PluginServiceHelper) {
+            jvmPluginClasspath.pluginClassLoader
+                .findServices<T>()
+                .loadAllServices()
         }
     }
 
-    override fun onDisable() {
-        // Command
-        for (command in ArknightsHelperCommand) {
-            command.unregister()
-        }
+    override fun onEnable() {
+        logger.warning { "2.0 版本重构需要重新配置订阅订阅" }
+        logger.warning { "2.0 版本重构需要重新配置订阅订阅" }
+        logger.warning { "2.0 版本重构需要重新配置订阅订阅" }
+        for (config in config) config.reload()
+        for (data in data) data.reload()
+        for (command in commands) command.register()
+        for (listener in listeners) (listener as SimpleListenerHost).registerTo(globalEventChannel())
+    }
 
-        ArknightsSubscriber.stop()
+    override fun onDisable() {
+        for (command in commands) command.unregister()
+        for (listener in listeners) (listener as SimpleListenerHost).cancel()
     }
 }

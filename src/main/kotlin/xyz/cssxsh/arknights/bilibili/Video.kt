@@ -1,69 +1,27 @@
 package xyz.cssxsh.arknights.bilibili
 
-import io.ktor.http.*
 import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
-import java.io.File
 import java.time.*
 
-private const val BILIBILI_API = "https://api.bilibili.com/x/space/arc/search"
+internal const val BILIBILI_API = "https://api.bilibili.com/x/space/arc/search"
 
-private const val BILIBILI_ID = 161775300L
-
-private const val PAGE_SIZE = 50
-
-private const val ORDER = "pubdate"
-
-private fun File.readVideoHistory(type: VideoDataType): List<Video> {
-    if (exists().not()) return emptyList()
-    return with(read<Temp>(type)) { requireNotNull(data) { "$type error $code $message" } }.list.videos
-}
-
-class VideoData(override val dir: File, override val types: Set<VideoDataType> = VideoDataType.values().toSet()) :
-    GameDataDownloader {
-    val anime get() = dir.readVideoHistory(VideoDataType.ANIME)
-    val music get() = dir.readVideoHistory(VideoDataType.MUSIC)
-    val game get() = dir.readVideoHistory(VideoDataType.GAME)
-    val entertainment get() = dir.readVideoHistory(VideoDataType.ENTERTAINMENT)
-
-    val all get() = types.flatMap { dir.readVideoHistory(it) }
-}
-
-val Video.url get() = Url("https://www.bilibili.com/video/${bvid}")
-val Video.cover get() = Url(pic)
+internal const val BILIBILI_ID = 161775300L
 
 @Serializable
-enum class VideoDataType(private val tid: Int, private val pn: Int = 1) : GameDataType {
-    ANIME(1),
-    MUSIC(3),
-    MUSIC_2(3, 2),
-    GAME(4),
-    GAME_2(4, 2),
-    GAME_3(4, 3),
-    ENTERTAINMENT(5);
+public enum class VideoType(public val tid: Int, public vararg val sub: Int) : CacheKey {
+    ANIME(1, 27),
+    MUSIC(3, 28, 29, 130, 193),
+    GAME(4, 172),
+    ENTERTAINMENT(5, 71);
 
-    override val duration: Long = 10_000
+    override val filename: String = "BILIBILI.${name}.json"
 
-    override val path = "${name}_${pn}.json"
-
-    @OptIn(ExperimentalSerializationApi::class)
-    override val readable: (ByteArray) -> Boolean = { bytes ->
-        CustomJson.decodeFromString<Temp>(bytes.decodeToString()).data != null
-    }
-
-    private val parameters = Parameters.build {
-        append("mid", BILIBILI_ID.toString())
-        append("ps", PAGE_SIZE.toString())
-        append("pn", pn.toString())
-        append("order", ORDER)
-        append("tid", tid.toString())
-    }
-
-    override val url: Url = Url(BILIBILI_API).copy(parameters = parameters)
+    override val url: String get() = BILIBILI_API
 }
 
 @Serializable
-private data class Temp(
+internal data class Temp(
     @SerialName("code")
     val code: Int,
     @SerialName("data")
@@ -75,19 +33,31 @@ private data class Temp(
 )
 
 @Serializable
-private data class VideoHistory(
+internal data class VideoHistory(
     @SerialName("list")
-    val list: VideoList,
+    val list: VideoList = VideoList(emptyList()),
+    @SerialName("page")
+    val page: VideoPage? = null
 )
 
 @Serializable
-private data class VideoList(
+internal data class VideoList(
     @SerialName("vlist")
     val videos: List<Video>
 )
 
 @Serializable
-data class Video(
+internal data class VideoPage(
+    @SerialName("pn")
+    val index: Int,
+    @SerialName("ps")
+    val size: Int,
+    @SerialName("count")
+    val count: Int
+)
+
+@Serializable
+public data class Video(
     @SerialName("aid")
     val aid: Int,
     @SerialName("author")
@@ -100,7 +70,7 @@ data class Video(
     val copyright: String,
     @SerialName("created")
     @Serializable(TimestampSerializer::class)
-    val created: OffsetDateTime,
+    override val created: OffsetDateTime,
     @SerialName("description")
     val description: String,
     @SerialName("length")
@@ -118,5 +88,7 @@ data class Video(
     @SerialName("title")
     val title: String,
     @SerialName("typeid")
-    val tid: Int,
-)
+    val type: Int,
+) : CacheInfo {
+    override val url: String by lazy { "https://www.bilibili.com/video/${bvid}" }
+}

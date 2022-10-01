@@ -1,5 +1,6 @@
 package xyz.cssxsh.arknights.mine
 
+import kotlinx.coroutines.*
 import kotlinx.serialization.*
 import xyz.cssxsh.arknights.bilibili.*
 import xyz.cssxsh.arknights.excel.*
@@ -7,7 +8,7 @@ import java.time.*
 import java.time.format.*
 
 @Serializable
-data class Question(
+public data class Question(
     @SerialName("problem")
     val problem: String,
     @SerialName("options")
@@ -24,25 +25,209 @@ data class Question(
     val type: QuestionType
 )
 
-enum class QuestionType(val description: String, private val load: (QuestionDataLoader) -> QuestionBuild) {
-    BUILDING("基建相关", { randomBuildingQuestion(it.excel().buffs) }),
-    PLAYER("玩家相关", { randomPlayerQuestion(it.excel().const) }),
-    TALENT("天赋相关", { randomTalentQuestion(it.excel().characters) }),
-    POSITION("位置相关", { randomPositionQuestion(it.excel().characters) }),
-    PROFESSION("职业相关", { randomProfessionQuestion(it.excel().characters) }),
-    RARITY("星级相关", { randomRarityQuestion(it.excel().characters) }),
-    POWER("政权相关", { randomPowerQuestion(it.excel().powers) }),
-    ILLUST("立绘相关", { randomIllustQuestion(it.excel().handbooks) }),
-    VOICE("声优相关", { randomCharacterVoiceQuestion(it.excel().handbooks) }),
-    INFO("档案相关", { randomInfoQuestion(it.excel().handbooks) }),
-    SKILL("技能相关", { randomSkillQuestion(it.excel().skills) }),
-    STORY("剧情相关", { randomStoryQuestion(it.excel().stories) }),
-    ENEMY("敌方相关", { randomEnemyInfoQuestion(it.excel().enemies) }),
-    WEEKLY("周常相关", { randomWeeklyQuestion(it.excel().weeks) }),
-    MUSIC("音乐相关", { randomMusicQuestion(it.video().music) }),
-    OTHER("自选相关", { requireNotNull(it.others().values.randomOrNull()) { "题目集为空" } });
+public enum class QuestionType(public val description: String) {
+    BUILDING("基建相关") { 
+        override fun load(loader: QuestionDataLoader): QuestionBuilder {
+            val building = runBlocking { loader.excel.building() }
+            val characters = runBlocking { loader.excel.character() }
+            return ChoiceQuestionBuilder(meaning = "角色" to "基建技能", range = DefaultChoiceRange) {
+                for ((characterId, info) in building.characters) {
+                    val character = characters[characterId] ?: continue
+                    for (char in info.buffs) {
+                        for ((buffId) in char.data) {
+                            val buff = building.buffs[buffId] ?: continue
 
-    fun random(loader: QuestionDataLoader): Question = load(loader).build(this)
+                            add(character.name to buff.name)
+                        }
+                    }
+                }
+            }
+        }
+    },
+    PLAYER("玩家相关") {
+        override fun load(loader: QuestionDataLoader): QuestionBuilder {
+            val const = runBlocking { loader.excel.const() }
+
+            val map: Map<String, Pair<Int, Set<Int>>> = buildMap {
+                val speed = const.playerApRegenSpeed
+                put("理智回复速度是每%d分钟1理智", speed to ((1..10).toSet() - speed))
+                val level = (1..const.maxPlayerLevel).random()
+                val ap = const.playerApMap[level - 1]
+                val exp = const.playerExpMap[level - 1]
+                put("等级为${level}, 理智回复上限为%d", ap to (const.playerApMap.toSet() - ap))
+                put("等级为${level}, 升级所需经验为%d", exp to (const.playerExpMap.toSet() - exp))
+            }
+
+            return JudgmentQuestionBuilder { state ->
+                val (text, param) = map.entries.random()
+                text.format(if (state) param.first else param.second.random()) to param.first.toString()
+            }
+        }
+    },
+    TALENT("天赋相关") {
+        override fun load(loader: QuestionDataLoader): QuestionBuilder {
+            val characters = runBlocking { loader.excel.character() }
+            return ChoiceQuestionBuilder(meaning = "角色" to "天赋", range = DefaultChoiceRange) {
+                for ((_, character) in characters) {
+                    val talents = character.talents ?: continue
+                    for (talent in talents) {
+                        val candidates = talent.candidates ?: continue
+                        for (candidate in candidates) {
+                            val name = candidate.name ?: continue
+
+                            add(character.name to name)
+                        }
+                    }
+                }
+            }
+        }
+    },
+    POSITION("位置相关") {
+        override fun load(loader: QuestionDataLoader): QuestionBuilder {
+            val characters = runBlocking { loader.excel.character() }
+            return ChoiceQuestionBuilder(meaning = "角色" to "放置位", range = DefaultChoiceRange) {
+                for ((_, character) in characters) {
+                    add(character.name to character.position.text)
+                }
+            }
+        }
+    },
+    PROFESSION("职业相关") {
+        override fun load(loader: QuestionDataLoader): QuestionBuilder {
+            val characters = runBlocking { loader.excel.character() }
+            return ChoiceQuestionBuilder(meaning = "角色" to "职业", range = DefaultChoiceRange) {
+                for ((_, character) in characters) {
+                    add(character.name to character.profession.text)
+                }
+            }
+        }
+    },
+    RARITY("星级相关") {
+        override fun load(loader: QuestionDataLoader): QuestionBuilder {
+            val characters = runBlocking { loader.excel.character() }
+            return ChoiceQuestionBuilder(meaning = "角色" to "稀有度", range = DefaultChoiceRange) {
+                for ((_, character) in characters) {
+                    add(character.name to (character.rarity + 1).toString())
+                }
+            }
+        }
+    },
+    POWER("政权相关") {
+        override fun load(loader: QuestionDataLoader): QuestionBuilder {
+            val teams = runBlocking { loader.excel.team() }
+            val characters = runBlocking { loader.excel.character() }
+            val level = PowerLevel.values().random()
+            return ChoiceQuestionBuilder(meaning = level.text to "角色", range = DefaultChoiceRange) {
+                for ((_, team) in teams) {
+                    if (team.level != level.ordinal) continue
+                    for ((_, character) in characters) {
+                        if (level.get(character) != team.id) continue
+
+                        add(team.name to character.name)
+                    }
+                }
+            }
+        }
+    },
+    ILLUST("立绘相关") {
+        override fun load(loader: QuestionDataLoader): QuestionBuilder {
+            val handbooks = runBlocking { loader.excel.handbook().handbooks }
+            val characters = runBlocking { loader.excel.character() }
+            return ChoiceQuestionBuilder(meaning = "画师" to "角色", range = DefaultChoiceRange) {
+                for ((characterId, handbook) in handbooks) {
+                    val character = characters[characterId] ?: continue
+                    add(handbook.illust to character.name)
+                }
+            }
+        }            
+    },
+    VOICE("声优相关") {
+        override fun load(loader: QuestionDataLoader): QuestionBuilder {
+            val voices = runBlocking { loader.excel.word().voiceLangDict }
+            val characters = runBlocking { loader.excel.character() }
+            return ChoiceQuestionBuilder(meaning = "声优" to "角色", range = DefaultChoiceRange) {
+                for ((characterId, voice) in voices) {
+                    val character = characters[characterId] ?: continue
+                    for ((_, dict) in voice.dict) {
+                        add(dict.cvName to character.name)
+                    }
+                }
+            }
+        }
+    },
+    SKILL("技能相关") {
+        override fun load(loader: QuestionDataLoader): QuestionBuilder {
+            val skills = runBlocking { loader.excel.skill() }
+            val characters = runBlocking { loader.excel.character() }
+            return ChoiceQuestionBuilder(meaning = "角色" to "技能", range = DefaultChoiceRange) {
+                for ((_, character) in characters) {
+                    for (info in character.skills) {
+                        val skillId = info.skill ?: continue
+                        val skill = skills[skillId] ?: continue
+                        val name = skill.levels.firstOrNull()?.name ?: continue
+                        add(character.name to name)
+                    }
+                }
+            }
+        }
+    },
+    STORY("剧情相关") {
+        override fun load(loader: QuestionDataLoader): QuestionBuilder {
+            val stories = runBlocking { loader.excel.story() }
+            val story = buildList {
+                for ((_, story) in stories) {
+                    if (story.action == ActionType.NONE) continue
+                    add(story)
+                }
+            }.random()
+            val problem = "${story.action.text}<${story.name}>开始于"
+            return DateTimeQuestionBuilder(problem = problem, datetime = story.start)
+        }
+    },
+    ENEMY("敌方相关") {
+        override fun load(loader: QuestionDataLoader): QuestionBuilder {
+            val enemies = runBlocking { loader.excel.enemy() }
+            val (attribute, value) = listOf<Pair<String, Enemy.() -> String>>(
+                "攻击方式" to { type },
+                "攻击力" to { attack },
+                "防御力" to { defence },
+                "法术抗性" to { resistance },
+                "耐久" to { endure }
+            ).random()
+            return ChoiceQuestionBuilder(meaning = "敌方" to attribute, range = DefaultChoiceRange) {
+                for ((_, enemy) in enemies) {
+                    add(enemy.designation to enemy.value())
+                }
+            }
+        }
+    },
+    WEEKLY("周常相关") {
+        override fun load(loader: QuestionDataLoader): QuestionBuilder {
+            val table = runBlocking { loader.excel.zone() }
+            return ChoiceQuestionBuilder(meaning = "周常" to "开启时间", range = DefaultChoiceRange) {
+                for ((zoneId, weekly) in table.weekly) {
+                    val zone = table.zones[zoneId] ?: continue
+                    add(zone.title to weekly.daysOfWeek.joinToString())
+                }
+            }
+        }
+    },
+    MUSIC("音乐相关") {
+        override fun load(loader: QuestionDataLoader): QuestionBuilder {
+            val video = loader.video.cache[VideoType.MUSIC].orEmpty().random()
+            val problem = "${video.title}(${video.bvid})发布于"
+            return DateTimeQuestionBuilder(problem = problem, datetime = video.created)
+        }
+    },
+    OTHER("自选相关") {
+        public override fun load(loader: QuestionDataLoader): QuestionBuilder {
+            return requireNotNull(loader.custom.question.values.randomOrNull()) { "题目集为空" }
+        }
+    };
+
+    public fun random(loader: QuestionDataLoader): Question = load(loader).build(this)
+
+    public abstract fun load(loader: QuestionDataLoader): QuestionBuilder
 }
 
 private fun Boolean.Companion.random() = listOf(true, false).random()
@@ -57,27 +242,31 @@ private fun OffsetDateTime.randomMinutes(offset: Int = 30) = plusMinutes(offset 
 
 private val DefaultChoiceRange = 'A'..'D'
 
-data class QuestionDataLoader(
-    val excel: () -> ExcelData,
-    val video: () -> VideoData,
-    val others: () -> Map<String, CustomQuestion>,
-)
-
-sealed class QuestionBuild {
-    abstract fun build(type: QuestionType): Question
+public interface QuestionDataLoader {
+    public val excel: ExcelDataHolder
+    public val video: VideoDataHolder
+    public val custom: CustomQuestionHolder
 }
 
-data class ChoiceQuestion(
-    val meaning: Pair<String, String>,
-    val range: CharRange,
-    val relation: () -> List<Pair<String, String>>
-) : QuestionBuild() {
+public interface CustomQuestionHolder {
+    public val question: MutableMap<String, CustomQuestionInfo>
+}
+
+public sealed class QuestionBuilder {
+    public abstract fun build(type: QuestionType): Question
+}
+
+public class ChoiceQuestionBuilder(
+    public val meaning: Pair<String, String>,
+    public val range: CharRange,
+    public val fill: MutableList<Pair<String, String>>.() -> Unit
+) : QuestionBuilder() {
     override fun build(type: QuestionType): Question {
         val reversal = Boolean.random()
         val key = { pair: Pair<String, String> -> if (reversal) pair.second else pair.first }
         val value = { pair: Pair<String, String> -> if (reversal) pair.first else pair.second }
 
-        val relation = relation().toMutableList().apply { shuffle() }
+        val relation = ArrayList<Pair<String, String>>().apply { fill(); shuffle() }
         val map = relation.groupBy(key, value)
 
         val options = (range zip map.entries).toMap()
@@ -96,7 +285,7 @@ data class ChoiceQuestion(
 }
 
 @Serializable
-data class CustomQuestion(
+public data class CustomQuestionInfo(
     @SerialName("problem")
     val problem: String,
     @SerialName("options")
@@ -107,8 +296,8 @@ data class CustomQuestion(
     val tips: String,
     @SerialName("timeout")
     val timeout: Long
-) : QuestionBuild() {
-    constructor(
+) : QuestionBuilder() {
+    public constructor(
         problem: String,
         right: List<String>,
         error: List<String>,
@@ -137,12 +326,10 @@ data class CustomQuestion(
     }
 }
 
-data class DateTimeQuestion(
-    @SerialName("problem")
-    val problem: String,
-    @SerialName("datetime")
-    val datetime: OffsetDateTime
-) : QuestionBuild() {
+public class DateTimeQuestionBuilder(
+    public val problem: String,
+    public val datetime: OffsetDateTime
+) : QuestionBuilder() {
     override fun build(type: QuestionType): Question {
         val range = DefaultChoiceRange
         val list = listOf(
@@ -152,7 +339,7 @@ data class DateTimeQuestion(
             datetime.randomDays().randomMinutes()
         )
         val map = (range zip list).toMap()
-        val answer = map.entries.filter { it.value == datetime }.map { it.key }.toSet()
+        val answer = map.entries.filter { it.value == datetime }.mapTo(HashSet()) { it.key }
         return Question(
             problem = problem,
             options = map.mapValues { (_, datetime) -> datetime.format(formatter) },
@@ -164,7 +351,9 @@ data class DateTimeQuestion(
     }
 }
 
-data class JudgmentQuestion(val generate: (Boolean) -> Pair<String, String>) : QuestionBuild() {
+public class JudgmentQuestionBuilder(
+    public val generate: (Boolean) -> Pair<String, String>
+) : QuestionBuilder() {
     override fun build(type: QuestionType): Question {
         val state = Boolean.random()
         val (problem, tips) = generate(state)
@@ -177,161 +366,5 @@ data class JudgmentQuestion(val generate: (Boolean) -> Pair<String, String>) : Q
             timeout = 60_000L,
             type = type
         )
-    }
-}
-
-typealias ConstInfoQuestion = (const: ConstInfo) -> QuestionBuild
-
-typealias BuffQuestion = (buffs: BuffMap) -> QuestionBuild
-
-typealias CharacterQuestion = (characters: CharacterMap) -> QuestionBuild
-
-typealias HandbookQuestion = (handbooks: HandbookMap) -> QuestionBuild
-
-typealias SkillQuestion = (skills: SkillMap) -> QuestionBuild
-
-typealias VideoQuestion = (videos: Collection<Video>) -> QuestionBuild
-
-typealias PowerQuestion = (teams: PowerMap) -> QuestionBuild
-
-typealias StoryQuestion = (stories: StoryMap) -> QuestionBuild
-
-typealias EnemyQuestion = (enemies: EnemyMap) -> QuestionBuild
-
-typealias WeeklyQuestion = (zones: WeeklyMap) -> QuestionBuild
-
-val randomPlayerQuestion: ConstInfoQuestion = { const ->
-    val map: Map<String, Pair<Int, Set<Int>>> = buildMap {
-        val speed = const.playerApRegenSpeed
-        put("理智回复速度是每%d分钟1理智", speed to ((1..10).toSet() - speed))
-        val level = (1..const.maxPlayerLevel).random()
-        val ap = const.playerApMap[level - 1]
-        val exp = const.playerExpMap[level - 1]
-        put("等级为${level}, 理智回复上限为%d", ap to (const.playerApMap.toSet() - ap))
-        put("等级为${level}, 升级所需经验为%d", exp to (const.playerExpMap.toSet() - exp))
-    }
-
-    JudgmentQuestion { state ->
-        val (text, param) = map.entries.random()
-        text.format(if (state) param.first else param.second.random()) to param.first.toString()
-    }
-}
-
-val randomBuildingQuestion: BuffQuestion = { buffs ->
-    ChoiceQuestion(meaning = "角色" to "基建技能", range = DefaultChoiceRange) {
-        buffs.flatMap { (name, list) ->
-            list.map { buff -> name to buff.name }
-        }
-    }
-}
-
-val randomTalentQuestion: CharacterQuestion = { characters ->
-    ChoiceQuestion(meaning = "角色" to "天赋", range = DefaultChoiceRange) {
-        characters.flatMap { (name, character) ->
-            character.talents().map { talent -> name to talent }
-        }
-    }
-}
-
-val randomPositionQuestion: CharacterQuestion = { characters ->
-    ChoiceQuestion(meaning = "角色" to "放置位", range = DefaultChoiceRange) {
-        characters.map { (name, character) -> name to character.position.text }
-    }
-}
-
-val randomProfessionQuestion: CharacterQuestion = { characters ->
-    ChoiceQuestion(meaning = "角色" to "职业", range = DefaultChoiceRange) {
-        characters.map { (name, character) -> name to character.profession.text }
-    }
-}
-
-val randomRarityQuestion: CharacterQuestion = { characters ->
-    ChoiceQuestion(meaning = "角色" to "稀有度", range = DefaultChoiceRange) {
-        characters.map { (name, character) -> name to (character.rarity + 1).toString() }
-    }
-}
-
-val randomTagQuestion: CharacterQuestion = { characters ->
-    ChoiceQuestion(meaning = "角色" to "TAG", range = DefaultChoiceRange) {
-        characters.flatMap { (name, character) ->
-            character.tags.orEmpty().map { tag -> name to tag }
-        }
-    }
-}
-
-val randomPowerQuestion: PowerQuestion = { teams ->
-    val level = PowerLevel.values().random()
-    ChoiceQuestion(meaning = level.text to "角色", range = DefaultChoiceRange) {
-        teams.getValue(level).filterKeys { it.id != DefaultTeam }.flatMap { (team, characters) ->
-            characters.map { name -> team.name to name }
-        }
-    }
-}
-
-val randomIllustQuestion: HandbookQuestion = { handbooks ->
-    ChoiceQuestion(meaning = "画师" to "角色", range = DefaultChoiceRange) {
-        handbooks.map { (name, handbook) -> handbook.illust to name }
-    }
-}
-
-val randomCharacterVoiceQuestion: HandbookQuestion = { handbooks ->
-    ChoiceQuestion(meaning = "声优" to "角色", range = DefaultChoiceRange) {
-        handbooks.map { (name, handbook) -> handbook.voice to name }
-    }
-}
-
-val randomInfoQuestion: HandbookQuestion = { handbooks ->
-    val tag = handbooks.tags().random()
-    ChoiceQuestion(meaning = "角色" to tag, range = DefaultChoiceRange) {
-        handbooks.mapNotNull { (name, handbook) ->
-            handbook.infos()[tag]?.let { value -> name to value }
-        }
-    }
-}
-
-val randomSkillQuestion: SkillQuestion = { skills ->
-    ChoiceQuestion(meaning = "角色" to "技能", range = DefaultChoiceRange) {
-        skills.flatMap { (name, list) ->
-            list.map { skill -> name to skill.levels.first().name }
-        }
-    }
-}
-
-val randomMusicQuestion: VideoQuestion = { videos ->
-    val video = videos.random()
-    val problem = "${video.title}(${video.bvid})发布于"
-    DateTimeQuestion(problem = problem, datetime = video.created)
-}
-
-val randomStoryQuestion: StoryQuestion = { stories ->
-    val story = (stories - ActionType.NONE).values.flatten().random()
-    val problem = "${story.action.text}<${story.name}>开始于"
-    DateTimeQuestion(problem = problem, datetime = story.start)
-}
-
-val randomEnemyInfoQuestion: EnemyQuestion = { enemies ->
-    val (attribute, value) = listOf<Pair<String, Enemy.() -> String>>(
-        "攻击方式" to { type },
-        "攻击力" to { attack },
-        "防御力" to { defence },
-        "法术抗性" to { resistance },
-        "耐久" to { endure }
-    ).random()
-    ChoiceQuestion(meaning = "敌方" to attribute, range = DefaultChoiceRange) {
-        enemies.flatMap { (_, enemies) ->
-            enemies.map { enemy ->
-                enemy.designation to enemy.value()
-            }
-        }
-    }
-}
-
-val randomWeeklyQuestion: WeeklyQuestion = { weeks ->
-    ChoiceQuestion(meaning = "周常" to "开启时间", range = DefaultChoiceRange) {
-        weeks.flatMap { (_, list) ->
-            list.map { (zone, weekly) ->
-                zone.title to weekly.daysOfWeek.joinToString()
-            }
-        }
     }
 }

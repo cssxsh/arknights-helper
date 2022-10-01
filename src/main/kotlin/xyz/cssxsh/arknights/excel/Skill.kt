@@ -2,10 +2,10 @@ package xyz.cssxsh.arknights.excel
 
 import kotlinx.serialization.*
 
-typealias SkillTable = Map<String, Skill>
+public typealias SkillTable = Map<String, Skill>
 
 @Serializable
-data class Skill(
+public data class Skill(
     @SerialName("hidden")
     val hidden: Boolean,
     @SerialName("iconId")
@@ -17,7 +17,7 @@ data class Skill(
 ) : Id
 
 @Serializable
-data class Level(
+public data class Level(
     @SerialName("blackboard")
     val blackboard: List<Blackboard>,
     @SerialName("description")
@@ -37,7 +37,7 @@ data class Level(
 ) : Name
 
 @Serializable
-data class SpData(
+public data class SpData(
     @SerialName("increment")
     val increment: Double,
     @SerialName("initSp")

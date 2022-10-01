@@ -10,12 +10,13 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.mirai.arknights.*
+import xyz.cssxsh.mirai.arknights.data.*
 
-object ArknightsMineCommand : SimpleCommand(
+public object ArknightsMineCommand : SimpleCommand(
     owner = ArknightsHelperPlugin,
-    "mine", "挖矿", "答题",
+    "ark-mine", "方舟挖矿", "方舟答题",
     description = "明日方舟助手挖矿指令"
-), ArknightsHelperCommand {
+) {
 
     private suspend inline fun <reified P : MessageEvent> P.nextAnswerOrNull(
         timeoutMillis: Long,
@@ -29,12 +30,24 @@ object ArknightsMineCommand : SimpleCommand(
         }
     }
 
+    private fun countQuestionType(type: QuestionType, mode: Int) {
+        ArknightsMineData.count.compute(type) { _, s ->
+            (s ?: mutableListOf(0, 0, 0)).apply { this[mode] += 1 }
+        }
+    }
+
     @Handler
-    suspend fun CommandSenderOnMessage<*>.handler(type: QuestionType = QuestionType.values().random()) {
-        val question = type.random()
+    public suspend fun CommandSenderOnMessage<*>.handler(type: QuestionType = QuestionType.values().random()) {
+        val question = type.random(ArknightsQuestionLoader)
 
         val (reply, time) = mutex.withLock {
-            sendMessage(fromEvent.message.quote() + question.toMessage())
+            sendMessage(buildMessageChain {
+                append(fromEvent.message.quote())
+                appendLine("[${type}]<${question.coin}>：${question.problem} (${question.timeout / 1000}s内作答)")
+                for ((index, text) in question.options) {
+                    appendLine("${index}.${text}")
+                }
+            })
 
             val start = System.currentTimeMillis()
             fromEvent.nextAnswerOrNull(question.timeout) { next ->
@@ -50,7 +63,7 @@ object ArknightsMineCommand : SimpleCommand(
         var multiple = 1
         var deduct = false
         val origin = fromEvent.sender
-        reply.toCommandSender().sendMessage {
+        reply.toCommandSender().reply {
             buildMessageChain {
                 appendLine(question.problem)
                 if (reply.sender != origin) {
@@ -64,13 +77,13 @@ object ArknightsMineCommand : SimpleCommand(
                 }
                 if (answer == question.answer) {
                     countQuestionType(type, 0)
-                    coin += (question.coin * multiple)
+                    user.coin += (question.coin * multiple)
                     appendLine("回答正确，合成玉${"%+d".format(question.coin)}*${multiple}")
                 } else {
                     countQuestionType(type, 1)
                     appendLine("回答错误${answer}, ${question.tips ?: "参考答案${question.answer}"}")
                     if (deduct) {
-                        coin -= (question.coin * multiple)
+                        user.coin -= (question.coin * multiple)
                         appendLine("抢答，合成玉${"%+d".format(question.coin * -1)}*${multiple}")
                     }
                 }

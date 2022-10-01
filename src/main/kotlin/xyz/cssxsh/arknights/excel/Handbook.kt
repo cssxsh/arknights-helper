@@ -3,24 +3,10 @@ package xyz.cssxsh.arknights.excel
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 
-private val TagRegex = """(?<=【|\[)(.+)(?:]|】)(.+)""".toRegex()
-
-fun Handbook.infos(): Map<String, String> {
-    return stories.values.flatten().flatMap { text ->
-        TagRegex.findAll(text).map { result ->
-            result.destructured.let { (key, value) -> key to value.trim() }
-        }
-    }.toMap()
-}
-
-val Handbook.stories get() = storyTextAudio.associate { info -> info.title to info.stories.map { it.text } }
-
-fun HandbookMap.tags() = entries.fold(emptySet<String>()) { acc, (_, handbook) -> acc + handbook.infos().keys }
-
 @Serializable
-data class HandbookTable(
+public data class HandbookTable(
     @SerialName("handbookDict")
-    val handbooks: HandbookMap,
+    val handbooks: Map<String, Handbook>,
     @SerialName("npcDict")
     val npc: Map<String, NpcInfo>,
     @SerialName("teamMissionList")
@@ -32,7 +18,7 @@ data class HandbookTable(
 )
 
 @Serializable
-data class Handbook(
+public data class Handbook(
     @SerialName("charID")
     override val character: String,
     @SerialName("drawName")
@@ -46,7 +32,7 @@ data class Handbook(
 ) : Illust, Voice, CharacterId
 
 @Serializable
-data class StoryTextAudio(
+public data class StoryTextAudio(
     @SerialName("stories")
     val stories: List<HandbookStory>,
     @SerialName("storyTitle")
@@ -56,7 +42,7 @@ data class StoryTextAudio(
 )
 
 @Serializable
-data class HandbookStory(
+public data class HandbookStory(
     @SerialName("storyText")
     val text: String,
     @SerialName("unLockParam")
@@ -68,7 +54,7 @@ data class HandbookStory(
 )
 
 @Serializable
-data class NpcInfo(
+public data class NpcInfo(
     @SerialName("appellation")
     override val appellation: String,
     @SerialName("cv")
@@ -86,7 +72,7 @@ data class NpcInfo(
     @SerialName("npcId")
     override val id: String,
     @SerialName("profession")
-    val profession: String,// XXX
+    val profession: String,
     @SerialName("teamId")
     override val team: String?,
     @SerialName("unlockDict")
@@ -94,7 +80,7 @@ data class NpcInfo(
 ) : Illust, Voice, Role, Id
 
 @Serializable
-data class TeamInfo(
+public data class TeamInfo(
     @SerialName("favorPoint")
     val favorPoint: Int,
     @SerialName("id")
@@ -102,7 +88,7 @@ data class TeamInfo(
     @SerialName("item")
     val item: LegacyItem,
     @SerialName("powerId")
-    val powerId: String, // XXX
+    val powerId: String,
     @SerialName("powerName")
     val powerName: String,
     @SerialName("sort")
