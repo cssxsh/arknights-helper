@@ -167,9 +167,7 @@ public interface NameI18n {
     public val i18n: I18n<String>
 }
 
-public infix fun <T> I18n<T>.get(server: ServerType): T? = get(server.locale.language)
-
-public fun <T> I18n<T>.get(): T? = get(SERVER.locale.language)
+public fun <T> I18n<T>.locale(): T? = get(SERVER.locale.language)
 
 public interface Id {
     public val id: String

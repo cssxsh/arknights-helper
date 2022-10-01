@@ -19,7 +19,7 @@ public object ArknightsItemCommand : SimpleCommand(
         val stages = ArknightsSubscriber.penguin.stages()
         val zones = ArknightsSubscriber.penguin.zones()
         val message = buildMessageChain {
-            appendLine("${item.alias.get()} 统计结果 By 企鹅物流数据统计")
+            appendLine("${item.alias.locale()} 统计结果 By 企鹅物流数据统计")
             if (matrices.isEmpty()) {
                 appendLine("列表为空，请尝试更新数据")
                 return@buildMessageChain
