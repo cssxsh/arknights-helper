@@ -7,12 +7,10 @@ import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
 import net.mamoe.mirai.console.data.*
 import net.mamoe.mirai.console.plugin.jvm.*
 import net.mamoe.mirai.event.*
-import xyz.cssxsh.arknights.excel.*
-import xyz.cssxsh.mirai.arknights.data.*
 import kotlin.collections.*
 
-object ArknightsHelperPlugin : KotlinPlugin(
-    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "1.4.2") {
+public object ArknightsHelperPlugin : KotlinPlugin(
+    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "2.0.0") {
         name("arknights-helper")
         author("cssxsh")
     }
@@ -21,6 +19,7 @@ object ArknightsHelperPlugin : KotlinPlugin(
     private val commands: List<Command> by services()
     private val config: List<PluginConfig> by services()
     private val data: List<PluginData> by services()
+    private val listeners: List<ListenerHost> by services()
 
     @Suppress("INVISIBLE_MEMBER")
     private inline fun <reified T : Any> services(): Lazy<List<T>> = lazy {
@@ -35,16 +34,11 @@ object ArknightsHelperPlugin : KotlinPlugin(
         for (config in config) config.reload()
         for (data in data) data.reload()
         for (command in commands) command.register()
-
-        System.setProperty(ExcelDataHolder.GAME_SOURCE_HOST_KEY, ArknightsConfig.host)
-
-        ArknightsSubscriber.registerTo(globalEventChannel())
-        ArknightsSubscriber.start()
+        for (listener in listeners) (listener as SimpleListenerHost).registerTo(globalEventChannel())
     }
 
     override fun onDisable() {
         for (command in commands) command.unregister()
-
-        ArknightsSubscriber.cancel()
+        for (listener in listeners) (listener as SimpleListenerHost).cancel()
     }
 }

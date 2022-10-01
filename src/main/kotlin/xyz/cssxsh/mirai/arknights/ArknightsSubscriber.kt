@@ -95,29 +95,11 @@ public object ArknightsSubscriber : SimpleListenerHost() {
 
     private fun CacheInfo.isToday(): Boolean = (created.toLocalDate() == LocalDate.now())
 
-//    private fun clock() = launch {
-//        logger.info { "明日方舟 定时器 订阅器开始运行" }
-//        while (isActive) {
-//            for ((id, timestamp) in ArknightsUserData.reason) {
-//                if (abs(timestamp - System.currentTimeMillis()) < RegenSpeed) {
-//                    launch {
-//                        sendReasonClock(id)
-//                    }
-//                }
-//            }
-//            for ((id, sites) in ArknightsUserData.recruit) {
-//                for ((site, timestamp) in sites) {
-//                    if (abs(timestamp - System.currentTimeMillis()) < RegenSpeed) {
-//                        launch {
-//                            sendRecruitClock(id, site)
-//                        }
-//                    }
-//                }
-//            }
-//            delay(Fast)
-//        }
-//    }
-//
+    private fun clock() {
+        // TODO: 剿灭
+        // TODO: 线索需求推送
+    }
+
     private fun video() {
         val history: MutableSet<String> = HashSet()
         val cron: (VideoType) -> Cron = { ArknightsCronConfig.video[it] ?: ArknightsCronConfig.default }
@@ -275,14 +257,6 @@ public object ArknightsSubscriber : SimpleListenerHost() {
         }
     }
 
-    public fun start() {
-        video()
-        weibo()
-        announce()
-        penguin()
-        excel()
-    }
-
     public suspend fun clear() {
         videos.clear()
         blogs.clear()
@@ -291,7 +265,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
         excel.clear()
     }
 
-    public fun listen(contact: Contact) {
+    private fun listen(contact: Contact) {
         contact.launch(coroutineContext) {
             ArknightsCollector(contact).emitAll(flow)
         }
@@ -299,6 +273,12 @@ public object ArknightsSubscriber : SimpleListenerHost() {
 
     @EventHandler
     public fun BotOnlineEvent.online() {
+        System.setProperty(ExcelDataHolder.GAME_SOURCE_HOST_KEY, ArknightsConfig.host)
+        video()
+        weibo()
+        announce()
+        penguin()
+        excel()
         for (group in bot.groups) {
             listen(contact = group)
         }
@@ -312,7 +292,6 @@ public object ArknightsSubscriber : SimpleListenerHost() {
         launch {
             delay(60_000)
             listen(contact = group)
-            group.sendMessage("机器人加添加群组，已自动开启蹲饼")
         }
     }
 
@@ -321,7 +300,6 @@ public object ArknightsSubscriber : SimpleListenerHost() {
         launch {
             delay(60_000)
             listen(contact = friend)
-            friend.sendMessage("机器人加添加好友，已自动开启蹲饼")
         }
     }
 }
