@@ -6,8 +6,8 @@
 [![Downloads](https://img.shields.io/github/downloads/cssxsh/arknights-helper/total)](https://shields.io/category/downloads)
 [![MiraiForum](https://img.shields.io/badge/post-on%20MiraiForum-yellow)](https://mirai.mamoe.net/topic/203)
 
-**使用前应该查阅的相关文档或项目**
-**Arknights Helper 在2.0版本进行了重构 需要重新配置订阅 详见 方舟蹲饼**
+**使用前应该查阅的相关文档或项目**  
+**Arknights Helper 在2.0版本进行了重构 需要重新配置订阅 详见 方舟蹲饼**  
 
 * [User Manual](https://github.com/mamoe/mirai/blob/dev/docs/UserManual.md)
 * [Permission Command](https://github.com/mamoe/mirai/blob/dev/mirai-console/docs/BuiltInCommands.md#permissioncommand)
@@ -24,9 +24,9 @@
 本插件指令权限ID 格式为 `xyz.cssxsh.mirai.plugin.arknights-helper:command.*`, `*` 是指令的第一指令名  
 例如 `/公招 远程位 支援` 的权限ID为 `xyz.cssxsh.mirai.plugin.arknights-helper:command.ark-recruit`
 
-### 助手抽卡指令
+### ~~助手抽卡指令~~
 
-**抽卡指令 2.0 版本重构中 咱不可用**
+**抽卡指令 2.0 版本重构中 暂不可用**
 
 | 指令                                            | 描述                                          |
 |:----------------------------------------------|:--------------------------------------------|
@@ -57,9 +57,9 @@ other表示剩余的其他干员
 other:0.42
 ```
 
-### 助手答题指令
+### ~~助手答题指令~~
 
-**表情指令 2.0 版本重构中 咱不可用**
+**表情指令 2.0 版本重构中 暂不可用**
 
 | 指令                                  | 描述                |
 |:------------------------------------|:------------------|
@@ -104,9 +104,9 @@ B. 选项
 * `limit` 是显示前多少项查询结果  
 * `now` 是是否只显示当前开启关卡，默认为 `true`  
 
-### 助手玩家指令
+### ~~助手玩家指令~~
 
-**表情指令 2.0 版本重构中 咱不可用**
+**表情指令 2.0 版本重构中 暂不可用**
 
 | 指令                                                   | 描述                    |
 |:-----------------------------------------------------|:----------------------|
@@ -143,9 +143,9 @@ B. 选项
 | `/<ark-data 方舟数据> <clear 清理>` | 清理缓存   |
 | `/<ark-data 方舟数据> <cron 定时>`  | 重载定时设置 |
 
-### 助手表情指令
+### ~~助手表情指令~~
 
-**表情指令 2.0 版本重构中 咱不可用**
+**表情指令 2.0 版本重构中 暂不可用**
 
 | 指令                                  | 描述                           |
 |:------------------------------------|:-----------------------------|
