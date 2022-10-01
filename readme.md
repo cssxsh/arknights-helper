@@ -7,7 +7,7 @@
 [![MiraiForum](https://img.shields.io/badge/post-on%20MiraiForum-yellow)](https://mirai.mamoe.net/topic/203)
 
 **使用前应该查阅的相关文档或项目**
-**Arknights Helper 在2.0版本进行了重构 部分功能咱不可用**
+**Arknights Helper 在2.0版本进行了重构 需要重新配置订阅 详见 方舟蹲饼**
 
 * [User Manual](https://github.com/mamoe/mirai/blob/dev/docs/UserManual.md)
 * [Permission Command](https://github.com/mamoe/mirai/blob/dev/mirai-console/docs/BuiltInCommands.md#permissioncommand)
