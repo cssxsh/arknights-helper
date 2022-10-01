@@ -1,6 +1,7 @@
 package xyz.cssxsh.arknights.weibo
 
 import io.ktor.client.request.*
+import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.*
 import kotlinx.serialization.*
@@ -86,7 +87,9 @@ public class MicroBlogDataHolder(override val folder: File, override val ignore:
             val url = image(pid = pid)
             val file = folder.resolve(url.substringAfterLast('/'))
             if (file.exists().not()) {
-                http.prepareGet(url).copyTo(file)
+                http.prepareGet(url) {
+                    header(HttpHeaders.Referrer, blog.url)
+                }.copyTo(file)
             }
             cache.add(file)
         }

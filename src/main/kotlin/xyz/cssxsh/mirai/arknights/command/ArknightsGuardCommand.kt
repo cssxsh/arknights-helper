@@ -20,15 +20,15 @@ public object ArknightsGuardCommand : CompositeCommand(
         val message = buildMessageChain {
             appendLine("=== 微博订阅 ===")
             ArknightsTaskConfig.blog.forEach { (id, blogs) ->
-                append("$id : $blogs")
+                appendLine("$id : $blogs")
             }
             appendLine("=== 视频订阅 ===")
             ArknightsTaskConfig.video.forEach { (id, videos) ->
-                append("$id : $videos")
+                appendLine("$id : $videos")
             }
             appendLine("=== 公告订阅 ===")
             ArknightsTaskConfig.announce.forEach { (id, announces) ->
-                append("$id : $announces")
+                appendLine("$id : $announces")
             }
         }
 

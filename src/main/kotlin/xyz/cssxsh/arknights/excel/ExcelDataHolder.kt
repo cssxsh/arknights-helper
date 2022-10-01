@@ -15,7 +15,7 @@ public class ExcelDataHolder(override val folder: File, override val ignore: sus
 
     override val cache: MutableMap<ExcelDataType, Any> = EnumMap(ExcelDataType::class.java)
 
-    private suspend inline fun <reified T: Any> ExcelDataType.get(): T = mutex.withLock {
+    private suspend inline fun <reified T : Any> ExcelDataType.get(): T = mutex.withLock {
         val raw = cache[this]
         return if (raw == null) {
             val read = CustomJson.decodeFromString<T>(file.readText())

@@ -38,6 +38,7 @@ public class ArknightsCollector(private val contact: Contact) : FlowCollector<Ca
                     append(blog = value)
 
                     value.retweeted?.let { retweeted ->
+                        appendLine()
                         appendLine("----------------")
                         appendLine("@${retweeted.user.name}")
 

@@ -12,7 +12,7 @@ public class PenguinDataHolder(override val folder: File, override val ignore: s
 
     public override val cache: MutableMap<PenguinDataType, Any> = EnumMap(PenguinDataType::class.java)
 
-    private suspend inline fun <reified T: Any> PenguinDataType.get(): T = mutex.withLock {
+    private suspend inline fun <reified T : Any> PenguinDataType.get(): T = mutex.withLock {
         val raw = cache[this]
         return if (raw == null) {
             val read = CustomJson.decodeFromString<T>(file.readText())

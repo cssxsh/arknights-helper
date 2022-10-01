@@ -4,8 +4,6 @@ import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
 import java.time.*
 
-val Zone.title get() = nameFirst?.let { "$it " }.orEmpty() + nameSecond.orEmpty() + nameThird?.let { " $it" }.orEmpty()
-
 @Serializable
 public data class ZoneTable(
     @SerialName("mainlineAdditionInfo")
@@ -44,6 +42,7 @@ public data class Weekly(
     val type: WeeklyType
 )
 
+@Serializable
 public enum class WeeklyType(public val text: String) {
     EVOLVE("进化"),
     MATERIAL("材料"),
@@ -84,8 +83,11 @@ public data class Zone(
     val nameTitleEx: String?,
     @SerialName("zoneNameTitleUnCurrent")
     val nameTitleUnCurrent: String?
-) : Id
+) : Id {
+    public val title: String = "${nameFirst.orEmpty()} ${nameSecond.orEmpty()} ${nameThird.orEmpty()}"
+}
 
+@Serializable
 public enum class ZoneType(public val text: String) {
     MAINLINE("主线"),
     GUIDE("指导"),

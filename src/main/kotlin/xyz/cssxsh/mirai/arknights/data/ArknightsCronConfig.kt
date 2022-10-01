@@ -21,7 +21,7 @@ public object ArknightsCronConfig : ReadOnlyPluginConfig("cron") {
 
     @ValueDescription("定时器 微博")
     public val blog: MutableMap<BlogUser, DataCron> by value {
-        put(BlogUser.ARKNIGHTS, cron("0 3,4 10-20 * * ? "))
+        put(BlogUser.ARKNIGHTS, cron("0 0-10 10-20 * * ? "))
         put(BlogUser.BYPRODUCT, cron("0 5,6 10-20 * * ? "))
         put(BlogUser.MOUNTEN, cron("0 7,8 10-20 * * ? "))
         put(BlogUser.HISTORICUS, cron("0 0 16 * * ? "))
