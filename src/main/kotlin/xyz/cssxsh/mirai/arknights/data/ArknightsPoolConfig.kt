@@ -11,5 +11,9 @@ public object ArknightsPoolConfig : AutoSavePluginConfig("pool") {
     private val default get() = GachaPoolRule.values().associate { it.name to it.rule }
 
     @ValueDescription("Key 规则名，Value是卡池规则")
-    public val rules: MutableMap<String, String> by value<MutableMap<String, String>>().withDefault { default.getValue(it) }
+    public val rules: MutableMap<String, String> by value<MutableMap<String, String>>().withDefault {
+        default.getValue(
+            it
+        )
+    }
 }

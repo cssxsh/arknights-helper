@@ -77,14 +77,13 @@ public object ArknightsRecruitCommand : SimpleCommand(
         val map = targets.sortedBy { it.size }.associateWith {
             it.fold(obtain as Set<Character>) { s, word -> s.filter(word) }
         }.mapValues { (_, characters) ->
-            characters.groupBy { it.rarity }
-        }.filter { (_, characters) ->
-            characters.isNotEmpty()
+            characters.groupByTo(java.util.TreeMap()) { it.rarity }
         }
 
         val message = buildMessageChain {
             for ((tags, result) in map) {
                 val info = when {
+                    result.isEmpty() -> continue
                     result.keys.all { it >= 3 } -> "${result.keys.minOrNull()!! + 1}星保底"
                     result.keys.any { it == 2 } -> continue
                     result.keys.all { it == 0 } -> "小车保底"

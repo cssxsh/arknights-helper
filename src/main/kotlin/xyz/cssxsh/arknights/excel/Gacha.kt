@@ -4,11 +4,6 @@ import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
 import java.time.*
 
-public typealias RecruitResult = Map<Int, List<Character>>
-
-public typealias RecruitMap = Map<Set<String>, RecruitResult>
-
-public fun Collection<Character>.toRecruitResult(): RecruitResult = groupBy { it.rarity }.toSortedMap()
 
 /**
  * 过滤当前卡池
