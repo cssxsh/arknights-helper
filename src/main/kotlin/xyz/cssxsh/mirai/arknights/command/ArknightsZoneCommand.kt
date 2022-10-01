@@ -7,7 +7,7 @@ import xyz.cssxsh.mirai.arknights.*
 
 public object ArknightsZoneCommand : SimpleCommand(
     owner = ArknightsHelperPlugin,
-    "zone", "章节", "活动", "地图",
+    "ark-zone", "方舟章节", "方舟活动", "方舟地图",
     description = "明日方舟助手地图指令"
 ) {
 
