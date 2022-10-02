@@ -272,13 +272,18 @@ public object ArknightsSubscriber : SimpleListenerHost() {
     }
 
     @EventHandler
-    public fun BotOnlineEvent.online() {
+    public fun StartupEvent.handle() {
         System.setProperty(ExcelDataHolder.GAME_SOURCE_HOST_KEY, ArknightsConfig.host)
         video()
         weibo()
         announce()
         penguin()
         excel()
+        plugin.logger.info { "蹲饼监听已开启" }
+    }
+
+    @EventHandler
+    public fun BotOnlineEvent.online() {
         for (group in bot.groups) {
             listen(contact = group)
         }
