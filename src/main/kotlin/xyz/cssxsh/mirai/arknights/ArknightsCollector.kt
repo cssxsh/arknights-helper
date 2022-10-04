@@ -26,7 +26,8 @@ public class ArknightsCollector(private val contact: Contact) : FlowCollector<Ca
      * 推送 [value] 到 [contact]
      */
     override suspend fun emit(value: CacheInfo): Unit = mutex.withLock {
-        if (cache.getValue(contact.id).contains(value.url)) return
+        val history = cache.getOrPut(contact.id) { WeakHashMap() }
+        if (value.url in history) return
         val message = when (value) {
             // 微博
             is MicroBlog -> {
@@ -71,7 +72,7 @@ public class ArknightsCollector(private val contact: Contact) : FlowCollector<Ca
             }
         }
         contact.sendMessage(message)
-        cache.getValue(contact.id)[value.url] = System.currentTimeMillis()
+        history[value.url] = System.currentTimeMillis()
     }
 
     private fun parseNodes(html: String, baseUri: String): List<Node> {
