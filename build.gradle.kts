@@ -48,6 +48,7 @@ dependencies {
     }
     implementation("org.jsoup:jsoup:1.15.3")
     compileOnly("javax.validation:validation-api:2.0.1.Final")
+    compileOnly("xyz.cssxsh:meme-helper:1.1.4")
 
     testImplementation(kotlin("test"))
     testImplementation("org.slf4j:slf4j-simple:2.0.1")
