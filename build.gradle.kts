@@ -2,12 +2,12 @@ plugins {
     kotlin("jvm") version "1.7.20"
     kotlin("plugin.serialization") version "1.7.20"
 
-    id("net.mamoe.mirai-console") version "2.12.3"
+    id("net.mamoe.mirai-console") version "2.13.0-RC"
     id("me.him188.maven-central-publish") version "1.0.0-dev-3"
 }
 
 group = "xyz.cssxsh"
-version = "2.0.0-RC"
+version = "2.0.0-RC2"
 
 mavenCentralPublish {
     useCentralS01()
@@ -26,12 +26,12 @@ repositories {
 }
 
 dependencies {
-    implementation("io.ktor:ktor-client-okhttp-jvm:2.1.2") {
+    implementation("io.ktor:ktor-client-okhttp:2.1.2") {
         exclude(group = "org.jetbrains.kotlin")
         exclude(group = "org.jetbrains.kotlinx")
         exclude(group = "org.slf4j")
     }
-    implementation("io.ktor:ktor-client-encoding-jvm:2.1.2") {
+    implementation("io.ktor:ktor-client-encoding:2.1.2") {
         exclude(group = "org.jetbrains.kotlin")
         exclude(group = "org.jetbrains.kotlinx")
         exclude(group = "org.slf4j")
@@ -42,17 +42,17 @@ dependencies {
         exclude(group = "org.slf4j")
     }
     implementation("com.cronutils:cron-utils:9.2.0") {
-        exclude("org.slf4j")
-        exclude("org.glassfish")
-        exclude("org.javassist")
+        exclude(group = "org.slf4j")
+        exclude(group = "org.glassfish")
+        exclude(group = "org.javassist")
     }
     implementation("org.jsoup:jsoup:1.15.3")
     compileOnly("javax.validation:validation-api:2.0.1.Final")
     compileOnly("xyz.cssxsh:meme-helper:1.1.4")
 
     testImplementation(kotlin("test"))
-    testImplementation("org.slf4j:slf4j-simple:2.0.1")
-    testImplementation("net.mamoe:mirai-logging-slf4j:2.12.3")
+    testImplementation("org.slf4j:slf4j-simple:2.0.3")
+    testImplementation("net.mamoe:mirai-logging-slf4j:2.13.0-RC")
 }
 
 kotlin {

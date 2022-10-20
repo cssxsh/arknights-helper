@@ -43,9 +43,9 @@ public object ArknightsHelperPlugin : KotlinPlugin(
     }
 
     override fun onEnable() {
-        logger.warning { "2.0 版本重构需要重新配置订阅订阅" }
-        logger.warning { "2.0 版本重构需要重新配置订阅订阅" }
-        logger.warning { "2.0 版本重构需要重新配置订阅订阅" }
+        logger.warning { "2.0 版本重构，需要重新配置订阅订阅" }
+        logger.warning { "2.0 版本重构，需要重新配置订阅订阅" }
+        logger.warning { "2.0 版本重构，需要重新配置订阅订阅" }
         for (config in config) config.reload()
         for (data in data) data.reload()
         for (command in commands) command.register()

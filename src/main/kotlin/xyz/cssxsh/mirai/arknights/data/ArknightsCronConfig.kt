@@ -21,7 +21,7 @@ public object ArknightsCronConfig : ReadOnlyPluginConfig("cron") {
 
     @ValueDescription("定时器 微博")
     public val blog: MutableMap<BlogUser, DataCron> by value {
-        put(BlogUser.ARKNIGHTS, cron("0 0-10 10-20 * * ? "))
+        put(BlogUser.ARKNIGHTS, cron("0 0/5 10-20 * * ? "))
         put(BlogUser.BYPRODUCT, cron("0 5,6 10-20 * * ? "))
         put(BlogUser.MOUNTEN, cron("0 7,8 10-20 * * ? "))
         put(BlogUser.HISTORICUS, cron("0 0 16 * * ? "))
@@ -29,9 +29,9 @@ public object ArknightsCronConfig : ReadOnlyPluginConfig("cron") {
 
     @ValueDescription("定时器 视频")
     public val video: MutableMap<VideoType, DataCron> by value {
-        put(VideoType.ANIME, cron("0 0,1,15 10-20 * * ? "))
-        put(VideoType.MUSIC, cron("0 0,1,15 10-20 * * ? "))
-        put(VideoType.GAME, cron("0 0,1,15 10-20 * * ? "))
+        put(VideoType.ANIME, cron("0 0/5 10-20 * * ? "))
+        put(VideoType.MUSIC, cron("0 1/5 10-20 * * ? "))
+        put(VideoType.GAME, cron("0 2/5 10-20 * * ? "))
         put(VideoType.ENTERTAINMENT, cron("0 0 16 * * ? "))
     }
 

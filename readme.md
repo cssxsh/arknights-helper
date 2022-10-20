@@ -57,25 +57,25 @@ other表示剩余的其他干员
 other:0.42
 ```
 
-### ~~助手答题指令~~
+### 助手答题指令
 
-**表情指令 2.0 版本重构中 暂不可用**
+| 指令                                        | 描述                |
+|:------------------------------------------|:------------------|
+| `/<ark-mine 方舟挖矿 方舟答题> [type]?`           | 机器人会提出一个问题        |
+| `/<ark-question 方舟问题> <detail 详情> [name]` | 查看自定义问题的详情        |
+| `/<ark-question 方舟问题> <list 列表>`          | 列出已经设置的自定义问题      |
+| `/<ark-question 方舟问题> <delete 删除>`        | 删除指定问题            |
+| `/<ark-question 方舟问题> <add 添加>`           | 与机器人互动，输入条件，设置新问题 |
+| `/<ark-question 方舟问题> <count 统计>`         | 答题情况统计            |
 
-| 指令                                  | 描述                |
-|:------------------------------------|:------------------|
-| `/<mine 挖矿 答题> [type]?`             | 机器人会提出一个问题        |
-| `/<question 问题> <detail 详情> [name]` | 查看自定义问题的详情        |
-| `/<question 问题> <list 列表>`          | 列出已经设置的自定义问题      |
-| `/<question 问题> <delete 删除>`        | 删除指定问题            |
-| `/<question 问题> <add 添加>`           | 与机器人互动，输入条件，设置新问题 |
-| `/<question 问题> <count 统计>`         | 答题情况统计            |
-
-回复选项序号`A~Z`，即算回答问题
-`type`是提问问题类型，默认为全部类型  
-回答了当前问题才会出现下一个问题  
-快速回答(规定时间的1/3内)会有相应奖励  
-群聊模式的其他群员亦可回答题目，但题目只能被回答一次，且其他人作为抢答者有相应奖励和惩罚   
-题目结构如下
+1.  回复选项序号`A~Z`，即算回答问题  
+2.  `type`是提问问题类型，默认为全部类型  
+    可选值 `BUILDING`, `PLAYER`, `TALENT`, `POSITION`, `PROFESSION`, `RARITY`, `POWER`, `ILLUST`, 
+    `VOICE`, `SKILL`, `STORY`, `ENEMY`, `WEEKLY`, `MUSIC`, `OTHER`
+3.  回答了当前问题才会出现下一个问题  
+4.  快速回答(规定时间的1/3内)会有相应奖励  
+5.  群聊模式的其他群员亦可回答题目，但题目只能被回答一次，且其他人作为抢答者有相应奖励和惩罚  
+6.  题目结构如下
 
 ```
 [类型](得分) 问题
@@ -126,14 +126,14 @@ B. 选项
 | `/<ark-guard 方舟蹲饼> <detail 详情>`                         | 查看蹲饼详情   |
 | `/<ark-guard 方舟蹲饼> <blog 微博> [contact] {blogs}`         | 设置微博蹲饼内容 |
 | `/<ark-guard 方舟蹲饼> <video 视频> [contact] {videos}`       | 设置视频蹲饼内容 |
-| `/<ark-guard 方舟蹲饼> <announce 公告> [contact] {announces}` | 设置视频蹲饼内容 |
+| `/<ark-guard 方舟蹲饼> <announce 公告> [contact] {announces}` | 设置公告蹲饼内容 |
 
 * `contact` 为群号或Q号  
-* `blogs` 可选值为 `ARKNIGHTS`(官号), `BYPRODUCT`(朝陇山), `MOUNTEN`(一拾山), `HISTORICUS`(泰拉记事社)
+* `blogs` 可选值为 `ARKNIGHTS`(官号), `BYPRODUCT`(朝陇山), `MOUNTEN`(一拾山), `HISTORICUS`(泰拉记事社)  
   例如 `/方舟蹲饼 微博 123456 ARKNIGHTS MOUNTEN`, 就订阅了官方号和一拾山
-* `video` 可选值为 `ANIME, MUSIC, GAME, ENTERTAINMENT`  
+* `video` 可选值为 `ANIME`, `MUSIC`, `GAME`, `ENTERTAINMENT`  
   例如 `/方舟蹲饼 视频 123456 GAME MUSIC`, 就订阅了PV和音乐单曲
-* `announce` 可选值为 `ANDROID, IOS, BILIBILI`
+* `announce` 可选值为 `ANDROID`, `IOS`, `BILIBILI`  
   例如 `/方舟蹲饼 公告 123456 ANDROID`, 就订阅了官服的公告 
 
 ### 助手数据指令
@@ -143,21 +143,20 @@ B. 选项
 | `/<ark-data 方舟数据> <clear 清理>` | 清理缓存   |
 | `/<ark-data 方舟数据> <cron 定时>`  | 重载定时设置 |
 
-### ~~助手表情指令~~
+位于 `Mirai-Console` 运行目录下的 `config/xyz.cssxsh.mirai.plugin.arknights-helper` 文件夹下的 `cron.json` 文件
 
-**表情指令 2.0 版本重构中 暂不可用**
+### 助手表情指令
 
-| 指令                                  | 描述                           |
-|:------------------------------------|:-----------------------------|
-| `/<arkface 方舟表情> <random 随机> [id]?` | 随机发送一个表情, id是表情包id, 默认为任意表情包 |
-| `/<arkface 方舟表情> <list 列表>`         | 表情商店链接列表                     |
-| `/<arkface 方舟表情> <detail 详情>`       | 查看表情详情                       |
+** 需要 [Meme Helper](https://github.com/cssxsh/meme-helper) 作为前置**
 
-表情详情指令使用时, 先发送指令，然后发送一个表情，机器人会回复表情的商店链接和原图
+| 指令                            | 描述       |
+|:------------------------------|:---------|
+| `/<arkface 方舟表情> <random 随机>` | 随机发送一个表情 |
+| `/<arkface 方舟表情> <detail 详情>` | 查看表情详情   |
 
 ## 配置文件
 
-位于`Mirai-Console`运行目录下的`config/xyz.cssxsh.mirai.plugin.arknights-helper`文件夹下的`config`文件
+位于 `Mirai-Console` 运行目录下的 `config/xyz.cssxsh.mirai.plugin.arknights-helper` 文件夹下的 `config` 文件
 
 ## 安装
 
