@@ -28,6 +28,7 @@ public object ArknightsItemCommand : SimpleCommand(
             for ((matrix, stage) in (matrices with stages).sortedBy { it.single }) {
                 if (count >= limit) break
                 if (stage.isGacha) continue
+                if (stage.zoneId == "gachabox") continue
                 val zone = zones.id(stage.zoneId)
                 appendLine("====> 作战: [${stage.code}] <${zone.name}> (cost=${stage.cost})")
                 append(matrix, stage)
