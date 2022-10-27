@@ -43,7 +43,7 @@ public class ArknightsCollector(private val contact: Contact) : FlowCollector<Ca
                         appendLine("----------------")
                         appendLine("@${retweeted.user.name}")
 
-                        append(blog = value)
+                        append(blog = retweeted)
                     }
                 }
             }
