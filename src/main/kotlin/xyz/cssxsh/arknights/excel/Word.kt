@@ -19,7 +19,7 @@ public data class Word(
     @SerialName("playVoiceRange")
     val playVoiceRange: String,
     @SerialName("startTimeWithTypeDict")
-    val startTimeWithTypeDict: Map<VoiceLangType, ChatStartTime>,
+    val startTimeWithTypeDict: Map<VoiceLangType, List<ChatStartTime>>,
     @SerialName("voiceLangDict")
     val voiceLangDict: Map<String, ChatVoiceInfo>,
     @SerialName("voiceLangGroupTypeDict")
@@ -35,7 +35,8 @@ public enum class VoiceLangType {
     JP,
     EN,
     KR,
-    LINKAGE
+    LINKAGE,
+    ITA
 }
 
 @Serializable
@@ -101,7 +102,7 @@ public data class CharWord(
     @SerialName("charWordId")
     val charWordId: String,
     @SerialName("lockDescription")
-    val lockDescription: String,
+    val lockDescription: String?,
     @SerialName("placeType")
     val placeType: String,
     @SerialName("unlockParam")

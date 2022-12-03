@@ -96,5 +96,6 @@ public enum class ZoneType(public val text: String) {
     ACTIVITY("活动"),
     BRANCHLINE("支线"),
     SIDESTORY("趣闻"),
-    ROGUELIKE("肉鸽")
+    ROGUELIKE("肉鸽"),
+    CLIMB_TOWER("爬塔")
 }

@@ -23,7 +23,9 @@ public class AnnouncementDataHolder(override val folder: File, override val igno
 
     override suspend fun raw(key: AnnounceType): List<Announcement> = mutex.withLock {
         return cache[key] ?: try {
-            key.read<AnnouncementMeta>().list
+            val meta = key.read<AnnouncementMeta>()
+            cache[key] = meta.list
+            meta.list
         } catch (_: FileNotFoundException) {
             emptyList()
         }

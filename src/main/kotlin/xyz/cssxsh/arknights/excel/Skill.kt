@@ -21,7 +21,7 @@ public data class Level(
     @SerialName("blackboard")
     val blackboard: List<Blackboard>,
     @SerialName("description")
-    val description: String,
+    val description: String?,
     @SerialName("duration")
     val duration: Double,
     @SerialName("name")
