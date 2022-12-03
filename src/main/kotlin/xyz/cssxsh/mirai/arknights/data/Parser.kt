@@ -10,14 +10,14 @@ import java.time.Duration
 import java.time.ZonedDateTime
 import java.util.*
 
-internal const val CRON_TYPE_KEY = "xyz.cssxsh.mirai.arknights.cron.type"
+internal const val CRON_TYPE_KEY = "xyz.cssxsh.mirai.cron.type"
 
 internal val DefaultCronParser: CronParser by lazy {
     val type = CronType.valueOf(System.getProperty(CRON_TYPE_KEY, "QUARTZ"))
     CronParser(CronDefinitionBuilder.instanceDefinitionFor(type))
 }
 
-internal const val CRON_LOCALE_KEY = "xyz.cssxsh.mirai.admin.arknights.locale"
+internal const val CRON_LOCALE_KEY = "xyz.cssxsh.mirai.cron.locale"
 
 internal val DefaultCronDescriptor: CronDescriptor by lazy {
     val locale = System.getProperty(CRON_LOCALE_KEY)?.let { Locale.forLanguageTag(it) } ?: Locale.getDefault()
