@@ -21,7 +21,7 @@ public class AnnouncementDataHolder(override val folder: File, override val igno
         cache.remove(key)
     }
 
-    override suspend fun raw(key: AnnounceType): List<Announcement> = mutex.withLock {
+    override suspend fun raw(key: AnnounceType): List<Announcement> {
         return cache[key] ?: try {
             val meta = key.read<AnnouncementMeta>()
             cache[key] = meta.list
