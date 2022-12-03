@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import org.junit.jupiter.api.*
 import xyz.cssxsh.arknights.announce.*
 import xyz.cssxsh.arknights.bilibili.*
+import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.weibo.*
 import java.io.File
 
@@ -11,6 +12,7 @@ internal class CacheDataHolderTest {
     private val video = VideoDataHolder(folder = File("./test")) { false }
     private val blog = MicroBlogDataHolder(folder = File("./test")) { false }
     private val announcement = AnnouncementDataHolder(folder = File("./test")) { false }
+    private val excel = ExcelDataHolder(folder = File("./test")) { false }
 
     @Test
     fun video(): Unit = runBlocking {
@@ -20,10 +22,19 @@ internal class CacheDataHolderTest {
     @Test
     fun blog(): Unit = runBlocking {
         blog.load(BlogUser.ARKNIGHTS)
+        blog.raw(BlogUser.ARKNIGHTS).forEach {
+            blog.images(it)
+        }
     }
 
     @Test
     fun announcement(): Unit = runBlocking {
         announcement.load(AnnounceType.BILIBILI)
+    }
+
+    @Test
+    fun character(): Unit = runBlocking {
+        excel.load(ExcelDataType.CHARACTER)
+        excel.character()
     }
 }
