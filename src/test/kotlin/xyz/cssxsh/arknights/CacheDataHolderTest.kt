@@ -9,10 +9,11 @@ import xyz.cssxsh.arknights.weibo.*
 import java.io.File
 
 internal class CacheDataHolderTest {
-    private val video = VideoDataHolder(folder = File("./test")) { false }
-    private val blog = MicroBlogDataHolder(folder = File("./test")) { false }
-    private val announcement = AnnouncementDataHolder(folder = File("./test")) { false }
-    private val excel = ExcelDataHolder(folder = File("./test")) { false }
+    private val folder = File("./test").apply { mkdirs() }
+    private val video = VideoDataHolder(folder = folder) { false }
+    private val blog = MicroBlogDataHolder(folder = folder) { false }
+    private val announcement = AnnouncementDataHolder(folder = folder) { false }
+    private val excel = ExcelDataHolder(folder = folder) { false }
 
     @Test
     fun video(): Unit = runBlocking {
