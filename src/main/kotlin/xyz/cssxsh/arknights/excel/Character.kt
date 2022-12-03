@@ -250,7 +250,7 @@ public data class Character(
      * XXX
      */
     @SerialName("potentialItemId")
-    private val potentialItem: String,
+    private val potentialItem: String?,
     /**
      * XXX
      */
