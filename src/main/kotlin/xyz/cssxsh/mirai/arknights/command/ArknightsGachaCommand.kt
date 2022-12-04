@@ -21,12 +21,17 @@ public object ArknightsGachaCommand : CompositeCommand(
     public suspend fun CommandSenderOnMessage<*>.one(times: Int = 1): Unit = reply {
         if (user.coin >= times * GACHA_USE_COIN) {
             user.coin -= times * GACHA_USE_COIN
-            val data = ArknightsSubscriber.excel.character().values
+            val pool = ArknightsSubscriber.excel.character().values
                 .pool(rules.getValue(subject.pool))
-            val result = List(times) { gacha(data) }.groupByTo(java.util.TreeMap()) { it.rarity }
+            val result = List(times) { gacha(pool = pool) }.groupByTo(java.util.TreeMap()) { it.rarity }
             buildMessageChain {
                 appendLine("当前卡池[${subject.pool}] 合成玉剩余${user.coin}")
-
+                for ((rarity, character) in result) {
+                    val sum = character.groupByTo(java.util.TreeMap()) { it.name }.map { (name, list) ->
+                        "${name}${if (list.size == 1) "" else "*${list.size}"}"
+                    }
+                    appendLine("${rarity + 1}星干员(${character.size}): $sum")
+                }
             }
         } else {
             "合成玉不足,当前拥有${user.coin},请尝试答题获得".toPlainText()
@@ -39,17 +44,18 @@ public object ArknightsGachaCommand : CompositeCommand(
 
     @SubCommand("pool", "卡池")
     @Description("设置新卡池")
-    public suspend fun CommandSenderOnMessage<*>.pool(name_: String, set: Boolean = false): Unit = reply {
-        val name = name_.lines().first()
-//        val lines = fromEvent.message.content.lines().filter {
-//            it.matches(BUILD_POOL_LINE) || it.startsWith('#')
-//        }.also {
-//            gacha(pool = Obtain.pool(it))
-//        }
-//        PoolRules[name] = lines.joinToString(";").trim()
-//        if (set) pool = name
-//        "卡池[${name}] -> $lines 已写入".toPlainText()
-        emptyMessageChain()
+    public suspend fun CommandSenderOnMessage<*>.pool(name: String, set: Boolean = false): Unit = reply {
+        val name0 = name.lines().first()
+        val lines = fromEvent.message.content.lineSequence()
+            .filter { it.matches(BUILD_POOL_LINE) || it.startsWith('#') }
+            .toList()
+        // Test
+        val pool = ArknightsSubscriber.excel.character().values
+            .pool(lines)
+        gacha(pool = pool)
+        rules[name0] = lines.joinToString(";").trim()
+        if (set) subject.pool = name0
+        "卡池[${name0}] -> $lines 已写入".toPlainText()
     }
 
     @SubCommand("detail", "详情")

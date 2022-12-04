@@ -8,8 +8,8 @@ import io.ktor.client.plugins.compression.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import net.mamoe.mirai.console.command.*
-import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.*
+import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.*
 import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
 import xyz.cssxsh.mirai.arknights.*
@@ -86,7 +86,7 @@ public object ArknightsFaceCommand : CompositeCommand(
                         }
                         append(thumb).appendLine()
                         appendLine("名称: ${item.name}")
-                        appendLine("链接: https://zb.vip.qq.com/hybrid/emoticonmall/detail?id=209583")
+                        appendLine("链接: https://zb.vip.qq.com/hybrid/emoticonmall/detail?id=${item.itemId}")
                     }
                 }
             }
