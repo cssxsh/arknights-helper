@@ -40,7 +40,7 @@ public object ArknightsQuestionCommand : CompositeCommand(
     @SubCommand("delete", "删除")
     @Description("删除指定问题")
     public suspend fun CommandSenderOnMessage<*>.delete(name: String): Unit = reply {
-        (ArknightsQuestionLoader.custom.question.remove(name)?.let { "问题：${it.problem} 已删除" } ?: "删除失败")
+        (ArknightsMineData.question.remove(name)?.let { "问题：${it.problem} 已删除" } ?: "删除失败")
             .toPlainText()
     }
 
@@ -61,7 +61,7 @@ public object ArknightsQuestionCommand : CompositeCommand(
         val duration = nextContent().toLong() * 1000
         val question = CustomQuestionInfo(problem, right, error, coin, tips, duration)
         val name = "${fromEvent.sender.nick} ${OffsetDateTime.now().withNano(0)}"
-        ArknightsQuestionLoader.custom.question[name] = question
+        ArknightsMineData.question[name] = question
         "问题${question} 已添加".toPlainText()
     }
 
