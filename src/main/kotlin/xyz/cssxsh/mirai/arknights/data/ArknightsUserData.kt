@@ -16,8 +16,3 @@ public object ArknightsUserData : AutoSavePluginData("user") {
 //    @ValueDescription("Key 是QQ号，Value是公招预警预警时间戳")
 //    public val recruit: MutableMap<Long, Map<Int, Long>> by value<MutableMap<Long, Map<Int, Long>>>().withDefault { emptyMap() }
 }
-
-
-
-
-

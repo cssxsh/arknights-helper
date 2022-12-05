@@ -1,7 +1,7 @@
 package xyz.cssxsh.mirai.arknights.command
 
-import kotlinx.coroutines.sync.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.*
 import net.mamoe.mirai.console.command.CommandSender.Companion.toCommandSender
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.event.*
@@ -36,11 +36,14 @@ public object ArknightsMineCommand : SimpleCommand(
         }
     }
 
+    private val CommandSenderOnMessage<*>.mutex: Mutex by SubjectDelegate { Mutex() }
+
     @Handler
     public suspend fun CommandSenderOnMessage<*>.handler(type: QuestionType = QuestionType.values().random()) {
-        val question = type.random(ArknightsQuestionLoader)
-
-        val (reply, time) = mutex.withLock {
+        val question = type.random(loader = ArknightsQuestionLoader)
+        val time: Long
+        val reply: MessageEvent?
+        mutex.withLock {
             sendMessage(buildMessageChain {
                 append(fromEvent.message.quote())
                 appendLine("[${type}]<${question.coin}>：${question.problem} (${question.timeout / 1000}s内作答)")
@@ -50,9 +53,10 @@ public object ArknightsMineCommand : SimpleCommand(
             })
 
             val start = System.currentTimeMillis()
-            fromEvent.nextAnswerOrNull(question.timeout) { next ->
+            reply = fromEvent.nextAnswerOrNull(question.timeout) { next ->
                 next.message.content.uppercase().any { it in question.options.keys }
-            } to System.currentTimeMillis() - start
+            }
+            time = System.currentTimeMillis() - start
         }
         if (reply == null) {
             sendMessage("回答超时")
