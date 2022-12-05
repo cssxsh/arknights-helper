@@ -298,7 +298,6 @@ public object ArknightsSubscriber : SimpleListenerHost() {
 
     @EventHandler
     public fun StartupEvent.handle() {
-        System.setProperty(ExcelDataHolder.GAME_SOURCE_HOST_KEY, ArknightsConfig.host)
         video()
         weibo()
         announce()
