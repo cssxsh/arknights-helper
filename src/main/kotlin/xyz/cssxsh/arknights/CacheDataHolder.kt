@@ -10,7 +10,7 @@ import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.*
 import kotlinx.serialization.*
-import java.io.File
+import java.io.*
 
 public abstract class CacheDataHolder<K : CacheKey, R : CacheInfo> {
     protected open val mutex: Mutex = Mutex()

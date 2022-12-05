@@ -202,7 +202,7 @@ public data class Character(
     @SerialName("nationId")
     override val nation: String?,
     /**
-     * 阶段 XXX
+     * 阶段
      */
     @SerialName("phases")
     val phases: List<JsonObject>,
@@ -237,22 +237,22 @@ public data class Character(
     @SerialName("teamId")
     override val team: String?,
     /**
-     * XXX
+     * 等级提升
      */
     @SerialName("allSkillLvlup")
     private val allSkillLvlup: List<JsonObject>,
     /**
-     * XXX
+     * 支持关键帧
      */
     @SerialName("favorKeyFrames")
     private val favorKeyFrames: List<JsonObject>?,
     /**
-     * XXX
+     * 潜在项目
      */
     @SerialName("potentialItemId")
     private val potentialItem: String?,
     /**
-     * XXX
+     * 潜在等级
      */
     @SerialName("potentialRanks")
     private val potentialRanks: List<JsonObject>,

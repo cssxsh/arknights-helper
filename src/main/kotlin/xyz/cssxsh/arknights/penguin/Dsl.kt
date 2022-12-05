@@ -99,14 +99,14 @@ public fun <V : ZoneId> Iterable<V>.with(zones: Iterable<Zone>): List<Pair<V, Zo
 public fun <V : ItemId> Iterable<V>.item(item: Item): List<V> = filter { it.itemId == item.id }
 
 /**
- * XXX
+ * 连接物品
  */
 @JvmName("withItem")
 public infix fun <V : ItemId> Iterable<V>.with(items: Iterable<Item>): List<Pair<V, Item>> =
     map { it to items.id(it.itemId) }
 
 /**
- * XXX
+ * 平均品质
  */
 public val Pair<Frequency, Item>.rarity: Double get() = first.probability * second.rarity
 
@@ -117,32 +117,22 @@ public val Pair<Frequency, Item>.rarity: Double get() = first.probability * seco
 public fun <V : StageId> Iterable<V>.stage(stage: Stage): List<V> = filter { it.stageId == stage.id }
 
 /**
- * XXX
+ * 连接关卡
  */
 @JvmName("withStage")
 public infix fun <V : StageId> Iterable<V>.with(stages: Iterable<Stage>): List<Pair<V, Stage>> =
     map { it to stages.id(it.stageId) }
 
 /**
- * XXX
+ * 计算单个用时
  */
-public val Pair<*, Stage>.stage: Stage get() = second
-
-/**
- * XXX
- */
-public val Pair<Frequency, *>.frequency: Frequency get() = first
-
-/**
- * XXX
- */
-public val Pair<Frequency, Stage>.single: Double get() = stage.cost / frequency.probability
+public val Pair<Frequency, Stage>.single: Double get() = second.cost / first.probability
 
 
 /**
- * XXX
+ * 计算最短用时
  */
-public val Pair<Frequency, Stage>.short: Long get() = (stage.minClearTime / frequency.probability).toLong()
+public val Pair<Frequency, Stage>.short: Long get() = (second.minClearTime / first.probability).toLong()
 
 /**
  * 根据时间戳过滤
@@ -157,7 +147,6 @@ public fun <V : TimePeriod> Iterable<V>.time(time: OffsetDateTime): List<V> = fi
 public fun <V : TimePeriod> Iterable<V>.now(): List<V> = time(OffsetDateTime.now())
 
 public typealias I18n<T> = Map<String, T>
-
 
 public interface Existences {
     public val existence: Server<Existence>

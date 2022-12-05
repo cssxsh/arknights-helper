@@ -4,7 +4,7 @@ import io.ktor.client.request.*
 import kotlinx.coroutines.sync.*
 import kotlinx.serialization.*
 import xyz.cssxsh.arknights.*
-import java.io.File
+import java.io.*
 import java.util.*
 
 public class ExcelDataHolder(override val folder: File, override val ignore: suspend (Throwable) -> Boolean) :
