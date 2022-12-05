@@ -15,6 +15,7 @@ import xyz.cssxsh.arknights.*
 import xyz.cssxsh.arknights.bilibili.*
 import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.penguin.*
+import xyz.cssxsh.arknights.prts.*
 import xyz.cssxsh.arknights.weibo.*
 import xyz.cssxsh.mirai.arknights.data.*
 import java.time.LocalDate
@@ -77,6 +78,9 @@ public object ArknightsSubscriber : SimpleListenerHost() {
     }
     public val excel: ExcelDataHolder by lazy {
         ExcelDataHolder(files.resolveDataFile("ArknightsGameData").apply { mkdirs() }, ignore)
+    }
+    public val static: StaticDataHolder by lazy {
+        StaticDataHolder(files.resolveDataFile("Static").apply { mkdirs() }, ignore)
     }
     public val shared: SharedFlow<CacheInfo> = flow.asSharedFlow()
 

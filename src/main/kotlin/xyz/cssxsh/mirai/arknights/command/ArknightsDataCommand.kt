@@ -1,7 +1,9 @@
 package xyz.cssxsh.mirai.arknights.command
 
 import net.mamoe.mirai.console.command.*
+import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
 import xyz.cssxsh.mirai.arknights.*
 import xyz.cssxsh.mirai.arknights.data.*
 
@@ -33,5 +35,18 @@ public object ArknightsDataCommand : CompositeCommand(
             (cause.message ?: cause.toString()).toPlainText()
         }
         sendMessage(message = message)
+    }
+
+    @SubCommand("voice", "语音")
+    public suspend fun UserCommandSender.voice(id: String = "") {
+        val words = ArknightsSubscriber.excel.word().charWords
+        val word = words[id] ?: words.values.random()
+        val character = ArknightsSubscriber.excel.character()[word.character]
+        ArknightsHelperPlugin.logger.info("${character?.name ?: word.charWordId} - ${word.voiceTitle} - ${word.voiceText}")
+        val file = ArknightsSubscriber.static.voice(word = word)
+        val audio = file.toExternalResource().use {
+            (subject as AudioSupported).uploadAudio(it)
+        }
+        sendMessage(message = audio)
     }
 }

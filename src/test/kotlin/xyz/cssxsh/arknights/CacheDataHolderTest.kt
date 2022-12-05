@@ -7,15 +7,18 @@ import xyz.cssxsh.arknights.bilibili.*
 import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.weibo.*
 import xyz.cssxsh.arknights.penguin.*
+import xyz.cssxsh.arknights.prts.*
 import java.io.File
 
 internal class CacheDataHolderTest {
     private val folder = File("./test").apply { mkdirs() }
-    private val video = VideoDataHolder(folder = folder) { false }
-    private val blog = MicroBlogDataHolder(folder = folder) { false }
-    private val announcement = AnnouncementDataHolder(folder = folder) { false }
-    private val excel = ExcelDataHolder(folder = folder) { false }
-    private val penguin = PenguinDataHolder(folder = folder) { false }
+    private val ignore: suspend (Throwable) -> Boolean = { it is java.io.IOException }
+    private val video = VideoDataHolder(folder = folder, ignore = ignore)
+    private val blog = MicroBlogDataHolder(folder = folder, ignore = ignore)
+    private val announcement = AnnouncementDataHolder(folder = folder, ignore = ignore)
+    private val excel = ExcelDataHolder(folder = folder, ignore = ignore)
+    private val penguin = PenguinDataHolder(folder = folder, ignore = ignore)
+    private val static = StaticDataHolder(folder = folder, ignore = ignore)
 
     @Test
     fun video(): Unit = runBlocking {
@@ -147,5 +150,11 @@ internal class CacheDataHolderTest {
     fun patterns(): Unit = runBlocking {
         penguin.load(PenguinDataType.RESULT_PATTERN)
         penguin.patterns()
+    }
+
+    @Test
+    fun voice(): Unit = runBlocking {
+        val word = excel.word().charWords.values.random()
+        static.voice(word = word)
     }
 }
