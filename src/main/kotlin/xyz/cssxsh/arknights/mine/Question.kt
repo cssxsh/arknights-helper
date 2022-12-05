@@ -30,7 +30,7 @@ public enum class QuestionType(public val description: String) {
         override fun load(loader: QuestionDataLoader): QuestionBuilder {
             val building = runBlocking { loader.excel.building() }
             val characters = runBlocking { loader.excel.character() }
-            return ChoiceQuestionBuilder(meaning = "角色" to "基建技能", range = DefaultChoiceRange) {
+            return ChoiceQuestionBuilder(meaning = "角色" to "基建技能", range = defaultChoiceRange) {
                 for ((characterId, info) in building.characters) {
                     val character = characters[characterId] ?: continue
                     for (char in info.buffs) {
@@ -67,7 +67,7 @@ public enum class QuestionType(public val description: String) {
     TALENT("天赋相关") {
         override fun load(loader: QuestionDataLoader): QuestionBuilder {
             val characters = runBlocking { loader.excel.character() }
-            return ChoiceQuestionBuilder(meaning = "角色" to "天赋", range = DefaultChoiceRange) {
+            return ChoiceQuestionBuilder(meaning = "角色" to "天赋", range = defaultChoiceRange) {
                 for ((_, character) in characters) {
                     val talents = character.talents ?: continue
                     for (talent in talents) {
@@ -85,7 +85,7 @@ public enum class QuestionType(public val description: String) {
     POSITION("位置相关") {
         override fun load(loader: QuestionDataLoader): QuestionBuilder {
             val characters = runBlocking { loader.excel.character() }
-            return ChoiceQuestionBuilder(meaning = "角色" to "放置位", range = DefaultChoiceRange) {
+            return ChoiceQuestionBuilder(meaning = "角色" to "放置位", range = defaultChoiceRange) {
                 for ((_, character) in characters) {
                     add(character.name to character.position.text)
                 }
@@ -95,7 +95,7 @@ public enum class QuestionType(public val description: String) {
     PROFESSION("职业相关") {
         override fun load(loader: QuestionDataLoader): QuestionBuilder {
             val characters = runBlocking { loader.excel.character() }
-            return ChoiceQuestionBuilder(meaning = "角色" to "职业", range = DefaultChoiceRange) {
+            return ChoiceQuestionBuilder(meaning = "角色" to "职业", range = defaultChoiceRange) {
                 for ((_, character) in characters) {
                     add(character.name to character.profession.text)
                 }
@@ -105,7 +105,7 @@ public enum class QuestionType(public val description: String) {
     RARITY("星级相关") {
         override fun load(loader: QuestionDataLoader): QuestionBuilder {
             val characters = runBlocking { loader.excel.character() }
-            return ChoiceQuestionBuilder(meaning = "角色" to "稀有度", range = DefaultChoiceRange) {
+            return ChoiceQuestionBuilder(meaning = "角色" to "稀有度", range = defaultChoiceRange) {
                 for ((_, character) in characters) {
                     add(character.name to (character.rarity + 1).toString())
                 }
@@ -117,7 +117,7 @@ public enum class QuestionType(public val description: String) {
             val teams = runBlocking { loader.excel.team() }
             val characters = runBlocking { loader.excel.character() }
             val level = PowerLevel.values().random()
-            return ChoiceQuestionBuilder(meaning = level.text to "角色", range = DefaultChoiceRange) {
+            return ChoiceQuestionBuilder(meaning = level.text to "角色", range = defaultChoiceRange) {
                 for ((_, team) in teams) {
                     if (team.level != level.ordinal) continue
                     for ((_, character) in characters) {
@@ -133,7 +133,7 @@ public enum class QuestionType(public val description: String) {
         override fun load(loader: QuestionDataLoader): QuestionBuilder {
             val handbooks = runBlocking { loader.excel.handbook().handbooks }
             val characters = runBlocking { loader.excel.character() }
-            return ChoiceQuestionBuilder(meaning = "画师" to "角色", range = DefaultChoiceRange) {
+            return ChoiceQuestionBuilder(meaning = "画师" to "角色", range = defaultChoiceRange) {
                 for ((characterId, handbook) in handbooks) {
                     val character = characters[characterId] ?: continue
                     add(handbook.illust to character.name)
@@ -145,7 +145,7 @@ public enum class QuestionType(public val description: String) {
         override fun load(loader: QuestionDataLoader): QuestionBuilder {
             val voices = runBlocking { loader.excel.word().voiceLangDict }
             val characters = runBlocking { loader.excel.character() }
-            return ChoiceQuestionBuilder(meaning = "声优" to "角色", range = DefaultChoiceRange) {
+            return ChoiceQuestionBuilder(meaning = "声优" to "角色", range = defaultChoiceRange) {
                 for ((characterId, voice) in voices) {
                     val character = characters[characterId] ?: continue
                     for ((_, dict) in voice.dict) {
@@ -159,7 +159,7 @@ public enum class QuestionType(public val description: String) {
         override fun load(loader: QuestionDataLoader): QuestionBuilder {
             val skills = runBlocking { loader.excel.skill() }
             val characters = runBlocking { loader.excel.character() }
-            return ChoiceQuestionBuilder(meaning = "角色" to "技能", range = DefaultChoiceRange) {
+            return ChoiceQuestionBuilder(meaning = "角色" to "技能", range = defaultChoiceRange) {
                 for ((_, character) in characters) {
                     for (info in character.skills) {
                         val skillId = info.skill ?: continue
@@ -194,7 +194,7 @@ public enum class QuestionType(public val description: String) {
                 "法术抗性" to { resistance },
                 "耐久" to { endure }
             ).random()
-            return ChoiceQuestionBuilder(meaning = "敌方" to attribute, range = DefaultChoiceRange) {
+            return ChoiceQuestionBuilder(meaning = "敌方" to attribute, range = defaultChoiceRange) {
                 for ((_, enemy) in enemies) {
                     add(enemy.designation to enemy.value())
                 }
@@ -204,7 +204,7 @@ public enum class QuestionType(public val description: String) {
     WEEKLY("周常相关") {
         override fun load(loader: QuestionDataLoader): QuestionBuilder {
             val table = runBlocking { loader.excel.zone() }
-            return ChoiceQuestionBuilder(meaning = "周常" to "开启时间", range = DefaultChoiceRange) {
+            return ChoiceQuestionBuilder(meaning = "周常" to "开启时间", range = defaultChoiceRange) {
                 for ((zoneId, weekly) in table.weekly) {
                     val zone = table.zones[zoneId] ?: continue
                     add(zone.title to weekly.daysOfWeek.joinToString())
@@ -240,7 +240,7 @@ private fun OffsetDateTime.randomDays(offset: Int = 1) = plusDays(offset * prefi
 
 private fun OffsetDateTime.randomMinutes(offset: Int = 30) = plusMinutes(offset * prefix)
 
-private val DefaultChoiceRange = 'A'..'D'
+private val defaultChoiceRange = 'A'..'D'
 
 public interface QuestionDataLoader {
     public val excel: ExcelDataHolder
@@ -249,7 +249,7 @@ public interface QuestionDataLoader {
 }
 
 public interface CustomQuestionHolder {
-    public val question: MutableMap<String, CustomQuestionInfo>
+    public val question: Map<String, CustomQuestionInfo>
 }
 
 public sealed class QuestionBuilder {
@@ -313,7 +313,7 @@ public data class CustomQuestionInfo(
     )
 
     override fun build(type: QuestionType): Question {
-        val map = (('A'..'Z') zip options.entries.toMutableList().apply { shuffle() }).toMap()
+        val map = (('A'..'Z') zip options.entries.shuffled()).toMap()
         return Question(
             problem = problem,
             options = map.mapValues { (_, entry) -> entry.key },
@@ -331,7 +331,7 @@ public class DateTimeQuestionBuilder(
     public val datetime: OffsetDateTime
 ) : QuestionBuilder() {
     override fun build(type: QuestionType): Question {
-        val range = DefaultChoiceRange
+        val range = defaultChoiceRange
         val list = listOf(
             datetime,
             datetime.randomDays(),

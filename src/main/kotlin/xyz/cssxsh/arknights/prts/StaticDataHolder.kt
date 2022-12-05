@@ -5,6 +5,7 @@ import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.compression.*
 import io.ktor.client.request.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.*
 import xyz.cssxsh.arknights.*
 import xyz.cssxsh.arknights.excel.*
@@ -28,7 +29,14 @@ public class StaticDataHolder(override val folder: File, override val ignore: su
 
     override val cache: MutableMap<StaticData, File> = HashMap()
 
-    override suspend fun clear(): Unit = Unit
+    override suspend fun clear(): Unit = mutex.withLock {
+        runInterruptible(context = Dispatchers.IO) {
+            for (item in folder.listFiles() ?: return@runInterruptible) {
+                if (!item.isDirectory) continue
+                item.deleteRecursively()
+            }
+        }
+    }
 
     @Deprecated(message = "raw is empty", level = DeprecationLevel.HIDDEN)
     public override suspend fun raw(key: StaticData): List<CacheInfo> = emptyList()
