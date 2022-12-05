@@ -125,14 +125,17 @@ B. 选项
 | `/<ark-guard 方舟蹲饼> <blog 微博> [contact] {blogs}`         | 设置微博蹲饼内容 |
 | `/<ark-guard 方舟蹲饼> <video 视频> [contact] {videos}`       | 设置视频蹲饼内容 |
 | `/<ark-guard 方舟蹲饼> <announce 公告> [contact] {announces}` | 设置公告蹲饼内容 |
+| `/<ark-guard 方舟蹲饼> <weekly 周常> [contact] {weeklies}`    | 设置周常蹲饼内容 |
 
-* `contact` 为群号或Q号  
-* `blogs` 可选值为 `ARKNIGHTS`(官号), `BYPRODUCT`(朝陇山), `MOUNTEN`(一拾山), `HISTORICUS`(泰拉记事社)  
-  例如 `/方舟蹲饼 微博 123456 ARKNIGHTS MOUNTEN`, 就订阅了官方号和一拾山
-* `video` 可选值为 `ANIME`, `MUSIC`, `GAME`, `ENTERTAINMENT`  
-  例如 `/方舟蹲饼 视频 123456 GAME MUSIC`, 就订阅了PV和音乐单曲
-* `announce` 可选值为 `ANDROID`, `IOS`, `BILIBILI`  
-  例如 `/方舟蹲饼 公告 123456 ANDROID`, 就订阅了官服的公告 
+*   `contact` 为群号或Q号  
+*   `blogs` 可选值为 `ARKNIGHTS`(官号), `BYPRODUCT`(朝陇山), `MOUNTEN`(一拾山), `HISTORICUS`(泰拉记事社)  
+    例如 `/方舟蹲饼 微博 123456 ARKNIGHTS MOUNTEN`, 就订阅了官方号和一拾山
+*   `videos` 可选值为 `ANIME`, `MUSIC`, `GAME`, `ENTERTAINMENT`  
+    例如 `/方舟蹲饼 视频 123456 GAME MUSIC`, 就订阅了PV和音乐单曲
+*   `announces` 可选值为 `ANDROID`, `IOS`, `BILIBILI`  
+    例如 `/方舟蹲饼 公告 123456 ANDROID`, 就订阅了官服的公告
+*   `weeklies` 可选值为 `EVOLVE`, `MATERIAL`, `SPECIAL`  
+    例如 `/方舟蹲饼 周常 123456 EVOLVE MATERIAL`, 就订阅了物资筹备和芯片搜索
 
 ### 助手数据指令
 

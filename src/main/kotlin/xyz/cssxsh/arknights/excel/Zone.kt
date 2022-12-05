@@ -99,3 +99,8 @@ public enum class ZoneType(public val text: String) {
     ROGUELIKE("肉鸽"),
     CLIMB_TOWER("爬塔")
 }
+
+public class WeeklyClock(public val zone: Zone, public val weekly: Weekly) : CacheInfo {
+    override val created: OffsetDateTime = OffsetDateTime.now().withHour(4)
+    override val url: String = ""
+}

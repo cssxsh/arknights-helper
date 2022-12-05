@@ -12,6 +12,7 @@ import org.jsoup.select.*
 import xyz.cssxsh.arknights.*
 import xyz.cssxsh.arknights.announce.*
 import xyz.cssxsh.arknights.bilibili.*
+import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.weibo.*
 import xyz.cssxsh.mirai.arknights.data.*
 import java.util.WeakHashMap
@@ -63,6 +64,15 @@ public class ArknightsCollector(private val contact: Contact) : FlowCollector<Ca
                 buildMessageChain {
                     appendLine("鹰角有新视频！${value.title}")
                     append(video = value)
+                }
+            }
+            // 周常
+            is WeeklyClock -> {
+                val accept = ArknightsTaskConfig.weekly[contact.id] ?: return
+                if (value.weekly.type !in accept) return
+                buildMessageChain {
+                    appendLine("方舟周常 ${value.zone.title} 今天开启")
+                    appendLine("有需要的材料记得刷哦")
                 }
             }
             // 未实现的类型

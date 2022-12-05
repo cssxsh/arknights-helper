@@ -38,7 +38,7 @@ public object ArknightsCronConfig : ReadOnlyPluginConfig("cron") {
     @ValueDescription("定时器 公告")
     public val announce: DataCron by value(cron("0 0 4-20 * * ? "))
 
-    @ValueDescription("定时器 数据")
+    @ValueDescription("定时器 掉落")
     public val penguin: MutableMap<PenguinDataType, DataCron> by value {
         put(PenguinDataType.ITEMS, cron("0 0 16 * * ? "))
         put(PenguinDataType.STAGES, cron("0 0 16 * * ? "))
@@ -51,4 +51,7 @@ public object ArknightsCronConfig : ReadOnlyPluginConfig("cron") {
 
     @ValueDescription("定时器 数据")
     public val excel: DataCron by value(cron("0 0 10-20 * * ? "))
+
+    @ValueDescription("定时器 周常")
+    public val clock: DataCron by value(cron("0 0 6,12 * * ? "))
 }

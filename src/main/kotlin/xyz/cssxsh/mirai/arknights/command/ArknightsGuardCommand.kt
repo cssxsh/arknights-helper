@@ -4,6 +4,7 @@ import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.message.data.*
 import xyz.cssxsh.arknights.announce.*
 import xyz.cssxsh.arknights.bilibili.*
+import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.weibo.*
 import xyz.cssxsh.mirai.arknights.*
 import xyz.cssxsh.mirai.arknights.data.*
@@ -29,6 +30,10 @@ public object ArknightsGuardCommand : CompositeCommand(
             appendLine("=== 公告订阅 ===")
             ArknightsTaskConfig.announce.forEach { (id, announces) ->
                 appendLine("$id : $announces")
+            }
+            appendLine("=== 周常订阅 ===")
+            ArknightsTaskConfig.weekly.forEach { (id, weeklies) ->
+                appendLine("$id : $weeklies")
             }
         }
 
@@ -66,6 +71,26 @@ public object ArknightsGuardCommand : CompositeCommand(
         val message = buildMessageChain {
             append("当前公告订阅内容 ")
             append(announces.joinToString(", ").ifEmpty { "为空" })
+        }
+
+        sendMessage(message = message)
+    }
+
+    @SubCommand("weekly", "周常")
+    @Description("设置视频蹲饼内容")
+    public suspend fun CommandSender.weekly(contact: Long, vararg weeklies: String) {
+        ArknightsTaskConfig.weekly[contact] = weeklies.map { WeeklyType.valueOf(it) }
+        val table = ArknightsSubscriber.excel.zone()
+        val record = ArknightsTaskConfig.weekly[contact].orEmpty()
+        val message = buildMessageChain {
+            append("当前周常订阅内容 ")
+            for ((id, weekly) in table.weekly) {
+                if (weekly.type !in record) continue
+                val zone = table.zones[id] ?: continue
+                append(zone.title)
+                append(" ")
+            }
+            if (record.isEmpty()) append("为空")
         }
 
         sendMessage(message = message)

@@ -101,8 +101,27 @@ public object ArknightsSubscriber : SimpleListenerHost() {
     private fun CacheInfo.isToday(): Boolean = (created.toLocalDate() == LocalDate.now())
 
     private fun clock() {
-        // TODO: 剿灭
-        // TODO: 线索需求推送
+        val cron = ArknightsCronConfig.clock
+        launch {
+            while (isActive) {
+                delay(10_000)
+                delay(cron.next())
+                val table = excel.zone()
+                val current = OffsetDateTime.now().minusHours(4)
+                for ((zoneId, weekly) in table.weekly) {
+                    if (current.dayOfWeek.value !in weekly.daysOfWeek) continue
+                    val zone = table.zones[zoneId] ?: continue
+
+                    val clock = WeeklyClock(zone, weekly)
+
+                    try {
+                        flow.emit(clock)
+                    } catch (cause: Exception) {
+                        logger.warning({ "周常[${clock.zone.title}]推送失败" }, cause)
+                    }
+                }
+            }
+        }
     }
 
     private fun video() {
@@ -268,6 +287,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
         announcements.clear()
         penguin.clear()
         excel.clear()
+        static.clear()
     }
 
     private fun listen(contact: Contact) {
@@ -284,6 +304,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
         announce()
         penguin()
         excel()
+        clock()
         plugin.logger.info { "蹲饼监听已开启" }
     }
 
