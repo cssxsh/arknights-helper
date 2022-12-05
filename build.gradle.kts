@@ -7,12 +7,12 @@ plugins {
 }
 
 group = "xyz.cssxsh"
-version = "2.0.0-RC3"
+version = "2.0.0"
 
 mavenCentralPublish {
     useCentralS01()
     singleDevGithubProject("cssxsh", "arknights-helper")
-    licenseFromGitHubProject("AGPL-3.0", "master")
+    licenseFromGitHubProject("AGPL-3.0", "dev")
     workingDir = System.getenv("PUBLICATION_TEMP")?.let { file(it).resolve(projectName) }
         ?: buildDir.resolve("publishing-tmp")
     publication {

@@ -8,7 +8,7 @@ import xyz.cssxsh.mirai.arknights.data.*
 
 public object ArknightsGachaCommand : CompositeCommand(
     owner = ArknightsHelperPlugin,
-    "ark-gacha", "方舟抽卡",
+    "ark-gacha", "方舟抽卡", "方舟招募",
     description = "明日方舟助手抽卡指令"
 ) {
 

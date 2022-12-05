@@ -3,15 +3,16 @@
 > 基于 [Mirai Console](https://github.com/mamoe/mirai-console) 的 [明日方舟](https://ak.hypergryph.com/) 助手插件
 
 [![Release](https://img.shields.io/github/v/release/cssxsh/arknights-helper)](https://github.com/cssxsh/arknights-helper/releases)
-[![Downloads](https://img.shields.io/github/downloads/cssxsh/arknights-helper/total)](https://shields.io/category/downloads)
+[![Downloads](https://img.shields.io/github/downloads/cssxsh/arknights-helper/total)](https://repo1.maven.org/maven2/xyz/cssxsh/arknights-helper/)
 [![MiraiForum](https://img.shields.io/badge/post-on%20MiraiForum-yellow)](https://mirai.mamoe.net/topic/203)
+[![DataHolder Test](https://github.com/cssxsh/arknights-helper/actions/workflows/test.yml/badge.svg)](https://github.com/cssxsh/arknights-helper/actions/workflows/test.yml)
 
 **使用前应该查阅的相关文档或项目**  
 **Arknights Helper 在2.0版本进行了重构 需要重新配置订阅 详见 方舟蹲饼**  
 
-* [User Manual](https://github.com/mamoe/mirai/blob/dev/docs/UserManual.md)
-* [Permission Command](https://github.com/mamoe/mirai/blob/dev/mirai-console/docs/BuiltInCommands.md#permissioncommand)
-* [Chat Command](https://github.com/project-mirai/chat-command)
+*   [User Manual](https://github.com/mamoe/mirai/blob/dev/docs/UserManual.md)
+*   [Permission Command](https://github.com/mamoe/mirai/blob/dev/mirai-console/docs/BuiltInCommands.md#permissioncommand)
+*   [Chat Command](https://github.com/project-mirai/chat-command)
 
 ## 指令
 
@@ -88,8 +89,8 @@ B. 选项
 |:------------------------------|:------------------|
 | `/<ark-recruit 方舟公招> {words}` | 查看关键词`words`的公招干员 |
 
-* `words`的数量为1~5  
-  例如 `/方舟公招 远程位 支援`
+*   `words`的数量为1~5  
+    例如 `/方舟公招 远程位 支援`
 
 ### 助手材料指令
 
@@ -99,23 +100,8 @@ B. 选项
 | `/<ark-stage 方舟关卡> [name] [limit]? [now]?` | 查看关卡的材料掉落率     |
 | `/<ark-zone 方舟章节> [name] [limit]? [now]?`  | 查看地图所有关卡的材料掉落率 |
 
-* `limit` 是显示前多少项查询结果  
-* `now` 是是否只显示当前开启关卡，默认为 `true`  
-
-### ~~助手玩家指令~~
-
-**玩家指令 2.0 版本废弃**
-
-| 指令                                                   | 描述                    |
-|:-----------------------------------------------------|:----------------------|
-| `/<player 玩家> <detail 详情>`                           | 当前玩家(QQ号)在助手中的数据      |
-| `/<player 玩家> <reason 理智> [init]`                    | 设置玩家(QQ号)当前理智为`init`  |
-| `/<player 玩家> <level 等级> [index]`                    | 设置玩家(QQ号)当前等级为`index` |
-| `/<player 玩家> <recruit 公招> [site] [hours] [minutes]` | 设置公招位`site`等待时间       |
-| `/<player 玩家> <record 记录>`                           | 列出玩家的公招记录             |
-
-玩家的默认等级为`120`  
-理智的提醒时间会根据玩家等级和当前理智值`init`设置
+*   `limit` 是显示前多少项查询结果  
+*   `now` 是是否只显示当前开启关卡，默认为 `true`
 
 ### 助手蹲饼指令
 
@@ -163,12 +149,12 @@ B. 选项
 
 ### MCL 指令安装
 
-`./mcl --update-package xyz.cssxsh:arknights-helper --channel stable --type plugin`
+`./mcl --update-package xyz.cssxsh:arknights-helper --channel maven-stable --type plugin`
 
 ### 手动安装
 
-1. 运行 [Mirai Console](https://github.com/mamoe/mirai-console) 生成`plugins`文件夹
-2. 从 [Releases](https://github.com/cssxsh/arknights-helper/releases) 下载`jar`并将其放入`plugins`文件夹中
+1.  从 [Releases](https://github.com/cssxsh/arknights-helper/releases) 或者 [Maven](https://repo1.maven.org/maven2/xyz/cssxsh/arknights-helper/) 下载 `mirai2.jar`
+2.  将其放入 `plugins` 文件夹中
 
 ## TODO
 
@@ -177,11 +163,11 @@ B. 选项
 - [x] 明日方舟官方QQ表情，下载、发送更新提醒等 21/05/14
 - [x] 自定义材料掉落别名(目前由企鹅物流数据提供支持) 21/05/14
 - [ ] 关卡规划
-- [ ] 剿灭和周常提醒
+- [x] 周常提醒
 - [x] 游戏公告
 
 ## 数据来源
 
-* 游戏数据 [Kengxxiao/ArknightsGameData](https://github.com/Kengxxiao/ArknightsGameData)
-* 掉落数据 [企鹅物流数据统计](https://penguin-stats.io/)
-* 其他数据 相关API
+*   游戏数据 [Kengxxiao/ArknightsGameData](https://github.com/Kengxxiao/ArknightsGameData)
+*   掉落数据 [企鹅物流数据统计](https://penguin-stats.io/)
+*   语音数据 [PRTS WIKI](https://prts.wiki/w/%E5%88%86%E7%B1%BB:%E5%B9%B2%E5%91%98%E8%AF%AD%E9%9F%B3)

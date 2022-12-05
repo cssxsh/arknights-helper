@@ -48,11 +48,6 @@ internal var User.coin: Int by ArknightsUserData.delegate()
  */
 internal var Contact.pool: String by ArknightsPoolConfig.delegate()
 
-/**
- * 答题互斥锁
- */
-internal val CommandSenderOnMessage<*>.mutex: Mutex by SubjectDelegate { Mutex() }
-
 @OptIn(ConsoleExperimentalApi::class)
 internal fun <V> AbstractPluginData.delegate() = object : ReadWriteProperty<Contact, V> {
     override fun getValue(thisRef: Contact, property: KProperty<*>): V {
@@ -73,6 +68,7 @@ internal class SubjectDelegate<T>(private val default: (Contact) -> T) :
         map[thisRef.fromEvent.subject] = value
     }
 
+    @Synchronized
     override fun getValue(thisRef: CommandSenderOnMessage<*>, property: KProperty<*>): T {
         return map.getOrPut(thisRef.fromEvent.subject) { default(thisRef.fromEvent.subject) }
     }
