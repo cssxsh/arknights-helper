@@ -171,3 +171,7 @@ B. 选项
 *   游戏数据 [Kengxxiao/ArknightsGameData](https://github.com/Kengxxiao/ArknightsGameData)
 *   掉落数据 [企鹅物流数据统计](https://penguin-stats.io/)
 *   语音数据 [PRTS WIKI](https://prts.wiki/w/%E5%88%86%E7%B1%BB:%E5%B9%B2%E5%91%98%E8%AF%AD%E9%9F%B3)
+
+## [爱发电](https://afdian.net/@cssxsh)
+
+![afdian](https://mirai.mamoe.net/assets/uploads/files/1670551864384-8ab9fe4e-37ff-440f-bd1e-c7bda4e1a85e-image.png)
