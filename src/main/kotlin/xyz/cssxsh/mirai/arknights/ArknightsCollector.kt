@@ -122,6 +122,7 @@ public class ArknightsCollector(private val contact: Contact) : FlowCollector<Ca
                     "a" -> {
                         when {
                             node.text() == node.attr("href").trim() -> Unit
+                            node.attr("href").startsWith("/n/") -> Unit
                             node.childrenSize() > 0 -> Unit
                             else -> append("<${node.attr("href")}>")
                         }
