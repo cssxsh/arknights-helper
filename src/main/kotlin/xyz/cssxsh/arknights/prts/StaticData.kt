@@ -15,8 +15,9 @@ public sealed class StaticData : CacheKey {
         override val filename: String = "${word.charWordId}.wav"
         override val type: String = System.getProperty(VOICE_TYPE_KEY, "voice")
         override val url: String = when {
-            word.wordKey != word.character -> "https://static.prts.wiki/voice_custom/${word.wordKey.lowercase()}/${word.voiceId}.wav"
-            else -> "https://static.prts.wiki/$type/${word.wordKey.lowercase()}/${word.voiceId}.wav"
+            "#" in word.wordKey -> "https://static.prts.wiki/${type}/${word.staticKey}/${word.voiceId}.wav"
+            word.wordKey != word.character -> "https://static.prts.wiki/voice_custom/${word.staticKey}/${word.voiceId}.wav"
+            else -> "https://static.prts.wiki/${type}/${word.staticKey}/${word.voiceId}.wav"
         }
     }
 }

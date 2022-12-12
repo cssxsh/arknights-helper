@@ -124,6 +124,9 @@ public data class CharWord(
     @SerialName("wordKey")
     val wordKey: String
 ) : CharacterId {
+
+    public val staticKey: String by lazy { wordKey.replace("#", "_").lowercase() }
+
     @Serializable
     public data class UnlockParam(
         @SerialName("valueInt")
