@@ -234,11 +234,9 @@ private fun Boolean.Companion.random() = listOf(true, false).random()
 
 private val formatter = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm:ss")
 
-private val prefix get() = listOf(-1L, 1L).random()
+private fun OffsetDateTime.randomDays() = plusDays((-7L .. 7L).random())
 
-private fun OffsetDateTime.randomDays(offset: Int = 1) = plusDays(offset * prefix)
-
-private fun OffsetDateTime.randomMinutes(offset: Int = 30) = plusMinutes(offset * prefix)
+private fun OffsetDateTime.randomMinutes() = plusHours((-6L .. 6L).random())
 
 private val defaultChoiceRange = 'A'..'D'
 
