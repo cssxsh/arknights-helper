@@ -154,7 +154,15 @@ internal class CacheDataHolderTest {
 
     @Test
     fun voice(): Unit = runBlocking {
-        val word = excel.word().charWords.values.random()
-        static.voice(word = word)
+        excel.load(ExcelDataType.CHARACTER)
+        excel.load(ExcelDataType.WORD)
+        val characters = excel.character()
+        val words = excel.word().charWords
+        for ((_, word) in words) {
+            val character = characters.getValue(word.character)
+            if (character.rarity != 5) break
+            static.voice(character = character, word = word)
+            delay(10_000)
+        }
     }
 }

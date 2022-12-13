@@ -1,5 +1,6 @@
 package xyz.cssxsh.arknights.prts
 
+import io.ktor.http.*
 import xyz.cssxsh.arknights.*
 import xyz.cssxsh.arknights.excel.*
 
@@ -7,17 +8,20 @@ public sealed class StaticData : CacheKey {
     public companion object {
         internal const val VOICE_TYPE_KEY = "xyz.cssxsh.arknights.prts.voice"
     }
-    public abstract val character: String
-    public abstract val type: String
 
-    public class Voice(word: CharWord): StaticData() {
+    public abstract val character: String
+    public abstract val type: ContentType
+
+    public class Voice(character: Character, word: CharWord) : StaticData() {
         override val character: String = word.character
-        override val filename: String = "${word.charWordId}.wav"
-        override val type: String = System.getProperty(VOICE_TYPE_KEY, "voice")
-        override val url: String = when {
-            "#" in word.wordKey -> "https://static.prts.wiki/${type}/${word.staticKey}/${word.voiceId}.wav"
-            word.wordKey != word.character -> "https://static.prts.wiki/voice_custom/${word.staticKey}/${word.voiceId}.wav"
-            else -> "https://static.prts.wiki/${type}/${word.staticKey}/${word.voiceId}.wav"
+        override val filename: String = "${character.name}/${word.voiceTitle}.wav"
+        override val type: ContentType = ContentType("audio", "wav")
+        public val group: String = when {
+            word.character == "char_4019_ncdeer" -> "voice_cn"
+            "TTA" in word.wordKey || "CN_TOPOLECT" in word.wordKey -> "voice_custom"
+            else -> System.getProperty(VOICE_TYPE_KEY, "voice")
         }
+        override val url: String =
+            "https://static.prts.wiki/${group}/${word.wordKey.replace("#", "_").lowercase()}/${word.voiceId}.wav"
     }
 }

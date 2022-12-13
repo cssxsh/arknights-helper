@@ -41,9 +41,9 @@ public object ArknightsDataCommand : CompositeCommand(
     public suspend fun UserCommandSender.voice(id: String = "") {
         val words = ArknightsSubscriber.excel.word().charWords
         val word = words[id] ?: words.values.random()
-        val character = ArknightsSubscriber.excel.character()[word.character]
-        ArknightsHelperPlugin.logger.info("${character?.name ?: word.charWordId} - ${word.voiceTitle} - ${word.voiceText}")
-        val file = ArknightsSubscriber.static.voice(word = word)
+        val character = ArknightsSubscriber.excel.character().getValue(word.character)
+        ArknightsHelperPlugin.logger.info("${character.name} - ${word.voiceTitle} - ${word.voiceText}")
+        val file = ArknightsSubscriber.static.voice(character = character, word = word)
         val audio = file.toExternalResource().use {
             (subject as AudioSupported).uploadAudio(it)
         }
