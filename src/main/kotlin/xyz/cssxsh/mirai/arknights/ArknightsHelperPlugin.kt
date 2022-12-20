@@ -12,7 +12,7 @@ import net.mamoe.mirai.utils.*
 import kotlin.collections.*
 
 public object ArknightsHelperPlugin : KotlinPlugin(
-    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "2.0.0") {
+    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "2.0.1") {
         name("arknights-helper")
         author("cssxsh")
 

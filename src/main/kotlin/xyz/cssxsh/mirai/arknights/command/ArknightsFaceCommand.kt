@@ -62,7 +62,7 @@ public object ArknightsFaceCommand : CompositeCommand(
                 bot says {
                     val head = try {
                         val bytes = http.get(author.head).body<ByteArray>()
-                        bytes.toExternalResource().use { resource  ->
+                        bytes.toExternalResource().use { resource ->
                             subject.uploadImage(resource)
                         }
                     } catch (cause: Exception) {
@@ -77,7 +77,7 @@ public object ArknightsFaceCommand : CompositeCommand(
                     bot says {
                         val thumb = try {
                             val bytes = http.get(item.thumb).body<ByteArray>()
-                            bytes.toExternalResource().use { resource  ->
+                            bytes.toExternalResource().use { resource ->
                                 subject.uploadImage(resource)
                             }
                         } catch (cause: Exception) {

@@ -23,7 +23,7 @@
 `{...}`表示连续的多个参数  
 
 本插件指令权限ID 格式为 `xyz.cssxsh.mirai.plugin.arknights-helper:command.*`, `*` 是指令的第一指令名  
-例如 `/公招 远程位 支援` 的权限ID为 `xyz.cssxsh.mirai.plugin.arknights-helper:command.ark-recruit`
+例如 `/方舟公招 远程位 支援` 的权限ID为 `xyz.cssxsh.mirai.plugin.arknights-helper:command.ark-recruit`
 
 ### 助手抽卡指令
 
@@ -35,7 +35,7 @@
 | `/<gacha 抽卡> <set 设置> [name]`                 | 设置卡池为`name`, 默认为`NORMAL`                    |
 | `/<gacha 抽卡> <pool 卡池> [name] [set]? {rules}` | 设置卡池`name`的规则为`rules`，当`set`为`true`时设置为当前卡池 |
 
-抽卡每一抽会消耗`600`合成玉，合成玉可以通过[答题](#助手答题指令)获得，通过[玩家详情](#助手玩家指令)查看
+抽卡每一抽会消耗`600`合成玉，合成玉可以通过[答题](#助手答题指令)获得
 
 #### ArknightsGachaCommand 卡池规则`rules`参数格式
 
@@ -160,8 +160,6 @@ B. 选项
 
 - [ ] 配置问题类型出现的概率
 - [x] 记录答题正确率 21/06/10
-- [x] 明日方舟官方QQ表情，下载、发送更新提醒等 21/05/14
-- [x] 自定义材料掉落别名(目前由企鹅物流数据提供支持) 21/05/14
 - [ ] 关卡规划
 - [x] 周常提醒
 - [x] 游戏公告
@@ -174,4 +172,4 @@ B. 选项
 
 ## [爱发电](https://afdian.net/@cssxsh)
 
-![afdian](https://mirai.mamoe.net/assets/uploads/files/1670551864384-8ab9fe4e-37ff-440f-bd1e-c7bda4e1a85e-image.png)
+![afdian](.github/afdian.jpg)

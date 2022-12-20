@@ -27,7 +27,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
         try {
             ArknightsHelperPlugin.dataFolder
             ArknightsHelperPlugin
-        } catch (_: ExceptionInInitializerError) {
+        } catch (_: UninitializedPropertyAccessException) {
             object : PluginFileExtensions {
                 override val configFolder by lazy { configFolderPath.toFile() }
                 override val configFolderPath by lazy { Path(System.setProperty("arknights.config", "./config")) }

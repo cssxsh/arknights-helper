@@ -26,7 +26,7 @@ public data class Question(
 )
 
 public enum class QuestionType(public val description: String) {
-    BUILDING("基建相关") { 
+    BUILDING("基建相关") {
         override fun load(loader: QuestionDataLoader): QuestionBuilder {
             val building = runBlocking { loader.excel.building() }
             val characters = runBlocking { loader.excel.character() }
@@ -139,7 +139,7 @@ public enum class QuestionType(public val description: String) {
                     add(handbook.illust to character.name)
                 }
             }
-        }            
+        }
     },
     VOICE("声优相关") {
         override fun load(loader: QuestionDataLoader): QuestionBuilder {
@@ -234,9 +234,9 @@ private fun Boolean.Companion.random() = listOf(true, false).random()
 
 private val formatter = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm:ss")
 
-private fun OffsetDateTime.randomDays() = plusDays((-7L .. 7L).random())
+private fun OffsetDateTime.randomDays() = plusDays((-7L..7L).random())
 
-private fun OffsetDateTime.randomMinutes() = plusHours((-6L .. 6L).random())
+private fun OffsetDateTime.randomMinutes() = plusHours((-6L..6L).random())
 
 private val defaultChoiceRange = 'A'..'D'
 
