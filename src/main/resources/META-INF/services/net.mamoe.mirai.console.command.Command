@@ -1,3 +1,4 @@
+xyz.cssxsh.mirai.arknights.command.ArknightsAudioCommand
 xyz.cssxsh.mirai.arknights.command.ArknightsDataCommand
 xyz.cssxsh.mirai.arknights.command.ArknightsFaceCommand
 xyz.cssxsh.mirai.arknights.command.ArknightsGachaCommand

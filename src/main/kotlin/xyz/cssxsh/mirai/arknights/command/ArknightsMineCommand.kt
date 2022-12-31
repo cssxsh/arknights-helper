@@ -2,12 +2,11 @@ package xyz.cssxsh.mirai.arknights.command
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.*
-import net.mamoe.mirai.console.command.CommandSender.Companion.toCommandSender
 import net.mamoe.mirai.console.command.*
+import net.mamoe.mirai.console.command.CommandSender.Companion.toCommandSender
 import net.mamoe.mirai.event.*
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.message.data.*
-import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import xyz.cssxsh.arknights.mine.*
 import xyz.cssxsh.mirai.arknights.*
 import xyz.cssxsh.mirai.arknights.data.*
@@ -45,7 +44,6 @@ public object ArknightsMineCommand : SimpleCommand(
         val reply: MessageEvent?
         mutex.withLock {
             sendMessage(buildMessageChain {
-                append(fromEvent.message.quote())
                 appendLine("[${type}]<${question.coin}>：${question.problem} (${question.timeout / 1000}s内作答)")
                 for ((index, text) in question.options) {
                     appendLine("${index}.${text}")
@@ -67,6 +65,7 @@ public object ArknightsMineCommand : SimpleCommand(
         var multiple = 1
         var deduct = false
         val origin = fromEvent.sender
+        delay(3_000L)
         reply.toCommandSender().reply {
             buildMessageChain {
                 appendLine(question.problem)
