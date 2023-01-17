@@ -149,7 +149,9 @@ public enum class QuestionType(public val description: String) {
                 for ((characterId, voice) in voices) {
                     val character = characters[characterId] ?: continue
                     for ((_, dict) in voice.dict) {
-                        add(dict.cvName to character.name)
+                        for (cv in dict.cvName) {
+                            add(cv to character.name)
+                        }
                     }
                 }
             }

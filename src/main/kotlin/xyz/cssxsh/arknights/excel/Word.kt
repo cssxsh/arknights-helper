@@ -86,7 +86,7 @@ public data class ChatVoiceInfo(
 @Serializable
 public data class ChatVoiceDict(
     @SerialName("cvName")
-    val cvName: String,
+    val cvName: List<String>,
     @SerialName("voiceLangType")
     val voiceLangType: VoiceLangType,
     @SerialName("voicePath")

@@ -22,11 +22,11 @@ public data class Handbook(
     @SerialName("charID")
     override val character: String,
     @SerialName("drawName")
-    override val illust: String,
+    override val illust: String = "Unknown",
     @SerialName("handbookAvgList")
     private val handbookAvgList: List<JsonObject>,
     @SerialName("infoName")
-    override val voice: String,
+    override val voice: String = "Unknown",
     @SerialName("storyTextAudio")
     val storyTextAudio: List<StoryTextAudio>
 ) : Illust, Voice, CharacterId
@@ -64,7 +64,7 @@ public data class NpcInfo(
     @SerialName("groupId")
     override val group: String?,
     @SerialName("illust")
-    override val illust: String,
+    override val illust: String = "Unknown",
     @SerialName("name")
     override val name: String,
     @SerialName("nationId")

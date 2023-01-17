@@ -77,13 +77,27 @@ internal class CacheDataHolderTest {
     @Test
     fun handbook(): Unit = runBlocking {
         excel.load(ExcelDataType.HANDBOOK)
-        excel.handbook()
+        val table = excel.handbook()
+        for ((id, handbook) in table.handbooks) {
+            if (handbook.illust != "Unknown") continue
+            println("$id ${handbook.illust}")
+        }
+        for ((id, npc) in table.npc) {
+            if (npc.illust != "Unknown") continue
+            println("$id ${npc.illust}")
+        }
     }
 
     @Test
     fun word(): Unit = runBlocking {
         excel.load(ExcelDataType.WORD)
-        excel.word()
+        val table = excel.word()
+        for ((id, voice) in table.voiceLangDict) {
+            for ((type, info) in voice.dict) {
+                if (info.cvName.size == 1) continue
+                println("$id $type $info")
+            }
+        }
     }
 
     @Test
