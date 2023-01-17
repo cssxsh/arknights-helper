@@ -34,6 +34,7 @@ public class ArknightsCollector(private val contact: Contact) : FlowCollector<Ca
             is MicroBlog -> {
                 val accept = ArknightsTaskConfig.blog[contact.id] ?: return
                 if (accept.none { it.uid == value.user.id }) return
+                if ("@微博抽奖平台" in value.text) return
                 buildMessageChain {
                     appendLine("鹰角有新微博！@${value.user.name}")
 

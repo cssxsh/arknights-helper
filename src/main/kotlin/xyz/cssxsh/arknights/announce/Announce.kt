@@ -55,8 +55,11 @@ public data class Announcement(
         }
     }
     public val type: AnnounceType by lazy {
-        val path = webUrl.substringAfter("announce/").substringBefore("/announcement")
-        AnnounceType.valueOf(path)
+        val value = webUrl
+            .substringAfter("announce/")
+            .substringBefore("/announcement")
+            .uppercase()
+        AnnounceType.valueOf(value)
     }
     override val url: String get() = webUrl
 }
