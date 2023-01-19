@@ -1,7 +1,6 @@
 package xyz.cssxsh.arknights.excel
 
 import kotlinx.serialization.*
-import kotlinx.serialization.json.*
 
 public typealias EnemyTable = Map<String, Enemy>
 
@@ -35,12 +34,14 @@ public data class Enemy(
     val isInvalidKilled: Boolean,
     @SerialName("name")
     override val name: String,
-    @SerialName("overrideKillCntInfos")
-    val overrideKillCntInfos: JsonObject,
     @SerialName("resistance")
     val resistance: String,
     @SerialName("sortId")
-    val sortId: Int
+    val sortId: Int,
+    @SerialName("overrideKillCntInfos")
+    internal val overrideKillCntInfos: Map<String, Int>,
+    @SerialName("hideInHandbook")
+    internal val hideInHandbook: Boolean
 ) : Id, Name, TagInfo
 
 public enum class EnemyLevel(public val text: String) {

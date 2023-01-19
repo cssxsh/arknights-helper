@@ -163,6 +163,8 @@ public data class Zone(
     val stages: List<String>,
     @SerialName("type")
     override val type: ZoneType,
+    @SerialName("subType")
+    val subType: ZoneSubType? = null,
     @SerialName("zoneId")
     override val id: String,
     @SerialName("zoneIndex")
@@ -181,6 +183,15 @@ public enum class ZoneType {
     WEEKLY,
     GACHABOX,
     RECRUIT
+}
+
+@Serializable
+public enum class ZoneSubType {
+    AWAKENING_HOUR,
+    VISION_SHATTER,
+    INTERLUDE,
+    SIDESTORY,
+    DYING_SUN
 }
 
 @Serializable
@@ -246,7 +257,9 @@ public data class Matrix(
     @Serializable(OffsetDataTimeSerializer::class)
     override val start: OffsetDateTime,
     @SerialName("times")
-    override val times: Long
+    override val times: Long,
+    @SerialName("stdDev")
+    internal val stdDev: Double
 ) : Frequency, TimePeriod, ItemId, StageId
 
 @Serializable

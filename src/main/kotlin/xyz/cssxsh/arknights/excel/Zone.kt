@@ -8,30 +8,49 @@ import java.time.*
 public data class ZoneTable(
     @SerialName("mainlineAdditionInfo")
     val mainline: Map<String, Mainline>,
-    @SerialName("weeklyAdditionInfo")
-    val weekly: Map<String, Weekly>,
     @SerialName("zoneValidInfo")
     val valid: Map<String, ValidInfo>,
+    @SerialName("weeklyAdditionInfo")
+    val weekly: Map<String, Weekly>,
     @SerialName("zones")
-    val zones: Map<String, Zone>
+    val zones: Map<String, Zone>,
+    @SerialName("zoneRecordGroupedData")
+    internal val recordGroupedData: Map<String, RecordGroupedData>,
+    @SerialName("zoneRecordRewardData")
+    internal val recordRewardData: Map<String, List<String>>
 )
 
 @Serializable
 public data class Mainline(
+    @SerialName("mainlneBgName")
+    val background: String,
     @SerialName("chapterId")
     val chapterId: String,
     @SerialName("endStageId")
-    val end: String,
-    @SerialName("mainlneBgName")
-    val mainlineBgName: String,
+    val endStageId: String,
     @SerialName("preposedZoneId")
-    val posed: String?,
+    val preposedZoneId: String?,
     @SerialName("startStageId")
-    val start: String,
+    val startStageId: String,
     @SerialName("zoneId")
     override val zoneId: String,
     @SerialName("zoneIndex")
-    val index: Int
+    val zoneIndex: Int,
+    @SerialName("zoneOpenTime")
+    @Serializable(TimestampSerializer::class)
+    val zoneOpenTime: OffsetDateTime,
+    @SerialName("buttonName")
+    internal val buttonName: String,
+    @SerialName("buttonStyle")
+    internal val buttonStyle: String,
+    @SerialName("diffGroup")
+    internal val diffGroup: List<Int>,
+    @SerialName("recapId")
+    internal val recapId: String,
+    @SerialName("recapPreStageId")
+    internal val recapPreStageId: String,
+    @SerialName("spoilAlert")
+    internal val spoilAlert: Boolean,
 ) : ZoneId
 
 @Serializable
@@ -84,8 +103,84 @@ public data class Zone(
     @SerialName("zoneNameTitleUnCurrent")
     val nameTitleUnCurrent: String?
 ) : Id {
-    public val title: String = "${nameFirst.orEmpty()} ${nameSecond.orEmpty()} ${nameThird.orEmpty()}"
+    public val title: String = "${nameFirst.orEmpty()} ${nameSecond.orEmpty()} ${nameThird.orEmpty()}".trim()
 }
+
+@Serializable
+public data class RecordGroupedData(
+    @SerialName("zoneId")
+    val zoneId: String,
+    @SerialName("records")
+    val records: List<RecordGroupedInfo>,
+    @SerialName("unlockData")
+    val unlockData: UnlockData
+)
+
+@Serializable
+public data class RecordGroupedInfo(
+    @SerialName("recordId")
+    val recordId: String,
+    @SerialName("zoneId")
+    val zoneId: String,
+    @SerialName("recordTitleName")
+    val recordTitle: String,
+    @SerialName("preRecordId")
+    val preRecordId: String?,
+    @SerialName("nodeTitle1")
+    val nodeTitle1: String?,
+    @SerialName("nodeTitle2")
+    val nodeTitle2: String?,
+    @SerialName("rewards")
+    val rewards: List<RecordRewardData>
+)
+
+@Serializable
+public data class RecordRewardData(
+    @SerialName("bindStageId")
+    val bindStageId: String,
+    @SerialName("stageDiff1")
+    val stageDiff1: String,
+    @SerialName("stageDiff")
+    val stageDiff: String,
+    @SerialName("picRes")
+    val picture: String?,
+    @SerialName("textPath")
+    val path: String?,
+    @SerialName("textDesc")
+    val description: String?,
+    @SerialName("recordReward")
+    val detail: List<RecordRewardInfo>?
+)
+
+@Serializable
+public data class RecordRewardInfo(
+    @SerialName("id")
+    val id: String,
+    @SerialName("count")
+    val count: Int,
+    @SerialName("type")
+    val type: String
+)
+
+@Serializable
+public data class UnlockData(
+    @SerialName("noteId")
+    val noteId: String,
+    @SerialName("zoneId")
+    val zoneId: String,
+    @SerialName("initialName")
+    val initialName: String,
+    @SerialName("finalName")
+    val finalName: String?,
+    @SerialName("accordingExposeId")
+    val accordingExposeId: String? = null,
+    @SerialName("initialDes")
+    val initialDescription: String? = null,
+    @SerialName("finalDes")
+    val finalDescription: String? = null,
+    @SerialName("remindDes")
+    val remindDescription: String? = null
+)
 
 @Serializable
 public enum class ZoneType(public val text: String) {
@@ -101,6 +196,7 @@ public enum class ZoneType(public val text: String) {
 }
 
 public class WeeklyClock(public val zone: Zone, public val weekly: Weekly) : CacheInfo {
-    override val created: OffsetDateTime = OffsetDateTime.now().withHour(4)
+    override val created: OffsetDateTime = OffsetDateTime.now()
+        .withHour(4).withMinute(0).withSecond(0).withNano(0)
     override val url: String = ""
 }

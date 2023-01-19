@@ -82,6 +82,12 @@ public data class UnlockCondition(
     val phase: Int
 )
 
+public interface UnlockInfo {
+    public val param: String
+    public val string: String?
+    public val type: Int
+}
+
 @Serializable
 public data class LegacyItem(
     @SerialName("count")

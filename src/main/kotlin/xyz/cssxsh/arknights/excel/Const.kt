@@ -1,152 +1,205 @@
 package xyz.cssxsh.arknights.excel
 
 import kotlinx.serialization.*
-import kotlinx.serialization.json.*
+import xyz.cssxsh.arknights.TimestampSerializer
+import java.time.OffsetDateTime
 
 @Serializable
 public data class ConstInfo(
-    @SerialName("advancedGachaCrystalCost")
-    private val advancedGachaCrystalCost: Int,
-    @SerialName("apBuyCost")
-    private val apBuyCost: Int,
-    @SerialName("apBuyThreshold")
-    private val apBuyThreshold: Int,
-    @SerialName("assistBeUsedSocialPt")
-    private val assistBeUsedSocialPt: Map<Int, Int>,
-    @SerialName("attackMax")
-    private val attackMax: Double,
-    @SerialName("baseMaxFriendNum")
-    private val baseMaxFriendNum: Int,
-    @SerialName("buyApTimeNoLimitFlag")
-    private val buyApTimeNoLimitFlag: Boolean,
-    @SerialName("charAssistRefreshTime")
-    private val charAssistRefreshTime: List<CharAssistRefreshTime>,
     @SerialName("characterExpMap")
     val characterExpMap: List<List<Int>>,
     @SerialName("characterUpgradeCostMap")
     val characterUpgradeCostMap: List<List<Int>>,
-    @SerialName("commonPotentialLvlUpCount")
-    private val commonPotentialLvlUpCount: Int,
-    @SerialName("completeCrystalBonus")
-    private val completeCrystalBonus: Int,
-    @SerialName("completeGainBonus")
-    private val completeGainBonus: Double,
-    @SerialName("creditLimit")
-    private val creditLimit: Int,
-    @SerialName("crisisUnlockStage")
-    private val crisisUnlockStage: String,
-    @SerialName("defCDPrimColor")
-    private val defCDPrimColor: String,
-    @SerialName("defCDSecColor")
-    private val defCDSecColor: String,
-    @SerialName("defMax")
-    private val defMax: Double,
-    @SerialName("diamondMaterialToShardExchangeRatio")
-    private val diamondMaterialToShardExchangeRatio: Int,
-    @SerialName("diamondToShdRate")
-    private val diamondToShdRate: Int,
-    @SerialName("evolveGoldCost")
-    private val evolveGoldCost: List<List<Int>>,
-    @SerialName("friendAssistRarityLimit")
-    private val friendAssistRarityLimit: List<Int>,
-    @SerialName("hardDiamondDrop")
-    private val hardDiamondDrop: Int,
-    @SerialName("hpMax")
-    private val hpMax: Double,
-    @SerialName("initCampaignTotalFee")
-    private val initCampaignTotalFee: Int,
-    @SerialName("initCharIdList")
-    private val initCharIdList: List<String>,
-    @SerialName("initPlayerDiamondShard")
-    private val initPlayerDiamondShard: Int,
-    @SerialName("initPlayerGold")
-    private val initPlayerGold: Int,
-    @SerialName("initRecruitTagList")
-    private val initRecruitTagList: List<Int>,
-    @SerialName("instFinDmdShdCost")
-    private val instFinDmdShdCost: Int,
-    @SerialName("isDynIllustEnabled")
-    private val isDynIllustEnabled: Boolean,
-    @SerialName("isLMGTSEnabled")
-    private val isLMGTSEnabled: Boolean,
-    @SerialName("lMTGSDescConstOne")
-    private val lMTGSDescConstOne: String,
-    @SerialName("lMTGSDescConstTwo")
-    private val lMTGSDescConstTwo: String,
-    @SerialName("LMTGSToEPGSRatio")
-    private val lMTGSToEPGSRatio: Int,
-    @SerialName("legacyItemList")
-    private val legacyItemList: List<LegacyItem>,
-    @SerialName("legacyTime")
-    private val legacyTime: Int,
-    @SerialName("mailBannerType")
-    private val mailBannerType: List<String>,
     @SerialName("maxLevel")
     val maxLevel: List<List<Int>>,
     @SerialName("maxPlayerLevel")
     val maxPlayerLevel: Int,
     @SerialName("maxPracticeTicket")
     val maxPracticeTicket: Int,
-    @SerialName("monthlySubRemainTimeLimitDays")
-    private val monthlySubRemainTimeLimitDays: Int,
-    @SerialName("monthlySubWarningTime")
-    private val monthlySubWarningTime: Int,
-    @SerialName("multiInComeByRank")
-    private val multiInComeByRank: List<String>,
-    @SerialName("newBeeGiftEPGS")
-    private val newBeeGiftEPGS: Int,
-    @SerialName("normalGachaUnlockPrice")
-    private val normalGachaUnlockPrice: List<Int>,
-    @SerialName("normalRecruitLockedString")
-    private val normalRecruitLockedString: List<String>,
     @SerialName("playerApMap")
     val playerApMap: List<Int>,
     @SerialName("playerApRegenSpeed")
     val playerApRegenSpeed: Int,
     @SerialName("playerExpMap")
     val playerExpMap: List<Int>,
-    @SerialName("pullForceZeroIndex")
-    private val pullForceZeroIndex: Int,
+    @SerialName("dataVersion")
+    val dataVersion: String,
+    @SerialName("resPrefVersion")
+    val resPrefVersion: String,
+    @SerialName("advancedGachaCrystalCost")
+    internal val advancedGachaCrystalCost: Int,
+    @SerialName("addedRewardDisplayZone")
+    internal val addedRewardDisplayZone: String,
+    @SerialName("apBuyCost")
+    internal val apBuyCost: Int,
+    @SerialName("apBuyThreshold")
+    internal val apBuyThreshold: Int,
+    @SerialName("assistBeUsedSocialPt")
+    internal val assistBeUsedSocialPt: Map<Int, Int>,
+    @SerialName("attackMax")
+    internal val attackMax: Double,
+    @SerialName("baseMaxFriendNum")
+    internal val baseMaxFriendNum: Int,
+    @SerialName("buyApTimeNoLimitFlag")
+    internal val buyApTimeNoLimitFlag: Boolean,
+    @SerialName("charAssistRefreshTime")
+    internal val charAssistRefreshTime: List<CharAssistRefreshTime>,
+    @SerialName("commonPotentialLvlUpCount")
+    internal val commonPotentialLvlUpCount: Int,
+    @SerialName("completeCrystalBonus")
+    internal val completeCrystalBonus: Int,
+    @SerialName("completeGainBonus")
+    internal val completeGainBonus: Double,
+    @SerialName("creditLimit")
+    internal val creditLimit: Int,
+    @SerialName("crisisUnlockStage")
+    internal val crisisUnlockStage: String,
+    @SerialName("charmEquipCount")
+    internal val charmEquipCount: Int,
+    // def
+    @SerialName("defCDPrimColor")
+    internal val defCDPrimColor: String,
+    @SerialName("defCDSecColor")
+    internal val defCDSecColor: String,
+    @SerialName("defMax")
+    internal val defMax: Double,
+    // diamond
+    @SerialName("diamondMaterialToShardExchangeRatio")
+    internal val diamondMaterialToShardExchangeRatio: Int,
+    @SerialName("diamondToShdRate")
+    internal val diamondToShdRate: Int,
+    //
+    @SerialName("easyCrystalBonus")
+    internal val easyCrystalBonus: Int,
+    @SerialName("evolveGoldCost")
+    internal val evolveGoldCost: List<List<Int>>,
+    @SerialName("friendAssistRarityLimit")
+    internal val friendAssistRarityLimit: List<Int>,
+    @SerialName("hardDiamondDrop")
+    internal val hardDiamondDrop: Int,
+    @SerialName("hpMax")
+    internal val hpMax: Double,
+    // init
+    @SerialName("initCampaignTotalFee")
+    internal val initCampaignTotalFee: Int,
+    @SerialName("initCharIdList")
+    internal val initCharIdList: List<String>,
+    @SerialName("initPlayerDiamondShard")
+    internal val initPlayerDiamondShard: Int,
+    @SerialName("initPlayerGold")
+    internal val initPlayerGold: Int,
+    @SerialName("initRecruitTagList")
+    internal val initRecruitTagList: List<Int>,
+    //
+    @SerialName("instFinDmdShdCost")
+    internal val instFinDmdShdCost: Int,
+    @SerialName("isDynIllustStartEnabled")
+    internal val isDynIllustStartEnabled: Boolean,
+    @SerialName("isDynIllustEnabled")
+    internal val isDynIllustEnabled: Boolean,
+    @SerialName("isLMGTSEnabled")
+    internal val isLMGTSEnabled: Boolean,
+    @SerialName("isRoguelikeTopicFuncEnabled")
+    internal val isRoguelikeTopicFuncEnabled: Boolean,
+    @SerialName("isRoguelikeAvgAchieveFuncEnabled")
+    internal val isRoguelikeAvgAchieveFuncEnabled: Boolean,
+    // legacy
+    @SerialName("legacyItemList")
+    internal val legacyItemList: List<LegacyItem>,
+    @SerialName("legacyTime")
+    @Serializable(TimestampSerializer::class)
+    internal val legacyTime: OffsetDateTime,
+    // LMTGS
+    @SerialName("lMTGSDescConstOne")
+    internal val lmtgsDescriptionConstOne: String,
+    @SerialName("lMTGSDescConstTwo")
+    internal val lmtgsDescriptionConstTwo: String,
+    @SerialName("LMTGSToEPGSRatio")
+    internal val lmtgsToEPGSRatio: Double,
+    //
+    @SerialName("mailBannerType")
+    internal val mailBannerType: List<String>,
+    // mainline
+    @SerialName("mainlineCompatibleDesc")
+    internal val mainlineCompatibleDescription: String,
+    @SerialName("mainlineEasyDesc")
+    internal val mainlineEasyDescription: String,
+    @SerialName("mainlineNormalDesc")
+    internal val mainlineNormalDescription: String,
+    @SerialName("mainlineToughDesc")
+    internal val mainlineToughDescription: String,
+    // monthly
+    @SerialName("monthlySubRemainTimeLimitDays")
+    internal val monthlySubRemainTimeLimitDays: Int,
+    @SerialName("monthlySubWarningTime")
+    internal val monthlySubWarningTime: Long,
+    //
+    @SerialName("multiInComeByRank")
+    internal val multiInComeByRank: List<String>,
+    @SerialName("newBeeGiftEPGS")
+    internal val newBeeGiftEPGS: Int,
+    @SerialName("normalGachaUnlockPrice")
+    internal val normalGachaUnlockPrice: List<Int>,
+    @SerialName("normalRecruitLockedString")
+    internal val normalRecruitLockedString: List<String>,
+    // dorce
     @SerialName("pullForces")
-    private val pullForces: List<Double>,
-    @SerialName("pushForceZeroIndex")
-    private val pushForceZeroIndex: Int,
+    internal val pullForces: List<Double>,
+    @SerialName("pullForceZeroIndex")
+    internal val pullForceZeroIndex: Int,
     @SerialName("pushForces")
-    private val pushForces: List<Double>,
-    @SerialName("reMax")
-    private val reMax: Double,
+    internal val pushForces: List<Double>,
+    @SerialName("pushForceZeroIndex")
+    internal val pushForceZeroIndex: Int,
+    //
     @SerialName("recruitPoolVersion")
-    private val recruitPoolVersion: Int,
+    internal val recruitPoolVersion: Int,
+    @SerialName("rejectSpCharMission")
+    @Serializable(TimestampSerializer::class)
+    internal val rejectSpCharMission: OffsetDateTime,
+    @SerialName("reMax")
+    internal val reMax: Double,
     @SerialName("replicateShopStartTime")
-    private val replicateShopStartTime: Int,
+    @Serializable(TimestampSerializer::class)
+    internal val replicateShopStartTime: OffsetDateTime,
     @SerialName("requestSameFriendCD")
-    private val requestSameFriendCD: Int,
+    internal val requestSameFriendCD: Int,
     @SerialName("richTextStyles")
-    private val richTextStyles: Map<String, String>,
-    @SerialName("TSO")
-    private val TSO: Int,
+    internal val richTextStyles: Map<String, String>,
+    @SerialName("storyReviewUnlockItemLackTip")
+    internal val storyReviewUnlockItemLackTip: String,
     @SerialName("termDescriptionDict")
-    private val termDescriptionDict: Map<String, JsonObject>,
+    internal val termDescriptionDict: Map<String, TermDescription>,
+    @SerialName("TSO")
+    @Serializable(TimestampSerializer::class)
+    internal val tso: OffsetDateTime,
     @SerialName("UnlimitSkinOutOfTime")
-    private val unlimitSkinOutOfTime: Int,
+    internal val unlimitSkinOutOfTime: Long,
+    // useAssistSocial
     @SerialName("useAssistSocialPt")
-    private val useAssistSocialPt: Int,
+    internal val useAssistSocialPt: Int,
     @SerialName("useAssistSocialPtMaxCount")
-    private val useAssistSocialPtMaxCount: Int,
+    internal val useAssistSocialPtMaxCount: Int,
+    // v006
     @SerialName("v006RecruitTimeStep1Refresh")
-    private val v006RecruitTimeStep1Refresh: Int,
+    @Serializable(TimestampSerializer::class)
+    internal val v006RecruitTimeStep1Refresh: OffsetDateTime,
     @SerialName("v006RecruitTimeStep2Check")
-    private val v006RecruitTimeStep2Check: Int,
+    @Serializable(TimestampSerializer::class)
+    internal val v006RecruitTimeStep2Check: OffsetDateTime,
     @SerialName("v006RecruitTimeStep2Flush")
-    private val v006RecruitTimeStep2Flush: Int,
+    @Serializable(TimestampSerializer::class)
+    internal val v006RecruitTimeStep2Flush: OffsetDateTime,
+    // voucher
     @SerialName("voucherDiv")
-    private val voucherDiv: Int,
+    internal val voucherDiv: Int,
     @SerialName("voucherSkinDesc")
-    private val voucherSkinDesc: String,
+    internal val voucherSkinDescription: String,
     @SerialName("voucherSkinRedeem")
-    private val voucherSkinRedeem: Int,
+    internal val voucherSkinRedeem: Int,
+    //
     @SerialName("weeklyOverrideDesc")
-    private val weeklyOverrideDesc: String
+    internal val weeklyOverrideDescription: String
 )
 
 @Serializable
@@ -155,4 +208,14 @@ public data class CharAssistRefreshTime(
     val hour: Int,
     @SerialName("Minute")
     val minute: Int
+)
+
+@Serializable
+public data class TermDescription(
+    @SerialName("termId")
+    val termId: String,
+    @SerialName("termName")
+    val name: String,
+    @SerialName("description")
+    val description: String
 )

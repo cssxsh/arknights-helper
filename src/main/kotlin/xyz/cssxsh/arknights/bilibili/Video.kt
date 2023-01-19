@@ -1,6 +1,7 @@
 package xyz.cssxsh.arknights.bilibili
 
 import kotlinx.serialization.*
+import kotlinx.serialization.json.*
 import xyz.cssxsh.arknights.*
 import java.time.*
 
@@ -35,15 +36,25 @@ internal data class Temp(
 @Serializable
 internal data class VideoHistory(
     @SerialName("list")
-    val list: VideoList = VideoList(emptyList()),
+    val list: VideoList = VideoList(),
     @SerialName("page")
-    val page: VideoPage? = null
+    val page: VideoPage? = null,
+    @SerialName("episodic_button")
+    val button: JsonElement = JsonNull,
+    @SerialName("is_risk")
+    val isRisk: Boolean = false,
+    @SerialName("gaia_res_type")
+    val gaiaResType: Int = 0,
+    @SerialName("gaia_data")
+    val gaiaData: JsonElement = JsonNull,
 )
 
 @Serializable
 internal data class VideoList(
     @SerialName("vlist")
-    val videos: List<Video>
+    val videos: List<Video> = emptyList(),
+    @SerialName("tlist")
+    val tlist: JsonElement = JsonNull
 )
 
 @Serializable
@@ -89,6 +100,24 @@ public data class Video(
     val title: String,
     @SerialName("typeid")
     val type: Int,
+    @SerialName("video_review")
+    internal val videoReview: Int = 0,
+    @SerialName("hide_click")
+    internal val hideClick: Boolean = false,
+    @SerialName("is_pay")
+    internal val isPay: Int = 0,
+    @SerialName("is_union_video")
+    internal val isUnionVideo: Int = 0,
+    @SerialName("is_steins_gate")
+    internal val isSteinsGate: Int = 0,
+    @SerialName("is_live_playback")
+    internal val isLivePlayback: Int = 0,
+    @SerialName("is_avoided")
+    internal val isAvoided: Int = 0,
+    @SerialName("attribute")
+    internal val attribute: Int = 0,
+    @SerialName("meta")
+    internal val meta: JsonElement = JsonNull
 ) : CacheInfo {
     override val url: String by lazy { "https://www.bilibili.com/video/${bvid}" }
 }

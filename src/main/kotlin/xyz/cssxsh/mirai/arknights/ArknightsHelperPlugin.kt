@@ -9,6 +9,7 @@ import net.mamoe.mirai.console.extension.*
 import net.mamoe.mirai.console.plugin.jvm.*
 import net.mamoe.mirai.event.*
 import net.mamoe.mirai.utils.*
+import xyz.cssxsh.arknights.*
 import kotlin.collections.*
 
 public object ArknightsHelperPlugin : KotlinPlugin(
@@ -32,6 +33,10 @@ public object ArknightsHelperPlugin : KotlinPlugin(
                 .findServices<T>()
                 .loadAllServices()
         }
+    }
+
+    init {
+        System.setProperty(IGNORE_UNKNOWN_KEYS, "true")
     }
 
     override fun PluginComponentStorage.onLoad() {

@@ -147,6 +147,11 @@ public data class Character(
     @SerialName("canUseGeneralPotentialItem")
     val canUseGeneralPotentialItem: Boolean,
     /**
+     * 能否使用活动信物
+     */
+    @SerialName("canUseActivityPotentialItem")
+    val canUseActivityPotentialItem: Boolean,
+    /**
      * 简介
      */
     @SerialName("description")
@@ -217,6 +222,11 @@ public data class Character(
     @SerialName("profession")
     val profession: ProfessionType,
     /**
+     * 职业
+     */
+    @SerialName("subProfessionId")
+    val subProfessionId: String,
+    /**
      * 稀有度 + 1 == 星级
      */
     @SerialName("rarity")
@@ -240,22 +250,27 @@ public data class Character(
      * 等级提升
      */
     @SerialName("allSkillLvlup")
-    private val allSkillLvlup: List<JsonObject>,
+    internal val allSkillLvlup: List<JsonObject>,
     /**
      * 支持关键帧
      */
     @SerialName("favorKeyFrames")
-    private val favorKeyFrames: List<JsonObject>?,
+    internal val favorKeyFrames: List<JsonObject>?,
     /**
      * 潜在项目
      */
     @SerialName("potentialItemId")
-    private val potentialItem: String?,
+    internal val potentialItem: String?,
+    /**
+     * 潜在项目
+     */
+    @SerialName("activityPotentialItemId")
+    internal val activityPotentialItem: String?,
     /**
      * 潜在等级
      */
     @SerialName("potentialRanks")
-    private val potentialRanks: List<JsonObject>,
+    internal val potentialRanks: List<JsonObject>,
     /**
      * 天赋
      */
@@ -265,12 +280,12 @@ public data class Character(
      * 替身 Key
      */
     @SerialName("tokenKey")
-    private val tokenKey: String?,
+    internal val tokenKey: String?,
     /**
      * 特质
      */
     @SerialName("trait")
-    private val trait: JsonObject?
+    internal val trait: JsonObject?
 ) : Role, TagInfo
 
 public enum class ProfessionType(public val text: String) {
@@ -382,7 +397,7 @@ public data class Candidate(
 @Serializable
 public data class SkillInfo(
     @SerialName("levelUpCostCond")
-    val levelUpCostCond: List<LevelUpCostCond>,
+    val levelUpCostCondition: List<LevelUpCostCondition>,
     @SerialName("overridePrefabKey")
     val overridePrefabKey: String?,
     @SerialName("overrideTokenKey")
@@ -390,15 +405,15 @@ public data class SkillInfo(
     @SerialName("skillId")
     override val skill: String?,
     @SerialName("unlockCond")
-    val unlockCond: UnlockCondition
+    val unlockCondition: UnlockCondition
 ) : SkillId
 
 @Serializable
-public data class LevelUpCostCond(
+public data class LevelUpCostCondition(
     @SerialName("levelUpCost")
     val levelUpCost: List<LegacyItem>?,
     @SerialName("lvlUpTime")
     val levelUpTime: Int,
     @SerialName("unlockCond")
-    val unlockCond: UnlockCondition
+    val unlockCondition: UnlockCondition
 )

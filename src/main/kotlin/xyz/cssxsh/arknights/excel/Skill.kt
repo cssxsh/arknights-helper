@@ -11,13 +11,13 @@ public data class Skill(
     @SerialName("iconId")
     val iconId: String?,
     @SerialName("levels")
-    val levels: List<Level>,
+    val levels: List<SkillLevel>,
     @SerialName("skillId")
     override val id: String
 ) : Id
 
 @Serializable
-public data class Level(
+public data class SkillLevel(
     @SerialName("blackboard")
     val blackboard: List<Blackboard>,
     @SerialName("description")
@@ -32,12 +32,14 @@ public data class Level(
     val rangeId: String?,
     @SerialName("skillType")
     val type: Int,
+    @SerialName("durationType")
+    val durationType: Int,
     @SerialName("spData")
-    val data: SpData
+    val data: SkillSpData
 ) : Name
 
 @Serializable
-public data class SpData(
+public data class SkillSpData(
     @SerialName("increment")
     val increment: Double,
     @SerialName("initSp")

@@ -49,7 +49,9 @@ public data class Story(
     @SerialName("storyMainColor")
     val storyMainColor: String?,
     @SerialName("storyPicId")
-    val storyPicId: String?
+    val storyPicId: String?,
+    @SerialName("useCustom")
+    val useCustom: Boolean
 ) : Id, Name
 
 public enum class ActionType(public val text: String) {

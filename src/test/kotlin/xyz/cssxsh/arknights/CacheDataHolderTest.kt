@@ -77,15 +77,7 @@ internal class CacheDataHolderTest {
     @Test
     fun handbook(): Unit = runBlocking {
         excel.load(ExcelDataType.HANDBOOK)
-        val table = excel.handbook()
-        for ((id, handbook) in table.handbooks) {
-            if (handbook.illust != "Unknown") continue
-            println("$id ${handbook.illust}")
-        }
-        for ((id, npc) in table.npc) {
-            if (npc.illust != "Unknown") continue
-            println("$id ${npc.illust}")
-        }
+        excel.handbook()
     }
 
     @Test
