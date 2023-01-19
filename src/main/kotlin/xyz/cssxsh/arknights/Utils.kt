@@ -10,7 +10,7 @@ public val CustomJson: Json = Json {
     ignoreUnknownKeys = System.getProperty(IGNORE_UNKNOWN_KEYS, "false").toBoolean()
     isLenient = true
     allowStructuredMapKeys = true
-//    coerceInputValues = true
+    coerceInputValues = true
 }
 
 public enum class ServerType(public val locale: Locale) {
