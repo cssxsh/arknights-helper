@@ -28,8 +28,7 @@ repositories {
 dependencies {
     implementation("com.cronutils:cron-utils:9.2.0")
     implementation("org.jsoup:jsoup:1.15.3")
-    compileOnly("javax.validation:validation-api:2.0.1.Final")
-    compileOnly("xyz.cssxsh:meme-helper:1.1.5")
+    compileOnly("xyz.cssxsh:meme-helper:1.1.7")
     testImplementation(kotlin("test"))
     //
     implementation(platform("net.mamoe:mirai-bom:2.13.2"))

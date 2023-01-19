@@ -7,6 +7,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.compression.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import kotlinx.coroutines.*
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.message.*
 import net.mamoe.mirai.message.data.*
@@ -24,6 +25,8 @@ public object ArknightsFaceCommand : CompositeCommand(
 
     private const val AUTHOR_ID = 40424L
 
+    private const val SUPPLIER_ID = 1112171476L
+
     private val http: HttpClient = HttpClient(OkHttp) {
         BrowserUserAgent()
         ContentEncoding()
@@ -39,10 +42,25 @@ public object ArknightsFaceCommand : CompositeCommand(
     @Description("表情随机")
     public suspend fun UserCommandSender.random() {
         val message = try {
-            val author = MarketFaceHelper.queryAuthorDetail(authorId = AUTHOR_ID)
-            val item = author.items.random()
-            val data = MarketFaceHelper.queryFaceDetail(itemId = item.itemId)
-            val faces = MarketFaceHelper.build(itemId = item.itemId, data = data)
+            val ids = buildList {
+                var offset = 0
+                while (isActive) {
+                    val info = MarketFaceHelper.querySupplierInfo(supplierId = SUPPLIER_ID, offset = offset)
+                    for (item in info.items) {
+                        add(item.itemId)
+                    }
+                    if (info.items.isEmpty() || info.workNum == this.size) break
+                    offset += 30
+                }
+                val author = MarketFaceHelper.queryAuthorDetail(authorId = AUTHOR_ID)
+                for (item in author.items) {
+                    add(item.itemId)
+                }
+            }
+
+            val itemId = ids.random()
+            val data = MarketFaceHelper.queryFaceAndroid(itemId = itemId)
+            val faces = MarketFaceHelper.build(data = data)
             faces.random()
         } catch (_: NoClassDefFoundError) {
             "请安装 https://github.com/cssxsh/meme-helper".toPlainText()
@@ -66,7 +84,7 @@ public object ArknightsFaceCommand : CompositeCommand(
                             subject.uploadImage(resource)
                         }
                     } catch (cause: Exception) {
-                        logger.warning({ "下载表情图片失败" }, cause)
+                        logger.warning({ "下载作者图片失败" }, cause)
                         emptyMessageChain()
                     }
                     append(head).appendLine()
@@ -87,6 +105,58 @@ public object ArknightsFaceCommand : CompositeCommand(
                         append(thumb).appendLine()
                         appendLine("名称: ${item.name}")
                         appendLine("链接: https://zb.vip.qq.com/hybrid/emoticonmall/detail?id=${item.itemId}")
+                    }
+                }
+            }
+        } catch (_: NoClassDefFoundError) {
+            "请安装 https://github.com/cssxsh/meme-helper".toPlainText()
+        } catch (cause: Exception) {
+            logger.warning({ "获取表情列表失败" }, cause)
+            "获取表情列表失败".toPlainText()
+        }
+        sendMessage(message)
+    }
+
+    @SubCommand("info", "信息")
+    @Description("表情列表")
+    public suspend fun UserCommandSender.info() {
+        val message = try {
+            val info = MarketFaceHelper.querySupplierInfo(supplierId = SUPPLIER_ID, offset = 0)
+            buildForwardMessage(subject) {
+                val head = try {
+                    val bytes = http.get(info.face).body<ByteArray>()
+                    bytes.toExternalResource().use { resource ->
+                        subject.uploadImage(resource)
+                    }
+                } catch (cause: Exception) {
+                    logger.warning({ "下载作者图片失败" }, cause)
+                    emptyMessageChain()
+                }
+                bot says {
+                    append(head).appendLine()
+                    appendLine("作者: ${info.name}")
+                    appendLine("qq群: ${info.group}")
+                    appendLine("简介: ${info.description}")
+                }
+                for (offset in 0 until info.workNum step 30) {
+                    val current = MarketFaceHelper.querySupplierInfo(supplierId = SUPPLIER_ID, offset = offset)
+                    bot says buildForwardMessage(subject) {
+                        for (item in current.items) {
+                            val thumb = try {
+                                val bytes = http.get(item.url).body<ByteArray>()
+                                bytes.toExternalResource().use { resource ->
+                                    subject.uploadImage(resource)
+                                }
+                            } catch (cause: Exception) {
+                                logger.warning({ "下载表情图片失败" }, cause)
+                                emptyMessageChain()
+                            }
+                            bot says {
+                                append(thumb).appendLine()
+                                appendLine("名称: ${item.name}")
+                                appendLine("链接: https://zb.vip.qq.com/hybrid/emoticonmall/detail?id=${item.itemId}")
+                            }
+                        }
                     }
                 }
             }
