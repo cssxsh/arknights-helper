@@ -2,12 +2,12 @@ plugins {
     kotlin("jvm") version "1.7.22"
     kotlin("plugin.serialization") version "1.7.22"
 
-    id("net.mamoe.mirai-console") version "2.13.2"
+    id("net.mamoe.mirai-console") version "2.14.0-RC"
     id("me.him188.maven-central-publish") version "1.0.0-dev-3"
 }
 
 group = "xyz.cssxsh"
-version = "2.0.1"
+version = "2.0.2"
 
 mavenCentralPublish {
     useCentralS01()
@@ -31,16 +31,14 @@ dependencies {
     compileOnly("xyz.cssxsh:meme-helper:1.1.7")
     testImplementation(kotlin("test"))
     //
-    implementation(platform("net.mamoe:mirai-bom:2.13.2"))
+    implementation(platform("net.mamoe:mirai-bom:2.14.0-RC"))
     compileOnly("net.mamoe:mirai-console-compiler-common")
-    testImplementation("net.mamoe:mirai-logging-slf4j")
     //
-    implementation(platform("io.ktor:ktor-bom:2.2.1"))
+    implementation(platform("io.ktor:ktor-bom:2.2.2"))
     implementation("io.ktor:ktor-client-okhttp")
     implementation("io.ktor:ktor-client-encoding")
     //
     implementation(platform("org.slf4j:slf4j-parent:2.0.6"))
-    testImplementation("org.slf4j:slf4j-simple")
 }
 
 kotlin {

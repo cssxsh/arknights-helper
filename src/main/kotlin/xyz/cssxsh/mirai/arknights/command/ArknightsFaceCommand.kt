@@ -47,6 +47,7 @@ public object ArknightsFaceCommand : CompositeCommand(
                 while (isActive) {
                     val info = MarketFaceHelper.querySupplierInfo(supplierId = SUPPLIER_ID, offset = offset)
                     for (item in info.items) {
+                        if (item.appId == 1) continue
                         add(item.itemId)
                     }
                     if (info.items.isEmpty() || info.workNum == this.size) break

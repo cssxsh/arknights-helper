@@ -41,6 +41,7 @@ internal suspend fun CommandSenderOnMessage<*>.reply(block: suspend UserCommandS
 /**
  * 合成玉数量
  */
+@PublishedApi
 internal var User.coin: Int by ArknightsUserData.delegate()
 
 /**

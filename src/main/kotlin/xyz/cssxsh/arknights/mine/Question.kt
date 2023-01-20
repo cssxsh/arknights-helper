@@ -236,9 +236,9 @@ private fun Boolean.Companion.random() = listOf(true, false).random()
 
 private val formatter = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm:ss")
 
-private fun OffsetDateTime.randomDays() = plusDays((-7L..7L).random())
+private fun OffsetDateTime.randomDays() = plusDays((-7L..7L).minus(0).random())
 
-private fun OffsetDateTime.randomMinutes() = plusHours((-6L..6L).random())
+private fun OffsetDateTime.randomHours() = plusHours((-6L..6L).minus(0).random())
 
 private val defaultChoiceRange = 'A'..'D'
 
@@ -313,11 +313,11 @@ public data class CustomQuestionInfo(
     )
 
     override fun build(type: QuestionType): Question {
-        val map = (('A'..'Z') zip options.entries.shuffled()).toMap()
+        val map = (('A'..'Z') zip options.keys.shuffled()).toMap()
         return Question(
             problem = problem,
-            options = map.mapValues { (_, entry) -> entry.key },
-            answer = map.filter { (_, entry) -> entry.value }.keys,
+            options = map,
+            answer = map.mapNotNullTo(HashSet()) { if (options[it.value] == true) it.key else null },
             coin = coin,
             tips = tips,
             timeout = timeout,
@@ -331,15 +331,16 @@ public class DateTimeQuestionBuilder(
     public val datetime: OffsetDateTime
 ) : QuestionBuilder() {
     override fun build(type: QuestionType): Question {
-        val range = defaultChoiceRange
-        val list = listOf(
+        val range = 'A'..'D'
+        val list = mutableListOf(
             datetime,
             datetime.randomDays(),
-            datetime.randomMinutes(),
-            datetime.randomDays().randomMinutes()
+            datetime.randomHours(),
+            datetime.randomDays().randomHours()
         )
+        list.shuffle()
         val map = (range zip list).toMap()
-        val answer = map.entries.filter { it.value == datetime }.mapTo(HashSet()) { it.key }
+        val answer = map.mapNotNullTo(HashSet()) { if (it.value == datetime) it.key else null }
         return Question(
             problem = problem,
             options = map.mapValues { (_, datetime) -> datetime.format(formatter) },

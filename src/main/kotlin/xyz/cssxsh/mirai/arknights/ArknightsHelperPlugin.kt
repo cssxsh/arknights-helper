@@ -13,7 +13,7 @@ import xyz.cssxsh.arknights.*
 import kotlin.collections.*
 
 public object ArknightsHelperPlugin : KotlinPlugin(
-    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "2.0.1") {
+    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "2.0.2") {
         name("arknights-helper")
         author("cssxsh")
 
@@ -21,13 +21,13 @@ public object ArknightsHelperPlugin : KotlinPlugin(
     }
 ) {
 
-    private val commands: List<Command> by services()
-    private val config: List<PluginConfig> by services()
-    private val data: List<PluginData> by services()
-    private val listeners: List<ListenerHost> by services()
+    private val commands: List<Command> by spi()
+    private val config: List<PluginConfig> by spi()
+    private val data: List<PluginData> by spi()
+    private val listeners: List<ListenerHost> by spi()
 
     @Suppress("INVISIBLE_MEMBER")
-    private inline fun <reified T : Any> services(): Lazy<List<T>> = lazy {
+    private inline fun <reified T : Any> spi(): Lazy<List<T>> = lazy {
         with(net.mamoe.mirai.console.internal.util.PluginServiceHelper) {
             jvmPluginClasspath.pluginClassLoader
                 .findServices<T>()
