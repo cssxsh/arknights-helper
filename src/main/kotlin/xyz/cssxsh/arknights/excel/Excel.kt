@@ -71,7 +71,9 @@ public data class Blackboard(
     @SerialName("key")
     val key: String,
     @SerialName("value")
-    val value: Double
+    val value: Double = 0.0,
+    @SerialName("valueStr")
+    val valueStr: String = ""
 )
 
 @Serializable
