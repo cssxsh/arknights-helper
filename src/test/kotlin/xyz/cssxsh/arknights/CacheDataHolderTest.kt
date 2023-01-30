@@ -9,6 +9,7 @@ import xyz.cssxsh.arknights.weibo.*
 import xyz.cssxsh.arknights.penguin.*
 import xyz.cssxsh.arknights.prts.*
 import java.io.File
+import java.time.*
 
 internal class CacheDataHolderTest {
     private val folder = File("./test").apply { mkdirs() }
@@ -19,6 +20,8 @@ internal class CacheDataHolderTest {
     private val excel = ExcelDataHolder(folder = folder, ignore = ignore)
     private val penguin = PenguinDataHolder(folder = folder, ignore = ignore)
     private val static = StaticDataHolder(folder = folder, ignore = ignore)
+
+    // region Cake
 
     @Test
     fun video(): Unit = runBlocking {
@@ -43,6 +46,10 @@ internal class CacheDataHolderTest {
             announcement.download(it.webUrl)
         }
     }
+
+    // endregion
+
+    // region Excel
 
     @Test
     fun character(): Unit = runBlocking {
@@ -86,7 +93,7 @@ internal class CacheDataHolderTest {
         val table = excel.word()
         for ((id, voice) in table.voiceLangDict) {
             for ((type, info) in voice.dict) {
-                if (info.cvName.size == 1) continue
+                if (info.voices.size == 1) continue
                 println("$id $type $info")
             }
         }
@@ -101,7 +108,13 @@ internal class CacheDataHolderTest {
     @Test
     fun story(): Unit = runBlocking {
         excel.load(ExcelDataType.STORY)
-        excel.story()
+        val table = excel.story()
+        table.forEach { (_, story) ->
+            println(story.name)
+            println(story.start)
+            println(story.show.start)
+            println(story.remake.start)
+        }
     }
 
     @Test
@@ -115,6 +128,61 @@ internal class CacheDataHolderTest {
         excel.load(ExcelDataType.ZONE)
         excel.zone()
     }
+
+    @Test
+    fun voice(): Unit = runBlocking {
+        excel.load(ExcelDataType.CHARACTER)
+        excel.load(ExcelDataType.WORD)
+        val characters = excel.character()
+        val words = excel.word().charWords
+        for ((_, word) in words) {
+            val character = characters.getValue(word.character)
+            if (character.rarity != 5) break
+            static.voice(character = character, word = word)
+            delay(10_000)
+        }
+    }
+
+    @Test
+    fun skin(): Unit = runBlocking {
+        excel.load(ExcelDataType.SKIN)
+        val table = excel.skin()
+        table.brands.forEach { (_, brand) ->
+            println(brand.name)
+        }
+    }
+
+    @Test
+    fun activity(): Unit = runBlocking {
+        excel.load(ExcelDataType.ACTIVITY)
+        val table = excel.activity()
+        val now = OffsetDateTime.now()
+        table.basic.forEach { (_, activity) ->
+            if (now in activity) {
+                println(activity.name)
+                println(activity.displayType ?: activity.type)
+                println(activity.reward)
+            }
+        }
+        table.themes.forEach { theme ->
+            if (now in theme) {
+                println(theme.id)
+                println(theme.type)
+                println(theme.start)
+                println(theme.nodes)
+            }
+        }
+    }
+
+    @Test
+    fun equip(): Unit = runBlocking {
+        excel.load(ExcelDataType.EQUIP)
+        excel.equip()
+    }
+
+    // endregion
+
+    // region Penguin
 
     @Test
     fun items(): Unit = runBlocking {
@@ -158,17 +226,5 @@ internal class CacheDataHolderTest {
         penguin.patterns()
     }
 
-    @Test
-    fun voice(): Unit = runBlocking {
-        excel.load(ExcelDataType.CHARACTER)
-        excel.load(ExcelDataType.WORD)
-        val characters = excel.character()
-        val words = excel.word().charWords
-        for ((_, word) in words) {
-            val character = characters.getValue(word.character)
-            if (character.rarity != 5) break
-            static.voice(character = character, word = word)
-            delay(10_000)
-        }
-    }
+    // endregion
 }

@@ -34,7 +34,8 @@ public interface Role : Name, GroupId, NationId, TeamId {
 }
 
 public interface Illust {
-    public val illust: String
+    public val illusts: List<String>?
+    public val designers: List<String>?
 }
 
 public interface Voice {
@@ -57,9 +58,11 @@ public interface ZoneId {
     public val zoneId: String
 }
 
-public interface Period {
-    public val start: OffsetDateTime
+public interface Period : ClosedRange<OffsetDateTime> {
+    public override val start: OffsetDateTime
     public val end: OffsetDateTime
+
+    override val endInclusive: OffsetDateTime get() = end
 }
 
 public interface StoryId {
@@ -113,6 +116,9 @@ public enum class ExcelDataType(override val url: String) : CacheKey {
     STORY("https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/story_review_table.json"),
     TEAM("https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/handbook_team_table.json"),
     ZONE("https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/zone_table.json"),
+    SKIN("https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/skin_table.json"),
+    ACTIVITY("https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/activity_table.json"),
+    EQUIP("https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/uniequip_table.json"),
     VERSION("https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/data_version.txt");
 
     override val filename: String = url.substringAfterLast('/')

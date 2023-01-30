@@ -2,8 +2,8 @@ package xyz.cssxsh.arknights.excel
 
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
-import xyz.cssxsh.arknights.TimestampSerializer
-import java.time.OffsetDateTime
+import xyz.cssxsh.arknights.*
+import java.time.*
 
 @Serializable
 public data class HandbookTable(
@@ -26,16 +26,16 @@ public data class Handbook(
     @SerialName("charID")
     override val character: String,
     @SerialName("drawName")
-    override val illust: String = "Unknown",
+    public val illust: String = "Unknown",
     @SerialName("handbookAvgList")
     val avg: List<HandbookAvgData>,
     @SerialName("infoName")
-    override val voice: String = "Unknown",
+    public val voice: String = "Unknown",
     @SerialName("storyTextAudio")
     val storyTextAudio: List<StoryTextAudio>,
     @SerialName("isLimited")
     internal val isLimited: Boolean = false,
-) : Illust, Voice, CharacterId
+) : CharacterId
 
 @Serializable
 public data class HandbookAvgData(
@@ -56,8 +56,7 @@ public data class HandbookAvgData(
     val storySetName: String,
     @SerialName("unlockParam")
     val unlockParam: List<UnlockParam>
-) {
-}
+)
 
 @Serializable
 public data class HandbookAvg(
@@ -111,11 +110,11 @@ public data class NpcInfo(
     override val group: String?,
     @Deprecated("Please use illusts", ReplaceWith("illusts[0]"))
     @SerialName("illust")
-    override val illust: String = "Unknown",
+    public val illust: String = "Unknown",
     @SerialName("illustList")
-    public val illusts: List<String> = emptyList(),
+    public override val illusts: List<String> = emptyList(),
     @SerialName("designerList")
-    public val designers: List<String>? = null,
+    public override val designers: List<String>? = null,
     @SerialName("name")
     override val name: String,
     @SerialName("nationId")

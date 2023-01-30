@@ -1,8 +1,8 @@
 package xyz.cssxsh.arknights.excel
 
 import kotlinx.serialization.*
-import xyz.cssxsh.arknights.TimestampSerializer
-import java.time.OffsetDateTime
+import xyz.cssxsh.arknights.*
+import java.time.*
 
 @Serializable
 public data class ConstInfo(
@@ -142,7 +142,7 @@ public data class ConstInfo(
     internal val normalGachaUnlockPrice: List<Int>,
     @SerialName("normalRecruitLockedString")
     internal val normalRecruitLockedString: List<String>,
-    // dorce
+    // force
     @SerialName("pullForces")
     internal val pullForces: List<Double>,
     @SerialName("pullForceZeroIndex")

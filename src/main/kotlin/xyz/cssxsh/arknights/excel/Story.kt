@@ -6,8 +6,6 @@ import java.time.*
 
 public typealias StoryTable = Map<String, Story>
 
-public val Story.start: OffsetDateTime get() = startTime.takeIf { it.toEpochSecond() > 1 } ?: startShowTime
-
 @Serializable
 public data class Story(
     @SerialName("actType")
@@ -17,7 +15,7 @@ public data class Story(
     val endShowTime: OffsetDateTime,
     @SerialName("endTime")
     @Serializable(TimestampSerializer::class)
-    val endTime: OffsetDateTime,
+    override val end: OffsetDateTime,
     @SerialName("entryType")
     val entry: EntryType,
     @SerialName("id")
@@ -41,7 +39,7 @@ public data class Story(
     val startShowTime: OffsetDateTime,
     @SerialName("startTime")
     @Serializable(TimestampSerializer::class)
-    val startTime: OffsetDateTime,
+    override val start: OffsetDateTime,
     @SerialName("storyCompleteMedalId")
     val storyCompleteMedalId: String?,
     @SerialName("storyEntryPicId")
@@ -52,7 +50,17 @@ public data class Story(
     val storyPicId: String?,
     @SerialName("useCustom")
     val useCustom: Boolean
-) : Id, Name
+) : Id, Name, Period {
+    public val show: Period = object : Period {
+        override val start: OffsetDateTime get() = startShowTime
+        override val end: OffsetDateTime get() = endShowTime
+    }
+
+    public val remake: Period = object : Period {
+        override val start: OffsetDateTime get() = remakeStartTime
+        override val end: OffsetDateTime get() = remakeEndTime
+    }
+}
 
 public enum class ActionType(public val text: String) {
     ACTIVITY_STORY("活动剧情"),

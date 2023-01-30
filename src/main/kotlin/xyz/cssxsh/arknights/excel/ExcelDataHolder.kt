@@ -91,4 +91,10 @@ public class ExcelDataHolder(override val folder: File, override val ignore: sus
     public suspend fun team(): TeamTable = ExcelDataType.TEAM.get()
 
     public suspend fun zone(): ZoneTable = ExcelDataType.ZONE.get()
+
+    public suspend fun skin(): SkinTable = ExcelDataType.SKIN.get()
+
+    public suspend fun activity(): ActivityTable = ExcelDataType.ACTIVITY.get()
+
+    public suspend fun equip(): EquipTable = ExcelDataType.EQUIP.get()
 }

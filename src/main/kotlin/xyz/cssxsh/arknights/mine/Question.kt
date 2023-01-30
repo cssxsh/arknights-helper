@@ -131,12 +131,15 @@ public enum class QuestionType(public val description: String) {
     },
     ILLUST("立绘相关") {
         override fun load(loader: QuestionDataLoader): QuestionBuilder {
-            val handbooks = runBlocking { loader.excel.handbook().handbooks }
+            val skins = runBlocking { loader.excel.skin().characterSkins }
             val characters = runBlocking { loader.excel.character() }
             return ChoiceQuestionBuilder(meaning = "画师" to "角色", range = defaultChoiceRange) {
-                for ((characterId, handbook) in handbooks) {
-                    val character = characters[characterId] ?: continue
-                    add(handbook.illust to character.name)
+                for ((_, skin) in skins) {
+                    val character = characters[skin.character] ?: continue
+                    val illusts = skin.display.illusts ?: continue
+                    for (drawer in illusts) {
+                        add(drawer to character.name)
+                    }
                 }
             }
         }
@@ -146,11 +149,11 @@ public enum class QuestionType(public val description: String) {
             val voices = runBlocking { loader.excel.word().voiceLangDict }
             val characters = runBlocking { loader.excel.character() }
             return ChoiceQuestionBuilder(meaning = "声优" to "角色", range = defaultChoiceRange) {
-                for ((characterId, voice) in voices) {
+                for ((characterId, info) in voices) {
                     val character = characters[characterId] ?: continue
-                    for ((_, dict) in voice.dict) {
-                        for (cv in dict.cvName) {
-                            add(cv to character.name)
+                    for ((_, dict) in info.dict) {
+                        for (voice in dict.voices) {
+                            add(voice to character.name)
                         }
                     }
                 }
@@ -173,15 +176,25 @@ public enum class QuestionType(public val description: String) {
             }
         }
     },
+    EQUIP("模组相关") {
+        override fun load(loader: QuestionDataLoader): QuestionBuilder {
+            val equips = runBlocking { loader.excel.equip().equips }
+            val characters = runBlocking { loader.excel.character() }
+            return ChoiceQuestionBuilder(meaning = "角色" to "模组", range = defaultChoiceRange) {
+                for ((_, equip) in equips) {
+                    val character = characters[equip.character] ?: continue
+                    add(character.name to equip.name)
+                }
+            }
+        }
+    },
     STORY("剧情相关") {
         override fun load(loader: QuestionDataLoader): QuestionBuilder {
             val stories = runBlocking { loader.excel.story() }
-            val story = buildList {
-                for ((_, story) in stories) {
-                    if (story.action == ActionType.NONE) continue
-                    add(story)
-                }
-            }.random()
+            val story = stories.values.asSequence()
+                .filter { it.action != ActionType.NONE }
+                .toList()
+                .random()
             val problem = "${story.action.text}<${story.name}>开始于"
             return DateTimeQuestionBuilder(problem = problem, datetime = story.start)
         }
