@@ -35,7 +35,7 @@ public object ArknightsAudioCommand : SimpleCommand(
 
     @Handler
     public suspend fun CommandSenderOnMessage<*>.handler() {
-        val table = ArknightsSubscriber.excel.word().charWords
+        val table = ArknightsSubscriber.excel.word().characterWords
         val categories = table.values.groupBy { it.voiceTitle }.values.random()
         val words = (options zip categories.shuffled()).toMap()
         val characters = ArknightsSubscriber.excel.character()

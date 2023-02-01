@@ -39,7 +39,7 @@ public object ArknightsDataCommand : CompositeCommand(
 
     @SubCommand("voice", "语音")
     public suspend fun UserCommandSender.voice(id: String = "") {
-        val words = ArknightsSubscriber.excel.word().charWords
+        val words = ArknightsSubscriber.excel.word().characterWords
         val characters = ArknightsSubscriber.excel.character()
         val word = words[id] ?: words.values.random()
         val character = characters.getValue(word.character)

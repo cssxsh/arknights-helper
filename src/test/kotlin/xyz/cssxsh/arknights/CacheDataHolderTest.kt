@@ -91,7 +91,7 @@ internal class CacheDataHolderTest {
     fun word(): Unit = runBlocking {
         excel.load(ExcelDataType.WORD)
         val table = excel.word()
-        for ((id, voice) in table.voiceLangDict) {
+        for ((id, voice) in table.voiceLanguages) {
             for ((type, info) in voice.dict) {
                 if (info.voices.size == 1) continue
                 println("$id $type $info")
@@ -134,7 +134,7 @@ internal class CacheDataHolderTest {
         excel.load(ExcelDataType.CHARACTER)
         excel.load(ExcelDataType.WORD)
         val characters = excel.character()
-        val words = excel.word().charWords
+        val words = excel.word().characterWords
         for ((_, word) in words) {
             val character = characters.getValue(word.character)
             if (character.rarity != 5) break

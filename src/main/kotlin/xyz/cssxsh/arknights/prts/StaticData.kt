@@ -12,7 +12,7 @@ public sealed class StaticData : CacheKey {
     public abstract val character: String
     public abstract val type: ContentType
 
-    public class Voice(character: Character, word: CharWord) : StaticData() {
+    public class Voice(character: Character, word: CharacterWord) : StaticData() {
         override val character: String = word.character
         override val filename: String = "${character.name}/${word.voiceTitle}.wav"
         override val type: ContentType = ContentType("audio", "wav")

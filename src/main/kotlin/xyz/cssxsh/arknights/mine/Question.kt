@@ -146,7 +146,7 @@ public enum class QuestionType(public val description: String) {
     },
     VOICE("声优相关") {
         override fun load(loader: QuestionDataLoader): QuestionBuilder {
-            val voices = runBlocking { loader.excel.word().voiceLangDict }
+            val voices = runBlocking { loader.excel.word().voiceLanguages }
             val characters = runBlocking { loader.excel.character() }
             return ChoiceQuestionBuilder(meaning = "声优" to "角色", range = defaultChoiceRange) {
                 for ((characterId, info) in voices) {

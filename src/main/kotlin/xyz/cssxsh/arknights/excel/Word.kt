@@ -1,35 +1,37 @@
 package xyz.cssxsh.arknights.excel
 
 import kotlinx.serialization.*
+import xyz.cssxsh.arknights.*
+import java.time.*
 
 @Serializable
 public data class Word(
     @SerialName("charDefaultTypeDict")
-    val charDefaultTypeDict: Map<String, VoiceLangType>,
+    val characterDefaultTypes: Map<String, VoiceLanguageType>,
     @SerialName("charWords")
-    val charWords: Map<String, CharWord>,
+    val characterWords: Map<String, CharacterWord>,
     @SerialName("defaultLangType")
-    val defaultLangType: VoiceLangType,
+    val defaultLanguageType: VoiceLanguageType,
     @SerialName("displayGroupTypeList")
-    val displayGroupTypeList: Set<VoiceLangGroupType>,
+    val displayGroupTypes: Set<VoiceLanguageGroupType>,
     @SerialName("displayTypeList")
-    val displayTypeList: Set<VoiceLangType>,
+    val displayTypes: Set<VoiceLanguageType>,
     @SerialName("newTagList")
-    val newTagList: Set<String>,
+    val newTags: Set<String>,
     @SerialName("playVoiceRange")
     val playVoiceRange: String,
     @SerialName("startTimeWithTypeDict")
-    val startTimeWithTypeDict: Map<VoiceLangType, List<ChatStartTime>>,
+    val startTimeWithTypes: Map<VoiceLanguageType, List<CharacterStartTime>>,
     @SerialName("voiceLangDict")
-    val voiceLangDict: Map<String, ChatVoiceInfo>,
+    val voiceLanguages: Map<String, CharacterVoiceLanguageInfo>,
     @SerialName("voiceLangGroupTypeDict")
-    val voiceLangGroupTypeDict: Map<VoiceLangGroupType, VoiceLangGroupTypeInfo>,
+    val voiceLanguageGroupTypes: Map<VoiceLanguageGroupType, VoiceLanguageGroupTypeInfo>,
     @SerialName("voiceLangTypeDict")
-    val voiceLangTypeDict: Map<VoiceLangType, VoiceLangTypeInfo>
+    val voiceLanguageTypes: Map<VoiceLanguageType, VoiceLanguageTypeInfo>
 )
 
 @Serializable
-public enum class VoiceLangType {
+public enum class VoiceLanguageType {
     CN_MANDARIN,
     CN_TOPOLECT,
     JP,
@@ -40,7 +42,7 @@ public enum class VoiceLangType {
 }
 
 @Serializable
-public enum class VoiceLangGroupType {
+public enum class VoiceLanguageGroupType {
     CN_MANDARIN,
     CUSTOM,
     JP,
@@ -50,45 +52,46 @@ public enum class VoiceLangGroupType {
 }
 
 @Serializable
-public data class VoiceLangTypeInfo(
+public data class VoiceLanguageTypeInfo(
     @SerialName("name")
     val name: String,
     @SerialName("groupType")
-    val groupType: VoiceLangGroupType
+    val groupType: VoiceLanguageGroupType
 )
 
 @Serializable
-public data class VoiceLangGroupTypeInfo(
+public data class VoiceLanguageGroupTypeInfo(
     @SerialName("name")
     val name: String,
     @SerialName("members")
-    val members: List<VoiceLangType>
+    val members: List<VoiceLanguageType>
 )
 
 @Serializable
-public data class ChatStartTime(
+public data class CharacterStartTime(
     @SerialName("charSet")
-    val chars: List<String>,
+    val characters: List<String>,
     @SerialName("timestamp")
-    val timestamp: Long
+    @Serializable(TimestampSerializer::class)
+    val timestamp: OffsetDateTime
 )
 
 @Serializable
-public data class ChatVoiceInfo(
+public data class CharacterVoiceLanguageInfo(
     @SerialName("wordkeys")
     val keys: Set<String>,
     @SerialName("charId")
     override val character: String,
     @SerialName("dict")
-    val dict: Map<VoiceLangType, ChatVoiceDict>
+    val dict: Map<VoiceLanguageType, CharacterVoiceInfo>
 ) : CharacterId
 
 @Serializable
-public data class ChatVoiceDict(
+public data class CharacterVoiceInfo(
     @SerialName("cvName")
     val voices: List<String>,
     @SerialName("voiceLangType")
-    val voiceLangType: VoiceLangType,
+    val voiceLangType: VoiceLanguageType,
     @SerialName("voicePath")
     val voicePath: String? = null,
     @SerialName("wordkey")
@@ -96,11 +99,11 @@ public data class ChatVoiceDict(
 )
 
 @Serializable
-public data class CharWord(
+public data class CharacterWord(
     @SerialName("charId")
     override val character: String,
     @SerialName("charWordId")
-    val charWordId: String,
+    val characterWordId: String,
     @SerialName("lockDescription")
     val lockDescription: String?,
     @SerialName("placeType")
