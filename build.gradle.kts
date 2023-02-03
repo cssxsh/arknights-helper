@@ -38,6 +38,9 @@ dependencies {
     implementation("io.ktor:ktor-client-okhttp")
     implementation("io.ktor:ktor-client-encoding")
     //
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))
+    implementation("com.squareup.okhttp3:okhttp-dnsoverhttps")
+    //
     implementation(platform("org.slf4j:slf4j-parent:2.0.6"))
 }
 

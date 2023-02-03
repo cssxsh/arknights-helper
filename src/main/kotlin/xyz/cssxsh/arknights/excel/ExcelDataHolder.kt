@@ -1,5 +1,9 @@
 package xyz.cssxsh.arknights.excel
 
+import io.ktor.client.*
+import io.ktor.client.engine.okhttp.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.compression.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.sync.*
 import kotlinx.serialization.*
@@ -11,6 +15,23 @@ public class ExcelDataHolder(override val folder: File, override val ignore: sus
     CacheDataHolder<ExcelDataType, CacheInfo>() {
     public companion object {
         internal const val GAME_SOURCE_HOST_KEY = "xyz.cssxsh.arknights.source"
+    }
+    override val http: HttpClient = HttpClient(OkHttp) {
+        BrowserUserAgent()
+        ContentEncoding()
+        expectSuccess = true
+        install(HttpTimeout) {
+            socketTimeoutMillis = 30_000
+            connectTimeoutMillis = 30_000
+            requestTimeoutMillis = null
+        }
+        engine {
+            config {
+                val url = System.getProperty("xyz.cssxsh.arknights.doh", "https://public.dns.iij.jp/dns-query")
+                val ipv6 = System.getProperty("xyz.cssxsh.arknights.ipv6", "true").toBoolean()
+                doh(urlString = url, ipv6 = ipv6)
+            }
+        }
     }
 
     override val cache: MutableMap<ExcelDataType, Any> = EnumMap(ExcelDataType::class.java)
