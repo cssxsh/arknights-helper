@@ -94,7 +94,7 @@ public data class ActivityTheme(
     @SerialName("timeNodes")
     val nodes: List<ActivityNode>,
     @SerialName("type")
-    val type: String,
+    val type: ActivityThemeType,
     @SerialName("startTs")
     @Serializable(TimestampSerializer::class)
     override val start: OffsetDateTime,
@@ -111,3 +111,18 @@ public data class ActivityNode(
     @Serializable(TimestampSerializer::class)
     val timestamp: OffsetDateTime
 )
+
+@Serializable
+public enum class ActivityThemeType {
+    ROGUELIKE, CRISIS, MAINLINE, ACTIVITY
+}
+
+@Serializable
+public data class ActivityClock(
+    public val basic: ActivityBasicInfo,
+    public val theme: ActivityTheme,
+    public val node: ActivityNode?
+) : CacheInfo {
+    override val created: OffsetDateTime get() = node?.timestamp ?: theme.end
+    override val url: String = "${basic.name} - ${node?.title}"
+}

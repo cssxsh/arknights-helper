@@ -258,6 +258,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
     private fun excel() {
         val cron = ArknightsCronConfig.excel
         val values = ExcelDataType.values().toList() - ExcelDataType.VERSION
+        val history: MutableSet<String> = HashSet()
         launch {
             while (isActive) {
                 delay(10_000)
@@ -275,6 +276,35 @@ public object ArknightsSubscriber : SimpleListenerHost() {
                         logger.warning({ "游戏数值 数据 $type 数据加载失败" }, cause)
                         continue
                     }
+                }
+                try {
+                    val now = OffsetDateTime.now()
+                    val table = excel.activity()
+                    for (theme in table.themes) {
+                        if (now !in theme) continue
+                        val basic = table.basic[theme.funcId] ?: continue
+                        for (node in theme.nodes) {
+                            val wait = node.timestamp.toInstant().toEpochMilli() - now.toInstant().toEpochMilli()
+                            if (wait < 0) continue
+                            val clock = ActivityClock(basic, theme, node)
+                            if (history.add(clock.url).not()) continue
+                            launch {
+                                delay(wait)
+                                flow.emit(clock)
+                            }
+                        }
+                        launch end@{
+                            if (now.toLocalDate() != theme.end.toLocalDate()) return@end
+                            val wait = theme.end.toInstant().toEpochMilli() - now.toInstant().toEpochMilli()
+                            if (wait < 0) return@end
+                            val clock = ActivityClock(basic, theme, null)
+                            if (history.add(clock.url).not()) return@end
+                            delay(wait - 6 * 3600 * 1000)
+                            flow.emit(clock)
+                        }
+                    }
+                } catch (cause: Exception) {
+                    logger.warning({ "游戏活动加载失败" }, cause)
                 }
                 delay(cron.next())
             }

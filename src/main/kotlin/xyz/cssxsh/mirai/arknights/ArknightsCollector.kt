@@ -76,6 +76,21 @@ public class ArknightsCollector(private val contact: Contact) : FlowCollector<Ca
                     appendLine("有需要的材料记得刷哦")
                 }
             }
+            // 活动
+            is ActivityClock -> {
+                val accept = ArknightsTaskConfig.activity[contact.id] ?: return
+                if (value.theme.type !in accept) return
+                buildMessageChain {
+                    appendLine("方舟活动 ${value.basic.name}")
+                    if (value.node != null) {
+                        appendLine(value.node.timestamp.toString())
+                        appendLine(value.node.title)
+                    } else {
+                        appendLine(value.theme.end.toString())
+                        appendLine("将结束")
+                    }
+                }
+            }
             // 未实现的类型
             else -> {
                 logger.error { "未实现的推送 ${value::class.qualifiedName}" }
