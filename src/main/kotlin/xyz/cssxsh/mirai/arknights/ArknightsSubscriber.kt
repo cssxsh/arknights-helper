@@ -266,7 +266,10 @@ public object ArknightsSubscriber : SimpleListenerHost() {
                 val local = SemVersion(version = excel.version().versionControl)
                 excel.load(ExcelDataType.VERSION)
                 val current = SemVersion(version = excel.version().versionControl)
-                if (local >= current) continue
+                if (local >= current) {
+                    delay(cron.next())
+                    continue
+                }
 
                 // 加载
                 for (type in values) {

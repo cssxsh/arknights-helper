@@ -113,6 +113,7 @@ B. 选项
 | `/<ark-guard 方舟蹲饼> <video 视频> [contact] {videos}`       | 设置视频蹲饼内容 |
 | `/<ark-guard 方舟蹲饼> <announce 公告> [contact] {announces}` | 设置公告蹲饼内容 |
 | `/<ark-guard 方舟蹲饼> <weekly 周常> [contact] {weeklies}`    | 设置周常蹲饼内容 |
+| `/<ark-guard 方舟蹲饼> <activity 活动> [contact] {themes}`    | 设置活动蹲饼内容 |
 
 *   `contact` 为群号或Q号  
 *   `blogs` 可选值为 `ARKNIGHTS`(官号), `BYPRODUCT`(朝陇山), `MOUNTEN`(一拾山), `HISTORICUS`(泰拉记事社)  
@@ -123,6 +124,8 @@ B. 选项
     例如 `/方舟蹲饼 公告 123456 ANDROID`, 就订阅了官服的公告
 *   `weeklies` 可选值为 `EVOLVE`, `MATERIAL`, `SPECIAL`  
     例如 `/方舟蹲饼 周常 123456 EVOLVE MATERIAL`, 就订阅了物资筹备和芯片搜索
+*   `themes` 可选值为 `ROGUELIKE`, `CRISIS`, `MAINLINE`, `ACTIVITY` 
+    例如 `/方舟蹲饼 周常 123456 ROGUELIKE`, 就订阅了肉鸽
 
 ### 助手数据指令
 

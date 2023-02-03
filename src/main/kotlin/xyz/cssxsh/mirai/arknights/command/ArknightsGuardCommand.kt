@@ -77,7 +77,7 @@ public object ArknightsGuardCommand : CompositeCommand(
     }
 
     @SubCommand("weekly", "周常")
-    @Description("设置视频蹲饼内容")
+    @Description("设置周常蹲饼内容")
     public suspend fun CommandSender.weekly(contact: Long, vararg weeklies: String) {
         ArknightsTaskConfig.weekly[contact] = weeklies.map { WeeklyType.valueOf(it) }
         val table = ArknightsSubscriber.excel.zone()
@@ -91,6 +91,18 @@ public object ArknightsGuardCommand : CompositeCommand(
                 append(" ")
             }
             if (record.isEmpty()) append("为空")
+        }
+
+        sendMessage(message = message)
+    }
+
+    @SubCommand("activity", "活动")
+    @Description("设置活动蹲饼内容")
+    public suspend fun CommandSender.activity(contact: Long, vararg themes: String) {
+        ArknightsTaskConfig.activity[contact] = themes.map { ActivityThemeType.valueOf(it) }
+        val message = buildMessageChain {
+            append("当前周常订阅内容 ")
+            append(themes.joinToString(", ").ifEmpty { "为空" })
         }
 
         sendMessage(message = message)

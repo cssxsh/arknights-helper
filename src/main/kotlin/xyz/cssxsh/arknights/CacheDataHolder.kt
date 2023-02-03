@@ -6,6 +6,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.compression.*
 import io.ktor.client.plugins.cookies.*
 import io.ktor.client.statement.*
+import io.ktor.http.*
 import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.*
@@ -58,6 +59,8 @@ public abstract class CacheDataHolder<K : CacheKey, R : CacheInfo> {
 
                         while (!channel.isClosedForRead) channel.copyTo(output)
                     }
+                    val timestamp = (response.lastModified() ?: response.date())?.time
+                    if (timestamp != null) target.setLastModified(timestamp)
                 }
                 break
             } catch (cause: Throwable) {

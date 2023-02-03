@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "xyz.cssxsh"
-version = "2.0.3"
+version = "2.0.4"
 
 mavenCentralPublish {
     useCentralS01()
@@ -34,7 +34,7 @@ dependencies {
     implementation(platform("net.mamoe:mirai-bom:2.14.0-RC"))
     compileOnly("net.mamoe:mirai-console-compiler-common")
     //
-    implementation(platform("io.ktor:ktor-bom:2.2.2"))
+    implementation(platform("io.ktor:ktor-bom:2.2.3"))
     implementation("io.ktor:ktor-client-okhttp")
     implementation("io.ktor:ktor-client-encoding")
     //

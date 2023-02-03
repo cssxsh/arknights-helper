@@ -13,7 +13,7 @@ import xyz.cssxsh.arknights.*
 import kotlin.collections.*
 
 public object ArknightsHelperPlugin : KotlinPlugin(
-    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "2.0.3") {
+    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "2.0.4") {
         name("arknights-helper")
         author("cssxsh")
 
@@ -48,9 +48,6 @@ public object ArknightsHelperPlugin : KotlinPlugin(
     }
 
     override fun onEnable() {
-        logger.warning { "2.0 版本重构，需要重新配置订阅订阅" }
-        logger.warning { "2.0 版本重构，需要重新配置订阅订阅" }
-        logger.warning { "2.0 版本重构，需要重新配置订阅订阅" }
         for (config in config) config.reload()
         for (data in data) data.reload()
         for (command in commands) command.register()
