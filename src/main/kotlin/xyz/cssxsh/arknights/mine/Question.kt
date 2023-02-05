@@ -196,7 +196,8 @@ public enum class QuestionType(public val description: String) {
                 .toList()
                 .random()
             val problem = "${story.action.text}<${story.name}>开始于"
-            return DateTimeQuestionBuilder(problem = problem, datetime = story.startShowTime)
+            val datetime = if (story.start.toEpochSecond() > 0) story.start else story.startShowTime
+            return DateTimeQuestionBuilder(problem = problem, datetime = datetime)
         }
     },
     ENEMY("敌方相关") {
