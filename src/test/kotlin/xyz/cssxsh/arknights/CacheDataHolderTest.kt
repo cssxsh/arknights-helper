@@ -41,8 +41,8 @@ internal class CacheDataHolderTest {
 
     @Test
     fun announcement(): Unit = runBlocking {
-        announcement.load(AnnounceType.BILIBILI)
-        announcement.raw(AnnounceType.BILIBILI).forEach {
+        announcement.load(AnnounceType.ANDROID)
+        announcement.raw(AnnounceType.ANDROID).forEach {
             announcement.download(it.webUrl)
         }
     }

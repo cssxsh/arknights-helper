@@ -41,7 +41,8 @@ public class AnnouncementDataHolder(override val folder: File, override val igno
     }
 
     public suspend fun download(url: String): File = html.withLock {
-        val file = folder.resolve("html/${url.substringAfterLast('/')}")
+        val filename = url.substringAfterLast('/').substringBeforeLast('?')
+        val file = folder.resolve("html/$filename")
         if (file.exists().not()) {
             file.parentFile.mkdirs()
             http.prepareGet(url).copyTo(target = file)

@@ -40,7 +40,9 @@ public data class Announcement(
     @SerialName("title")
     val title: String,
     @SerialName("webUrl")
-    val webUrl: String = ""
+    val webUrl: String = "",
+    @SerialName("type")
+    val category: String = ""
 ) : CacheInfo {
     override val created: OffsetDateTime by lazy {
         try {
