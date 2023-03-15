@@ -134,12 +134,16 @@ internal class CacheDataHolderTest {
         excel.load(ExcelDataType.CHARACTER)
         excel.load(ExcelDataType.WORD)
         val characters = excel.character()
-        val words = excel.word().characterWords
-        for ((_, word) in words) {
+        val table = excel.word()
+        val cache = hashSetOf<String>()
+        for ((_, word) in table.characterWords) {
+            if (cache.add(word.character).not()) continue
             val character = characters.getValue(word.character)
-            if (character.rarity != 5) break
-            static.voice(character = character, word = word)
-            delay(10_000)
+            val info = table.voiceLanguages.getValue(word.character)
+            val voice = info.dict.values.first()
+            if (voice.language == VoiceLanguageType.LINKAGE) continue
+            val key = StaticData.Voice(character = character, word = word, voice = voice)
+            println(key.url)
         }
     }
 

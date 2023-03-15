@@ -91,9 +91,9 @@ public data class CharacterVoiceInfo(
     @SerialName("cvName")
     val voices: List<String>,
     @SerialName("voiceLangType")
-    val voiceLangType: VoiceLanguageType,
+    val language: VoiceLanguageType,
     @SerialName("voicePath")
-    val voicePath: String? = null,
+    val path: String? = null,
     @SerialName("wordkey")
     val wordKey: String
 )

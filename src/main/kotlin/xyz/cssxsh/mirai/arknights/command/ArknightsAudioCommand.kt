@@ -9,6 +9,7 @@ import net.mamoe.mirai.event.*
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
+import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.mirai.arknights.*
 
 public object ArknightsAudioCommand : SimpleCommand(
@@ -35,13 +36,15 @@ public object ArknightsAudioCommand : SimpleCommand(
 
     @Handler
     public suspend fun CommandSenderOnMessage<*>.handler() {
-        val table = ArknightsSubscriber.excel.word().characterWords
-        val categories = table.values.groupBy { it.voiceTitle }.values.random()
+        val table = ArknightsSubscriber.excel.word()
+        val categories = table.characterWords.values.groupBy { it.voiceTitle }.values.random()
         val words = (options zip categories.shuffled()).toMap()
         val characters = ArknightsSubscriber.excel.character()
         val target = words.values.random()
         val info = characters.getValue(target.character)
-        val file = ArknightsSubscriber.static.voice(character = info, word = target)
+        val voice = table.voiceLanguages.getValue(target.character).dict.values
+            .filterNot { it.language == VoiceLanguageType.KR }.random()
+        val file = ArknightsSubscriber.static.voice(character = info, word = target, voice = voice)
         val audio = file.toExternalResource().use { (subject as AudioSupported).uploadAudio(it) }
 
         sendMessage(buildMessageChain {

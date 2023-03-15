@@ -51,8 +51,8 @@ public class StaticDataHolder(override val folder: File, override val ignore: su
         response.bodyAsChannel().copyAndClose(key.file.writeChannel())
     }
 
-    public suspend fun voice(character: Character, word: CharacterWord): File {
-        val key = StaticData.Voice(character = character, word = word)
+    public suspend fun voice(character: Character, word: CharacterWord, voice: CharacterVoiceInfo): File {
+        val key = StaticData.Voice(character = character, word = word, voice = voice)
         val file = key.file
         if (file.exists().not()) {
             file.parentFile.mkdirs()
