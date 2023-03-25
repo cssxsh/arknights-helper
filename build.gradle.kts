@@ -2,7 +2,7 @@ plugins {
     kotlin("jvm") version "1.7.22"
     kotlin("plugin.serialization") version "1.7.22"
 
-    id("net.mamoe.mirai-console") version "2.14.0-RC"
+    id("net.mamoe.mirai-console") version "2.14.0"
     id("me.him188.maven-central-publish") version "1.0.0-dev-3"
 }
 
@@ -31,7 +31,7 @@ dependencies {
     compileOnly("xyz.cssxsh:meme-helper:1.1.7")
     testImplementation(kotlin("test"))
     //
-    implementation(platform("net.mamoe:mirai-bom:2.14.0-RC"))
+    implementation(platform("net.mamoe:mirai-bom:2.14.0"))
     compileOnly("net.mamoe:mirai-console-compiler-common")
     //
     implementation(platform("io.ktor:ktor-bom:2.2.3"))

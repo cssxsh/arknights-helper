@@ -2,6 +2,7 @@ package xyz.cssxsh.arknights
 
 import kotlinx.coroutines.*
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.condition.*
 import xyz.cssxsh.arknights.announce.*
 import xyz.cssxsh.arknights.bilibili.*
 import xyz.cssxsh.arknights.excel.*
@@ -24,6 +25,7 @@ internal class CacheDataHolderTest {
     // region Cake
 
     @Test
+    @DisabledIfEnvironmentVariable(named = "CI", matches = "true")
     fun video(): Unit = runBlocking {
         video.load(VideoType.MUSIC)
         video.raw(VideoType.MUSIC).forEach {
