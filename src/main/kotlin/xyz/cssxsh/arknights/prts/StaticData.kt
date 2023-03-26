@@ -19,7 +19,7 @@ public sealed class StaticData : CacheKey {
             VoiceLanguageType.EN -> "voice_en"
             VoiceLanguageType.KR -> "voice_kr"
             VoiceLanguageType.LINKAGE -> {
-                (voice.path ?: "voice").removeSuffix("/").substringAfterLast("/").uppercase()
+                (voice.path ?: "voice").removeSuffix("/").substringAfterLast("/").lowercase()
             }
         }
         override val url: String =
