@@ -5,7 +5,7 @@ import kotlinx.serialization.json.*
 import xyz.cssxsh.arknights.*
 import java.time.*
 
-internal const val BILIBILI_API = "https://api.bilibili.com/x/space/arc/search"
+internal const val BILIBILI_API = "https://api.bilibili.com/x/space/wbi/arc/search"
 
 internal const val BILIBILI_ID = 161775300L
 
