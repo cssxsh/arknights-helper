@@ -101,6 +101,10 @@ public data class GachaTable(
     internal val potentialMaterialConverter: JsonObject,
     @SerialName("potentialMats")
     internal val potentialMats: JsonObject,
+    @SerialName("classicPotentialMaterialConverter")
+    internal val classicPotentialMaterialConverter: JsonObject,
+    @SerialName("classicPotentialMats")
+    internal val classicPotentialMats: JsonObject,
     @SerialName("recruitRarityTable")
     internal val recruitRarityTable: JsonObject,
     @SerialName("specialTagRarityTable")
@@ -144,7 +148,7 @@ public data class GachaPool(
     @Serializable(TimestampSerializer::class)
     override val start: OffsetDateTime,
     @SerialName("gachaRuleType")
-    val rule: GachaPoolRule,
+    val rule: GachaPoolRule = GachaPoolRule.NORMAL,
     @SerialName("gachaPoolSummary")
     val summary: String,
     @SerialName("linkageRuleId")

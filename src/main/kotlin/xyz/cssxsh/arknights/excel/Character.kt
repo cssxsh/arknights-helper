@@ -267,6 +267,11 @@ public data class Character(
     @SerialName("activityPotentialItemId")
     internal val activityPotentialItem: String?,
     /**
+     * 潜在项目
+     */
+    @SerialName("classicPotentialItemId")
+    internal val classicPotentialItemId: String? = null,
+    /**
      * 潜在等级
      */
     @SerialName("potentialRanks")

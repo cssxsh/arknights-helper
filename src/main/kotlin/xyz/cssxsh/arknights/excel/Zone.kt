@@ -1,6 +1,7 @@
 package xyz.cssxsh.arknights.excel
 
 import kotlinx.serialization.*
+import kotlinx.serialization.json.*
 import xyz.cssxsh.arknights.*
 import java.time.*
 
@@ -17,7 +18,9 @@ public data class ZoneTable(
     @SerialName("zoneRecordGroupedData")
     internal val recordGroupedData: Map<String, RecordGroupedData>,
     @SerialName("zoneRecordRewardData")
-    internal val recordRewardData: Map<String, List<String>>
+    internal val recordRewardData: Map<String, List<String>>,
+    @SerialName("zoneMetaData")
+    internal val metaData: JsonObject
 )
 
 @Serializable

@@ -26,6 +26,8 @@ public data class ConstInfo(
     val dataVersion: String,
     @SerialName("resPrefVersion")
     val resPrefVersion: String,
+    @SerialName("announceWebBusType")
+    val announceWebBusType: String,
     @SerialName("advancedGachaCrystalCost")
     internal val advancedGachaCrystalCost: Int,
     @SerialName("addedRewardDisplayZone")
@@ -93,6 +95,12 @@ public data class ConstInfo(
     //
     @SerialName("instFinDmdShdCost")
     internal val instFinDmdShdCost: Int,
+    @SerialName("isClassicQCShopEnabled")
+    internal val isClassicQCShopEnabled: Boolean,
+    @SerialName("isClassicPotentialItemFuncEnabled")
+    internal val isClassicPotentialItemFuncEnabled: Boolean,
+    @SerialName("isClassicGachaPoolFuncEnabled")
+    internal val isClassicGachaPoolFuncEnabled: Boolean,
     @SerialName("isDynIllustStartEnabled")
     internal val isDynIllustStartEnabled: Boolean,
     @SerialName("isDynIllustEnabled")
