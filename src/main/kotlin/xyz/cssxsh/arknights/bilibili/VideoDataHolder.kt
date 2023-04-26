@@ -29,6 +29,7 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
     init {
         http.launch {
             val cookies = with(File("data/xyz.cssxsh.mirai.plugin.bilibili-helper/cookies.json")) {
+                if (exists().not()) return@with emptyList()
                 Json.decodeFromString<List<EditThisCookie>>(readText().ifBlank { "[]" })
                     .map { it.toCookie() }
             }
@@ -57,7 +58,7 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
                 val json = response.bodyAsText()
                 val temp = CustomJson.decodeFromString<Temp>(json)
                 if (temp.code != 0) throw ResponseException(response, json)
-                temp.data ?: throw ResponseException(response, json)
+                CustomJson.decodeFromJsonElement<VideoHistory>(temp.data)
             }
             history.page ?: break
 

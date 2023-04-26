@@ -26,7 +26,7 @@ internal data class Temp(
     @SerialName("code")
     val code: Int,
     @SerialName("data")
-    val `data`: VideoHistory? = null,
+    val data: JsonElement = JsonNull,
     @SerialName("message")
     val message: String,
     @SerialName("ttl")
