@@ -21,8 +21,8 @@ public class ExcelDataHolder(override val folder: File, override val ignore: sus
         ContentEncoding()
         expectSuccess = true
         install(HttpTimeout) {
-            socketTimeoutMillis = 30_000
-            connectTimeoutMillis = 30_000
+            socketTimeoutMillis = 45_000
+            connectTimeoutMillis = 45_000
             requestTimeoutMillis = null
         }
         engine {

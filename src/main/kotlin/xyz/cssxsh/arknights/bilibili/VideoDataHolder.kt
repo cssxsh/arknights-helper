@@ -1,19 +1,40 @@
 package xyz.cssxsh.arknights.bilibili
 
 import io.ktor.client.plugins.*
+import io.ktor.client.plugins.cookies.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.*
 import kotlinx.serialization.*
+import kotlinx.serialization.json.*
 import xyz.cssxsh.arknights.*
 import java.io.*
 import java.util.*
 import kotlin.collections.*
+import kotlin.properties.*
 
 public class VideoDataHolder(override val folder: File, override val ignore: suspend (Throwable) -> Boolean) :
     CacheDataHolder<VideoType, Video>() {
+
+    private inline fun <reified T : Any, reified R> reflect() = ReadOnlyProperty<T, R> { thisRef, property ->
+        thisRef::class.java.getDeclaredField(property.name).apply { isAccessible = true }.get(thisRef) as R
+    }
+
+    private val HttpCookies.storage: CookiesStorage by reflect()
+
+    private val AcceptAllCookiesStorage.container: MutableList<Cookie> by reflect()
+
+    init {
+        http.launch {
+            val cookies = with(File("data/xyz.cssxsh.mirai.plugin.bilibili-helper/cookies.json")) {
+                Json.decodeFromString<List<EditThisCookie>>(readText().ifBlank { "[]" })
+                    .map { it.toCookie() }
+            }
+            (http.plugin(HttpCookies).storage as AcceptAllCookiesStorage).container.addAll(cookies)
+        }
+    }
 
     public override val cache: MutableMap<VideoType, List<Video>> = EnumMap(VideoType::class.java)
 

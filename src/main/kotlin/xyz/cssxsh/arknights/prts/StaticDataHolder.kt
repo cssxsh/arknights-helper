@@ -46,7 +46,9 @@ public class StaticDataHolder(override val folder: File, override val ignore: su
     public override suspend fun raw(key: StaticData): List<CacheInfo> = emptyList()
 
     override suspend fun load(key: StaticData): Unit = mutex.withLock {
-        val response = http.get(key.url)
+        val response = http.get(key.url) {
+            header(HttpHeaders.Referrer, "https://prts.wiki/")
+        }
         require(response.contentType() == key.type) { "${key.url} content type <${response.contentType()}> is not <${key.type}>" }
         response.bodyAsChannel().copyAndClose(key.file.writeChannel())
     }
@@ -61,4 +63,3 @@ public class StaticDataHolder(override val folder: File, override val ignore: su
         return file
     }
 }
-
