@@ -8,12 +8,11 @@ import net.mamoe.mirai.console.data.*
 import net.mamoe.mirai.console.extension.*
 import net.mamoe.mirai.console.plugin.jvm.*
 import net.mamoe.mirai.event.*
-import net.mamoe.mirai.utils.*
 import xyz.cssxsh.arknights.*
 import kotlin.collections.*
 
 public object ArknightsHelperPlugin : KotlinPlugin(
-    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "2.1.2") {
+    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "2.1.3") {
         name("arknights-helper")
         author("cssxsh")
 
@@ -21,19 +20,10 @@ public object ArknightsHelperPlugin : KotlinPlugin(
     }
 ) {
 
-    private val commands: List<Command> by spi()
-    private val config: List<PluginConfig> by spi()
-    private val data: List<PluginData> by spi()
-    private val listeners: List<ListenerHost> by spi()
-
-    @Suppress("INVISIBLE_MEMBER")
-    private inline fun <reified T : Any> spi(): Lazy<List<T>> = lazy {
-        with(net.mamoe.mirai.console.internal.util.PluginServiceHelper) {
-            jvmPluginClasspath.pluginClassLoader
-                .findServices<T>()
-                .loadAllServices()
-        }
-    }
+    private val commands: List<Command> by services()
+    private val config: List<PluginConfig> by services()
+    private val data: List<PluginData> by services()
+    private val listeners: List<ListenerHost> by services()
 
     init {
         System.setProperty(IGNORE_UNKNOWN_KEYS, "true")
