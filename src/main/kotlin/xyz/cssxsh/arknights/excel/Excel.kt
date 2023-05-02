@@ -84,7 +84,7 @@ public data class UnlockCondition(
     @SerialName("level")
     val level: Int,
     @SerialName("phase")
-    val phase: Int
+    val phase: String
 )
 
 public interface UnlockInfo {

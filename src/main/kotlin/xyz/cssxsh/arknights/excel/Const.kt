@@ -28,6 +28,8 @@ public data class ConstInfo(
     val resPrefVersion: String,
     @SerialName("announceWebBusType")
     val announceWebBusType: String,
+    @SerialName("subProfessionDamageTypePairs")
+    internal val subProfessionDamageTypePairs: Map<String, Int>,
     @SerialName("advancedGachaCrystalCost")
     internal val advancedGachaCrystalCost: Int,
     @SerialName("addedRewardDisplayZone")
@@ -111,6 +113,8 @@ public data class ConstInfo(
     internal val isRoguelikeTopicFuncEnabled: Boolean,
     @SerialName("isRoguelikeAvgAchieveFuncEnabled")
     internal val isRoguelikeAvgAchieveFuncEnabled: Boolean,
+    @SerialName("isVoucherClassicItemDistinguishable")
+    internal val isVoucherClassicItemDistinguishable: Boolean,
     // legacy
     @SerialName("legacyItemList")
     internal val legacyItemList: List<LegacyItem>,

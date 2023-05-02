@@ -30,7 +30,7 @@ public object ArknightsGachaCommand : CompositeCommand(
                     val sum = character.groupByTo(java.util.TreeMap()) { it.name }.map { (name, list) ->
                         "${name}${if (list.size == 1) "" else "*${list.size}"}"
                     }
-                    appendLine("${rarity + 1}星干员(${character.size}): $sum")
+                    appendLine("${rarity.ordinal + 1}星干员(${character.size}): $sum")
                 }
             }
         } else {

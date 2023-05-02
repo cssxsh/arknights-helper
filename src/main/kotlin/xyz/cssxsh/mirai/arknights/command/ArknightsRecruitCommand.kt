@@ -84,14 +84,14 @@ public object ArknightsRecruitCommand : SimpleCommand(
             for ((tags, result) in map) {
                 val info = when {
                     result.isEmpty() -> continue
-                    result.keys.all { it >= 3 } -> "${result.keys.minOrNull()!! + 1}星保底"
-                    result.keys.any { it == 2 } -> continue
-                    result.keys.all { it == 0 } -> "小车保底"
+                    result.keys.all { it.ordinal >= 3 } -> "${result.keys.minOrNull()!!.ordinal + 1}星保底"
+                    result.keys.any { it.ordinal == 2 } -> continue
+                    result.keys.all { it.ordinal == 0 } -> "小车保底"
                     else -> ""
                 }
                 appendLine("====> $tags $info")
                 for ((rarity, characters) in result) {
-                    appendLine("${rarity + 1}星干员: ${characters.map { it.name }}")
+                    appendLine("${rarity.ordinal + 1}星干员: ${characters.map { it.name }}")
                 }
             }
         }

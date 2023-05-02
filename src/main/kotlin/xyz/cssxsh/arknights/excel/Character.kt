@@ -63,17 +63,17 @@ public fun Collection<Character>.general(able: Boolean = true): Set<Character> =
 /**
  * @see Character.rarity
  */
-public fun Collection<Character>.rarities(levels: IntRange): Set<Character> = filter { it.rarity in levels }.toSet()
+public fun Collection<Character>.rarities(levels: IntRange): Set<Character> = filter { it.rarity.ordinal in levels }.toSet()
 
 /**
  * @see Character.rarity
  */
-public fun Collection<Character>.rarities(vararg levels: Int): Set<Character> = filter { it.rarity in levels }.toSet()
+public fun Collection<Character>.rarities(vararg levels: Int): Set<Character> = filter { it.rarity.ordinal in levels }.toSet()
 
 /**
  * @see Character.rarity
  */
-public fun Collection<Character>.rarities(levels: Collection<Int>): Set<Character> = filter { it.rarity in levels }.toSet()
+public fun Collection<Character>.rarities(levels: Collection<Int>): Set<Character> = filter { it.rarity.ordinal in levels }.toSet()
 
 /**
  * @see Character.tags
@@ -129,11 +129,6 @@ public fun Character.talents(): List<String> = talents.orEmpty().flatMap { talen
     talent.candidates.orEmpty().mapNotNull { it.name?.trim() }.toSet()
 }
 
-/**
- * 星级
- */
-public val Character.star: String get() = (0..rarity).map { '*' }.toString()
-
 @Serializable
 public data class Character(
     /**
@@ -155,17 +150,17 @@ public data class Character(
      * 简介
      */
     @SerialName("description")
-    val description: String?,
+    val description: String? = null,
     /**
      * 代号
      */
     @SerialName("displayNumber")
-    override val displayNumber: String?,
+    override val displayNumber: String? = null,
     /**
      * 势力 [blacksteel, karlan, sweep, rhine, penguin, lgd, glasgow, abyssal, siesta, babel, elite, sui]
      */
     @SerialName("groupId")
-    override val group: String?,
+    override val group: String? = null,
     /**
      * 是否为不可获得
      */
@@ -180,17 +175,17 @@ public data class Character(
      * 招募简介
      */
     @SerialName("itemDesc")
-    val itemDescription: String?,
+    val itemDescription: String? = null,
     /**
      * 招募方法 [招募寻访, 信用交易所, 活动获得, 限时礼包, 凭证交易所, 招募寻访、见习任务, 主线剧情, 周年奖励]
      */
     @SerialName("itemObtainApproach")
-    val itemObtainApproach: String?,
+    val itemObtainApproach: String? = null,
     /**
      * 招募发言
      */
     @SerialName("itemUsage")
-    val itemUsage: String?,
+    val itemUsage: String? = null,
     /**
      * 最大潜能 [0, 1, 5]
      */
@@ -205,7 +200,7 @@ public data class Character(
      * 国家代号 [rhodes, columbia, laterano, victoria, sami, kazimierz, siracusa, higashi, kjerag, sargon, lungmen, yan, ursus, egir, leithanien, rim, iberia]
      */
     @SerialName("nationId")
-    override val nation: String?,
+    override val nation: String? = null,
     /**
      * 阶段
      */
@@ -230,7 +225,7 @@ public data class Character(
      * 稀有度 + 1 == 星级
      */
     @SerialName("rarity")
-    val rarity: Int,
+    val rarity: RarityType,
     /**
      * 技能
      */
@@ -240,32 +235,32 @@ public data class Character(
      * 标签
      */
     @SerialName("tagList")
-    override val tags: List<String>?,
+    override val tags: List<String>? = null,
     /**
      * 团队 [action4, reserve1, reserve4, reserve6, student, chiave, rainbow, followers, lee]
      */
     @SerialName("teamId")
-    override val team: String?,
+    override val team: String? = null,
     /**
      * 等级提升
      */
     @SerialName("allSkillLvlup")
-    internal val allSkillLvlup: List<JsonObject>,
+    internal val allSkillLvlup: List<JsonObject>? = null,
     /**
      * 支持关键帧
      */
     @SerialName("favorKeyFrames")
-    internal val favorKeyFrames: List<JsonObject>?,
+    internal val favorKeyFrames: List<JsonObject>? = null,
     /**
      * 潜在项目
      */
     @SerialName("potentialItemId")
-    internal val potentialItem: String?,
+    internal val potentialItem: String? = null,
     /**
      * 潜在项目
      */
     @SerialName("activityPotentialItemId")
-    internal val activityPotentialItem: String?,
+    internal val activityPotentialItem: String? = null,
     /**
      * 潜在项目
      */
@@ -280,18 +275,23 @@ public data class Character(
      * 天赋
      */
     @SerialName("talents")
-    val talents: List<Talent>?,
+    val talents: List<Talent>? = null,
     /**
      * 替身 Key
      */
     @SerialName("tokenKey")
-    internal val tokenKey: String?,
+    internal val tokenKey: String? = null,
     /**
      * 特质
      */
     @SerialName("trait")
-    internal val trait: JsonObject?
+    internal val trait: JsonObject? = null
 ) : Role, TagInfo
+
+@Serializable
+public enum class RarityType {
+    TIER_1, TIER_2, TIER_3, TIER_4, TIER_5, TIER_6
+}
 
 public enum class ProfessionType(public val text: String) {
     /**
@@ -384,15 +384,15 @@ public data class Talent(
 @Serializable
 public data class Candidate(
     @SerialName("blackboard")
-    val blackboard: List<Blackboard>?,
+    val blackboard: List<Blackboard>? = null,
     @SerialName("description")
-    val description: String?,
+    val description: String? = null,
     @SerialName("name")
-    val name: String?,
+    val name: String? = null,
     @SerialName("prefabKey")
     val prefabKey: String?,
     @SerialName("rangeId")
-    val rangeId: String?,
+    val rangeId: String? = null,
     @SerialName("requiredPotentialRank")
     val requiredPotentialRank: Int,
     @SerialName("unlockCondition")
@@ -402,15 +402,19 @@ public data class Candidate(
 @Serializable
 public data class SkillInfo(
     @SerialName("levelUpCostCond")
-    val levelUpCostCondition: List<LevelUpCostCondition>,
+    val levelUpCostCondition: List<LevelUpCostCondition> = emptyList(),
     @SerialName("overridePrefabKey")
-    val overridePrefabKey: String?,
+    val overridePrefabKey: String? = null,
     @SerialName("overrideTokenKey")
-    val overrideTokenKey: String?,
+    val overrideTokenKey: String? = null,
     @SerialName("skillId")
-    override val skill: String?,
+    override val skill: String? = null,
     @SerialName("unlockCond")
-    val unlockCondition: UnlockCondition
+    val unlockCondition: UnlockCondition? = null,
+    @SerialName("specializeLevelUpData")
+    val specializeLevelUpData: List<JsonObject>,
+    @SerialName("initialUnlockCond")
+    val initialUnlockCond: UnlockCondition? = null,
 ) : SkillId
 
 @Serializable

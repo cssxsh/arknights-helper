@@ -107,7 +107,7 @@ public enum class QuestionType(public val description: String) {
             val characters = runBlocking { loader.excel.character() }
             return ChoiceQuestionBuilder(meaning = "角色" to "稀有度", range = defaultChoiceRange) {
                 for ((_, character) in characters) {
-                    add(character.name to (character.rarity + 1).toString())
+                    add(character.name to (character.rarity.ordinal + 1).toString())
                 }
             }
         }

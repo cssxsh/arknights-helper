@@ -119,6 +119,8 @@ public data class GachaTable(
     internal val limitTenGachaItem: List<JsonObject>,
     @SerialName("linkageTenGachaItem")
     internal val linkageTenGachaItem: List<JsonObject>,
+    @SerialName("fesGachaPoolRelateItem")
+    internal val fesGachaPoolRelateItem: JsonObject
 )
 
 @Serializable
@@ -128,7 +130,7 @@ public data class GachaTagInfo(
     @SerialName("tagName")
     val name: String,
     @SerialName("tagGroup")
-    val group: Int,
+    val group: Int
 )
 
 @Serializable
