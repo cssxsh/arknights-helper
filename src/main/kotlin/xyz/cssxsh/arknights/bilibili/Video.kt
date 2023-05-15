@@ -54,7 +54,9 @@ internal data class VideoList(
     @SerialName("vlist")
     val videos: List<Video> = emptyList(),
     @SerialName("tlist")
-    val tlist: JsonElement = JsonNull
+    val tlist: JsonElement = JsonNull,
+    @SerialName("slist")
+    val slist: JsonElement = JsonNull
 )
 
 @Serializable
@@ -114,6 +116,8 @@ public data class Video(
     internal val isLivePlayback: Int = 0,
     @SerialName("is_avoided")
     internal val isAvoided: Int = 0,
+    @SerialName("is_charging_arc")
+    internal val isChargingArc: Boolean = false,
     @SerialName("attribute")
     internal val attribute: Int = 0,
     @SerialName("meta")

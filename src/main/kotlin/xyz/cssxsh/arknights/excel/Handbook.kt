@@ -95,7 +95,7 @@ public data class HandbookStory(
     @SerialName("unLockString")
     override val string: String,
     @SerialName("unLockType")
-    override val type: Int
+    override val type: String
 ) : UnlockInfo
 
 @Serializable
@@ -140,7 +140,7 @@ public data class UnlockInfoImpl(
     @SerialName("unLockString")
     override val string: String?,
     @SerialName("unLockType")
-    override val type: Int
+    override val type: String
 ) : UnlockInfo
 
 @Serializable
@@ -152,7 +152,7 @@ public data class UnlockParam(
     @SerialName("unlockParam3")
     val unlockParam3: String? = null,
     @SerialName("unlockType")
-    val unlockType: Int = 0
+    val unlockType: String = ""
 )
 
 @Serializable

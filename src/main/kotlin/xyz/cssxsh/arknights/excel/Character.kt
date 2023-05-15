@@ -412,7 +412,7 @@ public data class SkillInfo(
     @SerialName("unlockCond")
     val unlockCondition: UnlockCondition? = null,
     @SerialName("specializeLevelUpData")
-    val specializeLevelUpData: List<JsonObject>,
+    val specializeLevelUpData: List<JsonObject> = emptyList(),
     @SerialName("initialUnlockCond")
     val initialUnlockCond: UnlockCondition? = null,
 ) : SkillId

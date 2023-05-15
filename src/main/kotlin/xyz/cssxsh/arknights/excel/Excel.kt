@@ -90,7 +90,7 @@ public data class UnlockCondition(
 public interface UnlockInfo {
     public val param: String
     public val string: String?
-    public val type: Int
+    public val type: String
 }
 
 @Serializable

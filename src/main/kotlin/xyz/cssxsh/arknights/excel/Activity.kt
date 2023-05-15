@@ -42,7 +42,9 @@ public data class ActivityTable(
     @SerialName("hiddenStageData")
     internal val hiddenStageData: List<JsonObject>,
     @SerialName("stringRes")
-    internal val stringRes: Map<String, JsonObject>
+    internal val stringRes: Map<String, JsonObject>,
+    @SerialName("dynEntrySwitchData")
+    internal val dynEntrySwitchData: Map<String, JsonObject>
 )
 
 @Serializable
@@ -75,7 +77,9 @@ public data class ActivityBasicInfo(
     @SerialName("ungroupedMedalIds")
     val ungroupedMedalIds: List<String>? = null,
     @SerialName("isReplicate")
-    val isReplicate: Boolean
+    val isReplicate: Boolean,
+    @SerialName("needFixedSync")
+    val needFixedSync: Boolean
 ) : Period {
     public val type: String get() = displayType ?: internalType
 }
