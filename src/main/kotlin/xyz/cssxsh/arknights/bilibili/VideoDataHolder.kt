@@ -11,6 +11,7 @@ import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import xyz.cssxsh.arknights.*
 import java.io.*
+import java.security.*
 import java.util.*
 import kotlin.collections.*
 import kotlin.properties.*
@@ -25,6 +26,16 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
     private val HttpCookies.storage: CookiesStorage by reflect()
 
     private val AcceptAllCookiesStorage.container: MutableList<Cookie> by reflect()
+
+    private val salt: String
+        get() = kotlin.run {
+            val file = File("data/xyz.cssxsh.mirai.plugin.bilibili-helper/salt.txt")
+            if (file.exists()) {
+                file.readText()
+            } else {
+                ""
+            }
+        }
 
     init {
         http.launch {
@@ -51,6 +62,16 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
                 parameter("order", "pubdate")
                 parameter("tid", key.tid)
                 parameter("jsonp", "jsonp")
+                parameter("wts", System.currentTimeMillis() / 1000)
+
+                val digest = MessageDigest.getInstance("MD5")
+                val parameters = url.parameters.entries()
+                    .flatMap { e -> e.value.map { e.key to it } }
+                    .sortedBy { it.first }.formUrlEncode()
+
+                val md5 = digest.digest((parameters + salt).encodeToByteArray())
+
+                parameter("w_rid", md5.joinToString("") { "%02x".format(it) })
 
                 header(HttpHeaders.Origin, "https://space.bilibili.com")
                 header(HttpHeaders.Referrer, "https://space.bilibili.com/161775300/video")
