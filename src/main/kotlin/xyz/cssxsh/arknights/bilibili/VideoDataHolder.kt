@@ -27,9 +27,18 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
 
     private val AcceptAllCookiesStorage.container: MutableList<Cookie> by reflect()
 
+    private val external: File by lazy {
+        File(
+            System.getProperty(
+                "xyz.cssxsh.arknights.bilibili.external",
+                "data/xyz.cssxsh.mirai.plugin.bilibili-helper"
+            )
+        )
+    }
+
     private val salt: String
         get() = kotlin.run {
-            val file = File("data/xyz.cssxsh.mirai.plugin.bilibili-helper/salt.txt")
+            val file = external.resolve("salt.txt")
             if (file.exists()) {
                 file.readText()
             } else {
@@ -39,7 +48,7 @@ public class VideoDataHolder(override val folder: File, override val ignore: sus
 
     init {
         http.launch {
-            val cookies = with(File("data/xyz.cssxsh.mirai.plugin.bilibili-helper/cookies.json")) {
+            val cookies = with(external.resolve("cookies.json")) {
                 if (exists().not()) return@with emptyList()
                 Json.decodeFromString<List<EditThisCookie>>(readText().ifBlank { "[]" })
                     .map { it.toCookie() }
