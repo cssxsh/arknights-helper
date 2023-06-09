@@ -120,7 +120,9 @@ public data class GachaTable(
     @SerialName("linkageTenGachaItem")
     internal val linkageTenGachaItem: List<JsonObject>,
     @SerialName("fesGachaPoolRelateItem")
-    internal val fesGachaPoolRelateItem: JsonObject
+    internal val fesGachaPoolRelateItem: JsonObject,
+    @SerialName("dicRecruit6StarHint")
+    internal val dicRecruit6StarHint: JsonObject
 )
 
 @Serializable

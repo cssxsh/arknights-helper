@@ -202,16 +202,15 @@ public enum class QuestionType(public val description: String) {
     },
     ENEMY("敌方相关") {
         override fun load(loader: QuestionDataLoader): QuestionBuilder {
-            val enemies = runBlocking { loader.excel.enemy() }
+            val table = runBlocking { loader.excel.enemy() }
             val (attribute, value) = listOf<Pair<String, Enemy.() -> String>>(
-                "攻击方式" to { type },
-                "攻击力" to { attack },
-                "防御力" to { defence },
-                "法术抗性" to { resistance },
-                "耐久" to { endure }
+                "攻击方式" to { damageType.joinToString().ifEmpty { "无" } },
+                "等级" to { level.text },
+                "简介" to { description },
+                "能力" to { abilities.joinToString { it.text }.ifEmpty { "无" } },
             ).random()
             return ChoiceQuestionBuilder(meaning = "敌方" to attribute, range = defaultChoiceRange) {
-                for ((_, enemy) in enemies) {
+                for ((_, enemy) in table.enemies) {
                     add(enemy.designation to enemy.value())
                 }
             }

@@ -33,7 +33,7 @@ public data class SkillLevel(
     @SerialName("skillType")
     val type: SkillType,
     @SerialName("durationType")
-    val durationType: DurationType,
+    val durationType: DurationType = DurationType.INSTANT,
     @SerialName("spData")
     val data: SkillSpData
 ) : Name
