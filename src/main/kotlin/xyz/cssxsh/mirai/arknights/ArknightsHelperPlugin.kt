@@ -12,7 +12,7 @@ import xyz.cssxsh.arknights.*
 import kotlin.collections.*
 
 public object ArknightsHelperPlugin : KotlinPlugin(
-    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "2.1.6") {
+    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "2.1.7") {
         name("arknights-helper")
         author("cssxsh")
 

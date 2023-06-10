@@ -1,3 +1,7 @@
+## v2.1.7 (23/06/10)
+
+1. update: data structure
+
 ## v2.1.6 (23/05/27)
 
 1. fix: VideoDataHolder

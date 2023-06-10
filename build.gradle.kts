@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "xyz.cssxsh"
-version = "2.1.6"
+version = "2.1.7"
 
 mavenCentralPublish {
     useCentralS01()
@@ -28,7 +28,7 @@ repositories {
 dependencies {
     implementation("com.cronutils:cron-utils:9.2.0")
     implementation("org.jsoup:jsoup:1.16.1")
-    compileOnly("xyz.cssxsh:meme-helper:1.1.7")
+    compileOnly("xyz.cssxsh:meme-helper:1.2.0")
     testImplementation(kotlin("test"))
     //
     implementation(platform("net.mamoe:mirai-bom:2.14.0"))
