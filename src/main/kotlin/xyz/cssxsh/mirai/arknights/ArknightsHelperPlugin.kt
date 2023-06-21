@@ -5,7 +5,6 @@ import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
 import net.mamoe.mirai.console.data.*
-import net.mamoe.mirai.console.extension.*
 import net.mamoe.mirai.console.plugin.jvm.*
 import net.mamoe.mirai.event.*
 import xyz.cssxsh.arknights.*
@@ -27,14 +26,6 @@ public object ArknightsHelperPlugin : KotlinPlugin(
 
     init {
         System.setProperty(IGNORE_UNKNOWN_KEYS, "true")
-    }
-
-    override fun PluginComponentStorage.onLoad() {
-        runAfterStartup {
-            launch {
-                StartupEvent(plugin = this@ArknightsHelperPlugin).broadcast()
-            }
-        }
     }
 
     override fun onEnable() {

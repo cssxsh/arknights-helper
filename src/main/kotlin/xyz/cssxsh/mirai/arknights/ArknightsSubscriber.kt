@@ -4,6 +4,7 @@ import com.cronutils.model.*
 import io.ktor.client.network.sockets.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import net.mamoe.mirai.console.events.*
 import net.mamoe.mirai.console.plugin.*
 import net.mamoe.mirai.console.util.*
 import net.mamoe.mirai.contact.*
@@ -337,7 +338,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
         penguin()
         excel()
         clock()
-        plugin.logger.info { "蹲饼监听已开启" }
+        logger.info { "蹲饼监听已开启 $timestamp" }
     }
 
     @EventHandler
