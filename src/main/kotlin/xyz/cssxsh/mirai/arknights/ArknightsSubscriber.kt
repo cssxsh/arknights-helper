@@ -91,10 +91,10 @@ public object ArknightsSubscriber : SimpleListenerHost() {
                 // ignore
             }
             is ExceptionInEventHandlerException -> {
-                logger.warning({ "exception in ${exception.event::class.simpleName}" }, exception.cause)
+                logger.warning({ "exception in ${exception.event}" }, exception.cause)
             }
             else -> {
-                logger.warning({ "exception in arknights-subscriber" }, exception)
+                logger.warning({ "exception in ${context[CoroutineName]}" }, exception)
             }
         }
     }
@@ -103,7 +103,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
 
     private fun clock() {
         val cron = ArknightsCronConfig.clock
-        launch {
+        launch(CoroutineName(name = "clock")) {
             while (isActive) {
                 delay(10_000)
                 delay(cron.next())
@@ -129,7 +129,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
         val history: MutableSet<String> = HashSet()
         val cron: (VideoType) -> Cron = { ArknightsCronConfig.video[it] ?: ArknightsCronConfig.default }
         for (type in VideoType.values()) {
-            launch {
+            launch(CoroutineName(name = "video")) {
                 for (video in videos.raw(type)) {
                     history.add(video.bvid)
                 }
@@ -166,7 +166,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
         val history: MutableSet<Long> = HashSet()
         val cron: (BlogUser) -> Cron = { ArknightsCronConfig.blog[it] ?: ArknightsCronConfig.default }
         for (user in BlogUser.values()) {
-            launch {
+            launch(CoroutineName(name = "weibo")) {
                 for (blog in blogs.raw(user)) {
                     history.add(blog.id)
                 }
@@ -203,7 +203,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
         val history: MutableSet<Int> = HashSet()
         val cron = ArknightsCronConfig.announce
         for (type in AnnounceType.values()) {
-            launch {
+            launch(CoroutineName(name = "announce")) {
                 for (announcement in announcements.raw(type)) {
                     history.add(announcement.id)
                 }
@@ -240,7 +240,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
     private fun penguin() {
         val cron: (PenguinDataType) -> Cron = { ArknightsCronConfig.penguin[it] ?: ArknightsCronConfig.default }
         for (type in PenguinDataType.values()) {
-            launch {
+            launch(CoroutineName(name = "penguin")) {
                 while (isActive) {
                     delay(10_000)
                     // 加载
@@ -260,7 +260,7 @@ public object ArknightsSubscriber : SimpleListenerHost() {
         val cron = ArknightsCronConfig.excel
         val values = ExcelDataType.values().toList() - ExcelDataType.VERSION
         val history: MutableSet<String> = HashSet()
-        launch {
+        launch(CoroutineName(name = "excel")) {
             while (isActive) {
                 delay(10_000)
 
