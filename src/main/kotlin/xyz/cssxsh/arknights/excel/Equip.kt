@@ -32,7 +32,7 @@ public data class Equip(
     @SerialName("missionList")
     val missions: List<String>,
     @SerialName("showEvolvePhase")
-    val showEvolvePhase: Int,
+    val showEvolvePhase: String,
     @SerialName("showLevel")
     val showLevel: Int,
     @SerialName("tmplId")
@@ -57,7 +57,7 @@ public data class Equip(
     @SerialName("uniEquipName")
     val name: String,
     @SerialName("unlockEvolvePhase")
-    val unlockEvolvePhase: Int,
+    val unlockEvolvePhase: String,
     @SerialName("unlockFavorPoint")
     val unlockFavorPoint: Int,
     @SerialName("unlockLevel")

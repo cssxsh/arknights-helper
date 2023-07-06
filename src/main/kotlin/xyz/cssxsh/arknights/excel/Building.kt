@@ -198,6 +198,7 @@ public data class BuildingBuff(
     val textColor: String
 ) : Id, Name
 
+@Serializable
 public enum class RoomType {
     CONTROL,
     CORRIDOR,

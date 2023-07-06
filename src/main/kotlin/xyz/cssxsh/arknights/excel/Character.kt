@@ -293,6 +293,7 @@ public enum class RarityType {
     TIER_1, TIER_2, TIER_3, TIER_4, TIER_5, TIER_6
 }
 
+@Serializable
 public enum class ProfessionType(public val text: String) {
     /**
      * 先锋
@@ -353,6 +354,7 @@ public enum class ProfessionType(public val text: String) {
     }
 }
 
+@Serializable
 public enum class PositionType(public val text: String) {
     /**
      * 远程位

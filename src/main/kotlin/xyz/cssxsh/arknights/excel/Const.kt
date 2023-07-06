@@ -29,7 +29,7 @@ public data class ConstInfo(
     @SerialName("announceWebBusType")
     val announceWebBusType: String,
     @SerialName("subProfessionDamageTypePairs")
-    internal val subProfessionDamageTypePairs: Map<String, Int>,
+    internal val subProfessionDamageTypePairs: Map<String, ProfessionDamageType>,
     @SerialName("advancedGachaCrystalCost")
     internal val advancedGachaCrystalCost: Int,
     @SerialName("addedRewardDisplayZone")
@@ -231,3 +231,13 @@ public data class TermDescription(
     @SerialName("description")
     val description: String
 )
+
+@Serializable
+public enum class ProfessionDamageType(public val text: String) {
+    NONE("其他"),
+    PHYSICAL("物理"),
+    MAGICAL("法术"),
+    HEAL("治疗");
+
+    override fun toString(): String = text
+}

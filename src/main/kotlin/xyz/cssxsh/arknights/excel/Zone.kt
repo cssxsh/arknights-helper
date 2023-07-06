@@ -47,7 +47,7 @@ public data class Mainline(
     @SerialName("buttonStyle")
     internal val buttonStyle: String,
     @SerialName("diffGroup")
-    internal val diffGroup: List<Int>,
+    internal val diffGroup: List<String>,
     @SerialName("recapId")
     internal val recapId: String,
     @SerialName("recapPreStageId")

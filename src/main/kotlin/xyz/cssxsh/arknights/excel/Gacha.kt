@@ -88,7 +88,7 @@ public data class GachaTable(
     @SerialName("gachaTags")
     val tags: List<GachaTagInfo>,
     @SerialName("gachaTagMaxValid")
-    val tagMaxValid: Int,
+    internal val tagMaxValid: Int? = null,
     @SerialName("gachaPoolClient")
     val pools: List<GachaPool>,
     @SerialName("newbeeGachaPoolClient")
@@ -99,12 +99,8 @@ public data class GachaTable(
     internal val specialRecruitPool: List<JsonObject>,
     @SerialName("potentialMaterialConverter")
     internal val potentialMaterialConverter: JsonObject,
-    @SerialName("potentialMats")
-    internal val potentialMats: JsonObject,
     @SerialName("classicPotentialMaterialConverter")
     internal val classicPotentialMaterialConverter: JsonObject,
-    @SerialName("classicPotentialMats")
-    internal val classicPotentialMats: JsonObject,
     @SerialName("recruitRarityTable")
     internal val recruitRarityTable: JsonObject,
     @SerialName("specialTagRarityTable")

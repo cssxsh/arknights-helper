@@ -10,6 +10,8 @@ public typealias StoryTable = Map<String, Story>
 public data class Story(
     @SerialName("actType")
     val action: ActionType,
+    @SerialName("customType")
+    val customType: Int = 0,
     @SerialName("endShowTime")
     @Serializable(TimestampSerializer::class)
     val endShowTime: OffsetDateTime,
@@ -30,8 +32,6 @@ public data class Story(
     @SerialName("remakeStartTime")
     @Serializable(TimestampSerializer::class)
     val remakeStartTime: OffsetDateTime,
-    @SerialName("replicateActionId")
-    val replicateActionId: String?,
     @SerialName("rewards")
     val rewards: List<LegacyItem>?,
     @SerialName("startShowTime")
@@ -47,9 +47,7 @@ public data class Story(
     @SerialName("storyMainColor")
     val storyMainColor: String?,
     @SerialName("storyPicId")
-    val storyPicId: String?,
-    @SerialName("useCustom")
-    val useCustom: Boolean
+    val storyPicId: String?
 ) : Id, Name, Period {
     public val show: Period = object : Period {
         override val start: OffsetDateTime get() = startShowTime
@@ -62,6 +60,7 @@ public data class Story(
     }
 }
 
+@Serializable
 public enum class ActionType(public val text: String) {
     ACTIVITY_STORY("活动剧情"),
     MINI_STORY("微型故事集"),
@@ -69,6 +68,7 @@ public enum class ActionType(public val text: String) {
     NONE("其他故事");
 }
 
+@Serializable
 public enum class EntryType(public val text: String) {
     ACTIVITY("活动"),
     MINI_ACTIVITY("微型活动"),
@@ -109,7 +109,7 @@ public data class StoryInfo(
     @SerialName("storyPic")
     val storyPic: String?,
     @SerialName("storyReviewType")
-    val storyReviewType: Int,
+    val storyReviewType: String,
     @SerialName("storySort")
     val storySort: Int,
     @SerialName("storyTxt")
@@ -118,11 +118,13 @@ public data class StoryInfo(
     val unLockType: UnLockType
 ) : StoryId
 
+@Serializable
 public enum class CostItemType {
     NONE,
     MATERIAL;
 }
 
+@Serializable
 public enum class UnLockType {
     STAGE_CLEAR,
     USE_ITEM;
@@ -133,7 +135,7 @@ public data class StoryStage(
     @SerialName("stageId")
     val stage: String,
     @SerialName("minState")
-    val min: Int,
+    val min: String,
     @SerialName("maxState")
-    val max: Int,
+    val max: String,
 )

@@ -5,7 +5,7 @@ import kotlinx.serialization.*
 @Serializable
 public data class EnemyTable(
     @SerialName("levelInfoList")
-    public val levelInfos: List<LevelInfo>,
+    public val levels: List<LevelInfo>,
     @SerialName("enemyData")
     public val enemies: Map<String, Enemy>,
     @SerialName("raceData")
@@ -21,13 +21,17 @@ public data class LevelInfo(
     @SerialName("def")
     public val def: LevelInfoRange,
     @SerialName("magicRes")
-    public val magicRes: LevelInfoRange,
+    public val magic: LevelInfoRange,
     @SerialName("maxHP")
     public val maxHP: LevelInfoRange,
     @SerialName("moveSpeed")
     public val moveSpeed: LevelInfoRange,
     @SerialName("attackSpeed")
     public val attackSpeed: LevelInfoRange,
+    @SerialName("enemyDamageRes")
+    public val enemyDamage: LevelInfoRange,
+    @SerialName("enemyRes")
+    public val enemy: LevelInfoRange
 )
 
 @Serializable
@@ -69,17 +73,20 @@ public data class Enemy(
     @SerialName("linkEnemies")
     internal val linkEnemies: List<String>,
     @SerialName("damageType")
-    internal val damageType: List<String>,
+    val damageType: Set<DamageType>,
     @SerialName("invisibleDetail")
     internal val invisibleDetail: Boolean,
 ) : Id, Name, TagInfo {
     val designation: String get() = "${name}(${level.text})"
 }
 
+@Serializable
 public enum class EnemyLevel(public val text: String) {
     NORMAL("普通"),
     ELITE("精英"),
     BOSS("领袖");
+
+    override fun toString(): String = text
 }
 
 @Serializable
@@ -99,3 +106,13 @@ public data class Race(
     @SerialName("sortId")
     val sortId: Int
 )
+
+@Serializable
+public enum class DamageType(public val text: String) {
+    NO_DAMAGE("其他"),
+    PHYSIC("物理"),
+    MAGIC("法术"),
+    HEAL("治疗");
+
+    override fun toString(): String = text
+}

@@ -66,6 +66,7 @@ public data class Announcement(
     override val url: String get() = webUrl
 }
 
+@Serializable
 public enum class AnnouncementGroup {
     ACTIVITY,
     SYSTEM

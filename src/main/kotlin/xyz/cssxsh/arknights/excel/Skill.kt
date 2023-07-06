@@ -38,10 +38,12 @@ public data class SkillLevel(
     val data: SkillSpData
 ) : Name
 
+@Serializable
 public enum class SkillType {
     AUTO, MANUAL, PASSIVE
 }
 
+@Serializable
 public enum class DurationType {
     PASSIVE, INSTANT, LIMITED
 }

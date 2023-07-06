@@ -54,9 +54,9 @@ internal data class VideoList(
     @SerialName("vlist")
     val videos: List<Video> = emptyList(),
     @SerialName("tlist")
-    val tlist: JsonElement = JsonNull,
+    val t: JsonElement = JsonNull,
     @SerialName("slist")
-    val slist: JsonElement = JsonNull
+    val s: JsonElement = JsonNull
 )
 
 @Serializable
@@ -121,7 +121,11 @@ public data class Video(
     @SerialName("attribute")
     internal val attribute: Int = 0,
     @SerialName("meta")
-    internal val meta: JsonElement = JsonNull
+    internal val meta: JsonElement = JsonNull,
+    @SerialName("vt")
+    internal val vt: Int = 0,
+    @SerialName("enable_vt")
+    internal val enableVT: Int = 0
 ) : CacheInfo {
     override val url: String by lazy { "https://www.bilibili.com/video/${bvid}" }
 }

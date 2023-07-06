@@ -110,13 +110,7 @@ internal class CacheDataHolderTest {
     @Test
     fun story(): Unit = runBlocking {
         excel.load(ExcelDataType.STORY)
-        val table = excel.story()
-        table.forEach { (_, story) ->
-            println(story.name)
-            println(story.start)
-            println(story.show.start)
-            println(story.remake.start)
-        }
+        excel.story()
     }
 
     @Test
@@ -167,7 +161,9 @@ internal class CacheDataHolderTest {
             if (now in activity) {
                 println(activity.name)
                 println(activity.displayType ?: activity.type)
+                println(activity.start)
                 println(activity.reward)
+                println(activity.end)
             }
         }
         table.themes.forEach { theme ->
