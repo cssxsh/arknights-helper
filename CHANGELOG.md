@@ -1,3 +1,9 @@
+## v2.2.0 (23/07/13)
+
+1. update: dependencies mirai 2.15.0
+2. fix: handle exception
+3. update: data structure
+
 ## v2.1.7 (23/06/10)
 
 1. update: data structure

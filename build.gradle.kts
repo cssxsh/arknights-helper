@@ -2,12 +2,12 @@ plugins {
     kotlin("jvm") version "1.8.10"
     kotlin("plugin.serialization") version "1.8.10"
 
-    id("net.mamoe.mirai-console") version "2.15.0-RC"
+    id("net.mamoe.mirai-console") version "2.15.0"
     id("me.him188.maven-central-publish") version "1.0.0-dev-3"
 }
 
 group = "xyz.cssxsh"
-version = "2.1.7"
+version = "2.2.0"
 
 mavenCentralPublish {
     useCentralS01()
@@ -31,7 +31,7 @@ dependencies {
     compileOnly("xyz.cssxsh:meme-helper:1.2.0")
     testImplementation(kotlin("test"))
     //
-    implementation(platform("net.mamoe:mirai-bom:2.15.0-RC"))
+    implementation(platform("net.mamoe:mirai-bom:2.15.0"))
     compileOnly("net.mamoe:mirai-console-compiler-common")
     //
     implementation(platform("io.ktor:ktor-bom:2.2.4"))
