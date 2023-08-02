@@ -5,6 +5,7 @@ import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 import java.time.*
 
+@PublishedApi
 internal object TimestampSerializer : KSerializer<OffsetDateTime> {
 
     fun timestamp(second: Long): OffsetDateTime {

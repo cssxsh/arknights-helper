@@ -285,7 +285,12 @@ public data class Character(
      * 特质
      */
     @SerialName("trait")
-    internal val trait: JsonObject? = null
+    internal val trait: JsonObject? = null,
+    /**
+     * ???
+     */
+    @SerialName("displayTokenDict")
+    internal val displayTokens: Map<String, Boolean>? = null,
 ) : Role, TagInfo
 
 @Serializable
@@ -398,7 +403,9 @@ public data class Candidate(
     @SerialName("requiredPotentialRank")
     val requiredPotentialRank: Int,
     @SerialName("unlockCondition")
-    val unlockCondition: UnlockCondition?
+    val unlockCondition: UnlockCondition?,
+    @SerialName("tokenKey")
+    val tokenKey: String? = null
 )
 
 @Serializable

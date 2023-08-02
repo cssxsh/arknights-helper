@@ -16,7 +16,7 @@ public data class SkinTable(
     @SerialName("charSkins")
     val characterSkins: Map<String, CharacterSkin>,
     @SerialName("specialSkinInfoList")
-    val specialSkinInfos: List<JsonObject>
+    val specialSkinInfos: List<SpecialSkinInfo>
 )
 
 @Serializable
@@ -30,11 +30,31 @@ public data class SkinBrand(
     @SerialName("description")
     val description: String,
     @SerialName("groupList")
-    val groups: List<String>,
+    val groups: List<SkinGroup>,
     @SerialName("kvImgIdList")
-    val images: List<String>,
+    val images: List<KvImage>,
     @SerialName("sortId")
-    val sortId: Int = 0
+    val sortId: Int = 0,
+    @SerialName("publishTime")
+    @Serializable(TimestampSerializer::class)
+    val publish: OffsetDateTime
+)
+
+@Serializable
+public data class SkinGroup(
+    @SerialName("skinGroupId")
+    val groupId: String,
+    @SerialName("publishTime")
+    @Serializable(TimestampSerializer::class)
+    val publish: OffsetDateTime
+)
+
+@Serializable
+public data class KvImage(
+    @SerialName("kvImgId")
+    val kvImgId: String,
+    @SerialName("linkedSkinGroupId")
+    val linkedSkinGroupId: String
 )
 
 @Serializable
