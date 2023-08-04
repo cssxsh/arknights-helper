@@ -7,7 +7,8 @@ import io.ktor.client.plugins.compression.*
 import io.ktor.client.plugins.cookies.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.utils.io.jvm.javaio.*
+import io.ktor.util.cio.*
+import io.ktor.utils.io.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.*
 import kotlinx.serialization.*
@@ -53,20 +54,23 @@ public abstract class CacheDataHolder<K : CacheKey, R : CacheInfo> {
     }
 
     protected suspend fun HttpStatement.copyTo(target: File): Unit = supervisorScope {
+        val ignored = mutableListOf<Throwable>()
         while (isActive) {
             try {
                 execute { response ->
-                    target.outputStream().use { output ->
-                        val channel = response.bodyAsChannel()
-
-                        while (!channel.isClosedForRead) channel.copyTo(output)
-                    }
+                    response.bodyAsChannel().copyAndClose(target.writeChannel(coroutineContext))
                     val timestamp = (response.lastModified() ?: response.date())?.time
                     if (timestamp != null) target.setLastModified(timestamp)
                 }
                 break
             } catch (cause: Throwable) {
-                if (ignore(cause).not()) throw cause
+                if (ignore(cause).not()) {
+                    for (suppressed in ignored) {
+                        cause.addSuppressed(suppressed)
+                    }
+                    throw IllegalStateException("${this@copyTo} copy to ${target.toPath().toUri()}", cause)
+                }
+                ignored.add(element = cause)
             }
         }
     }
