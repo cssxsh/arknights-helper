@@ -43,24 +43,13 @@ public object ArknightsSubscriber : SimpleListenerHost() {
             is java.net.UnknownHostException,
             is java.net.NoRouteToHostException,
             is javax.net.ssl.SSLException,
-            is okhttp3.internal.http2.StreamResetException -> {
-                false
-            }
-            // 缩短信息文本
+            is okhttp3.internal.http2.StreamResetException -> false
+            // 可重试
             is SocketTimeoutException,
-            is ConnectTimeoutException -> {
-                logger.warning { cause.message ?: "Timeout" }
-                true
-            }
-            // IOException 直接忽略
-            is java.io.IOException -> {
-                logger.warning({ "Downloader IOException" }, cause)
-                true
-            }
+            is ConnectTimeoutException,
+            is java.io.IOException -> true
             // 其他问题甩出
-            else -> {
-                false
-            }
+            else -> false
         }
     }
     private val flow: MutableSharedFlow<CacheInfo> = MutableSharedFlow()
