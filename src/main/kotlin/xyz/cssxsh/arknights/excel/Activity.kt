@@ -44,7 +44,9 @@ public data class ActivityTable(
     @SerialName("stringRes")
     internal val stringRes: Map<String, JsonObject>,
     @SerialName("dynEntrySwitchData")
-    internal val dynEntrySwitchData: Map<String, JsonObject>
+    internal val dynEntrySwitchData: Map<String, JsonObject>,
+    @SerialName("extraData")
+    internal val extraData: Map<String, JsonObject>
 )
 
 @Serializable

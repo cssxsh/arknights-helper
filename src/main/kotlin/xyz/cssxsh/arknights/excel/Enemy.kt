@@ -76,6 +76,8 @@ public data class Enemy(
     val damageType: Set<DamageType>,
     @SerialName("invisibleDetail")
     internal val invisibleDetail: Boolean,
+    @SerialName("hideInStage")
+    internal val hideInStage: Boolean = false
 ) : Id, Name, TagInfo {
     val designation: String get() = "${name}(${level.text})"
 }
