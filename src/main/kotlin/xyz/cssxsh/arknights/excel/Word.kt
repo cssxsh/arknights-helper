@@ -38,7 +38,9 @@ public enum class VoiceLanguageType {
     EN,
     KR,
     LINKAGE,
-    ITA
+    ITA,
+    RUS,
+    GER
 }
 
 @Serializable

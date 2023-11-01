@@ -15,12 +15,11 @@ public sealed class StaticData : CacheKey {
         public val group: String = when (voice.language) {
             VoiceLanguageType.JP -> "voice"
             VoiceLanguageType.CN_MANDARIN -> "voice_cn"
-            VoiceLanguageType.CN_TOPOLECT, VoiceLanguageType.ITA -> "voice_custom"
+            VoiceLanguageType.CN_TOPOLECT, VoiceLanguageType.ITA, VoiceLanguageType.RUS, VoiceLanguageType.GER -> "voice_custom"
             VoiceLanguageType.EN -> "voice_en"
             VoiceLanguageType.KR -> "voice_kr"
-            VoiceLanguageType.LINKAGE -> {
-                (voice.path ?: "voice").removeSuffix("/").substringAfterLast("/").lowercase()
-            }
+            VoiceLanguageType.LINKAGE -> (voice.path ?: "voice")
+                .removeSuffix("/").substringAfterLast("/").lowercase()
         }
         override val url: String =
             "https://static.prts.wiki/${group}/${voice.wordKey.replace("#", "_").lowercase()}/${word.voiceId}.wav"

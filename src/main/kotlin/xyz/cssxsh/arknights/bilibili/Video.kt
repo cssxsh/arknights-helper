@@ -127,7 +127,9 @@ public data class Video(
     @SerialName("enable_vt")
     internal val enableVT: Int = 0,
     @SerialName("vt_display")
-    internal val vtDisplay: String = ""
+    internal val vtDisplay: String = "",
+    @SerialName("playback_position")
+    internal val playbackPosition: Int = 0
 ) : CacheInfo {
     override val url: String by lazy { "https://www.bilibili.com/video/${bvid}" }
 }

@@ -28,6 +28,12 @@ public data class ConstInfo(
     val resPrefVersion: String,
     @SerialName("announceWebBusType")
     val announceWebBusType: String,
+    @SerialName("defaultMinContinuousBattleTimes")
+    val defaultMinContinuousBattleTimes: Int,
+    @SerialName("defaultMaxContinuousBattleTimes")
+    val defaultMaxContinuousBattleTimes: Int,
+    @SerialName("continuousActionOpen")
+    val continuousActionOpen: Boolean,
     @SerialName("subProfessionDamageTypePairs")
     internal val subProfessionDamageTypePairs: Map<String, ProfessionDamageType>,
     @SerialName("advancedGachaCrystalCost")
@@ -56,8 +62,6 @@ public data class ConstInfo(
     internal val completeGainBonus: Double,
     @SerialName("creditLimit")
     internal val creditLimit: Int,
-    @SerialName("crisisUnlockStage")
-    internal val crisisUnlockStage: String,
     @SerialName("charmEquipCount")
     internal val charmEquipCount: Int,
     // def
