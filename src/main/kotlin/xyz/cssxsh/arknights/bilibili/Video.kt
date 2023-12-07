@@ -118,6 +118,8 @@ public data class Video(
     internal val isAvoided: Int = 0,
     @SerialName("is_charging_arc")
     internal val isChargingArc: Boolean = false,
+    @SerialName("is_lesson_video")
+    internal val isLessonVideo: Int = 0,
     @SerialName("attribute")
     internal val attribute: Int = 0,
     @SerialName("meta")
