@@ -138,7 +138,7 @@ B. 选项
 
 ### 助手表情指令
 
-** 需要 [Meme Helper](https://github.com/cssxsh/meme-helper) 作为前置**
+**需要 [Meme Helper](https://github.com/cssxsh/meme-helper) 作为前置**
 
 | 指令                             | 描述       |
 |:-------------------------------|:---------|

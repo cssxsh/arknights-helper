@@ -1,3 +1,13 @@
+## v2.2.2 (23/09/..)
+
+1. fix: copyTo
+2. fix: ignore
+
+## v2.2.1 (23/08/03)
+
+1. update: repositories
+2. fix: game data
+
 ## v2.2.0 (23/07/13)
 
 1. update: dependencies mirai 2.15.0

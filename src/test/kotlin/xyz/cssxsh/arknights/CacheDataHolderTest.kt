@@ -9,11 +9,10 @@ import xyz.cssxsh.arknights.excel.*
 import xyz.cssxsh.arknights.weibo.*
 import xyz.cssxsh.arknights.penguin.*
 import xyz.cssxsh.arknights.prts.*
-import java.io.File
 import java.time.*
 
 internal class CacheDataHolderTest {
-    private val folder = File("./test").apply { mkdirs() }
+    private val folder = java.io.File("./run").apply { mkdirs() }
     private val ignore: suspend (Throwable) -> Boolean = { it is java.io.IOException }
     private val video = VideoDataHolder(folder = folder, ignore = ignore)
     private val blog = MicroBlogDataHolder(folder = folder, ignore = ignore)
