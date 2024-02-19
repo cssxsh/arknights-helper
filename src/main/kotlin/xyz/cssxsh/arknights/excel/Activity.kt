@@ -120,7 +120,7 @@ public data class ActivityNode(
 
 @Serializable
 public enum class ActivityThemeType {
-    ROGUELIKE, CRISIS, CRISISV2, MAINLINE, ACTIVITY
+    ROGUELIKE, CRISIS, CRISISV2, MAINLINE, ACTIVITY, SANDBOX_PERM
 }
 
 @Serializable

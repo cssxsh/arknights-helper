@@ -139,6 +139,8 @@ public data class Building(
     @SerialName("tradingStrategyUnlockLevel")
     internal val tradingStrategyUnlockLevel: Int,
     //
+    @SerialName("trainingBonusMax")
+    internal val trainingBonusMax: Int,
     @SerialName("trainingData")
     internal val trainingData: JsonObject,
     // workshop

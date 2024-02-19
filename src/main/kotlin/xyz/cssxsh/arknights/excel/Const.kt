@@ -119,6 +119,8 @@ public data class ConstInfo(
     internal val isRoguelikeAvgAchieveFuncEnabled: Boolean,
     @SerialName("isVoucherClassicItemDistinguishable")
     internal val isVoucherClassicItemDistinguishable: Boolean,
+    @SerialName("isSandboxPermFuncEnabled")
+    internal val isSandboxPermFuncEnabled: Boolean,
     // legacy
     @SerialName("legacyItemList")
     internal val legacyItemList: List<LegacyItem>,
@@ -215,7 +217,10 @@ public data class ConstInfo(
     internal val voucherSkinRedeem: Int,
     //
     @SerialName("weeklyOverrideDesc")
-    internal val weeklyOverrideDescription: String
+    internal val weeklyOverrideDescription: String,
+    //
+    @SerialName("classicProtectChar")
+    internal val classicProtectChar: List<String>
 )
 
 @Serializable
