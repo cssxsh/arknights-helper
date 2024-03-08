@@ -23,6 +23,12 @@ public data class ActivityTable(
     internal val activity: Map<String, JsonObject>,
     @SerialName("activityItems")
     internal val activityItems: Map<String, List<String>>,
+    @SerialName("activityTraps")
+    internal val activityTraps: Map<String, JsonObject>,
+    @SerialName("activityTrapMissions")
+    internal val activityTrapMissions: Map<String, JsonObject>,
+    @SerialName("trapRuneDataDict")
+    internal val trapRuneDataDict: Map<String, JsonObject>,
     @SerialName("syncPoints")
     val syncPoints: Map<String, List<Long>>,
     @SerialName("dynActs")
@@ -74,6 +80,8 @@ public data class ActivityBasicInfo(
     val hasStage: Boolean,
     @SerialName("templateShopId")
     val templateShopId: String? = null,
+    @SerialName("trapDomainId")
+    val trapDomainId: String? = null,
     @SerialName("medalGroupId")
     val medalGroupId: String? = null,
     @SerialName("ungroupedMedalIds")
