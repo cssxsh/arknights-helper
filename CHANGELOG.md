@@ -1,7 +1,9 @@
-## v2.2.2 (23/09/..)
+## v2.2.2 (24/01/23)
 
 1. fix: copyTo
 2. fix: ignore
+3. update: dep
+4. fix: game data
 
 ## v2.2.1 (23/08/03)
 
