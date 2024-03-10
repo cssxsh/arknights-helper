@@ -12,7 +12,7 @@ import kotlin.collections.*
 
 @PublishedApi
 internal object ArknightsHelperPlugin : KotlinPlugin(
-    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "2.2.2") {
+    JvmPluginDescription("xyz.cssxsh.mirai.plugin.arknights-helper", "2.3.1") {
         name("arknights-helper")
         author("cssxsh")
 
